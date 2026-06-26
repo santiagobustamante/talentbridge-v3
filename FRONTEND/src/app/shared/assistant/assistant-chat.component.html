@@ -1,0 +1,152 @@
+<div class="chat-root" [class.open]="open()">
+  <!-- FAB Launcher -->
+  <button type="button" class="launcher-btn" (click)="toggle()" [attr.aria-label]="open() ? 'Cerrar chat' : 'Abrir chat con Joaquín'">
+    <span class="launcher-icon">
+      <mat-icon>{{ open() ? 'close' : 'chat' }}</mat-icon>
+    </span>
+    @if (!open()) {
+      <span class="launcher-label">Joaquín</span>
+    }
+  </button>
+
+  <!-- Chat Panel -->
+  <div class="panel" [class.visible]="open()">
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-left">
+        <div class="header-avatar">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="24" fill="#93c5fd"/>
+            <circle cx="24" cy="19" r="11" fill="#dbeafe"/>
+            <circle cx="18.5" cy="17" r="2.2" fill="#1e40af"/>
+            <circle cx="29.5" cy="17" r="2.2" fill="#1e40af"/>
+            <circle cx="18.5" cy="16.4" r="0.7" fill="#fff"/>
+            <circle cx="29.5" cy="16.4" r="0.7" fill="#fff"/>
+            <path d="M18 26.5 Q24 32 30 26.5" fill="none" stroke="#1e40af" stroke-width="2.2" stroke-linecap="round"/>
+            <ellipse cx="19" cy="25" rx="3.5" ry="2.8" fill="#fca5a5" opacity="0.5"/>
+            <ellipse cx="29" cy="25" rx="3.5" ry="2.8" fill="#fca5a5" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="header-text">
+          <span class="header-name">Joaquín</span>
+          <span class="header-sub">{{ isCompany ? 'Asistente de búsqueda de talento' : 'Asistente profesional' }}</span>
+        </div>
+      </div>
+      <button type="button" class="header-close" (click)="closePanel()" aria-label="Cerrar chat">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Messages Body -->
+    <div class="panel-body" #scrollContainer>
+      @for (msg of messages; track $index) {
+        <div class="msg-row" [class.msg-row--user]="msg.from === 'user'" [class.msg-row--bot]="msg.from === 'assistant'">
+          <!-- User bubble -->
+          @if (msg.from === 'user') {
+            <div class="bubble bubble--user">
+              <p class="bubble-text">{{ msg.text }}</p>
+            </div>
+          }
+
+          <!-- Assistant bubble -->
+          @if (msg.from === 'assistant') {
+            <div class="bot-avatar">
+              <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="15" cy="15" r="15" fill="#93c5fd"/>
+                <circle cx="15" cy="12" r="7" fill="#dbeafe"/>
+                <circle cx="11.5" cy="10.8" r="1.5" fill="#1e40af"/>
+                <circle cx="18.5" cy="10.8" r="1.5" fill="#1e40af"/>
+                <path d="M11.5 17.2 Q15 20.5 18.5 17.2" fill="none" stroke="#1e40af" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="bubble bubble--bot">
+              <p class="bubble-text">{{ msg.text }}</p>
+
+              <!-- Quick suggestions (first greeting) -->
+              @if ($index === 0 && isCandidate) {
+                <div class="quick-prompts">
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Qué debo completar para que mi perfil se vea más profesional?')">Perfil profesional</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Cómo publico y comparto mi portafolio con empresas?')">Publicar portafolio</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Qué habilidades debería agregar para que las empresas me encuentren mejor?')">Agregar habilidades</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Cómo decido qué información mostrar u ocultar en mi perfil público?')">Visibilidad</button>
+                </div>
+              }
+              @if ($index === 0 && isCompany) {
+                <div class="quick-prompts">
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Cómo encuentro candidatos que se ajusten a una vacante?')">Encontrar candidatos</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Cómo filtro candidatos por varias habilidades a la vez?')">Filtrar por habilidades</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Qué diferencia hay entre buscar por TODAS o por CUALQUIERA habilidad?')">Todas o cualquiera</button>
+                  <button type="button" class="prompt-chip" (click)="sendMessage('¿Qué hago si no encuentro candidatos con mis filtros?')">Sin resultados</button>
+                </div>
+              }
+
+              <!-- Candidate results -->
+              @if (msg.results?.length) {
+                <div class="results-list">
+                  @for (r of msg.results; track r.slug) {
+                    <div class="result-mini" (click)="navigate('/portfolio/' + r.slug)">
+                      <span class="result-initial">{{ r.fullName?.charAt(0) }}</span>
+                      <div class="result-detail">
+                        <span class="result-fullname">{{ r.fullName }}</span>
+                        <span class="result-role">{{ r.professionalTitle }}</span>
+                        @if (r.city) { <span class="result-loc">{{ r.city }}</span> }
+                      </div>
+                      <mat-icon class="result-arrow">chevron_right</mat-icon>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Action buttons -->
+              @if (msg.actions?.length) {
+                <div class="actions-row">
+                  @for (a of msg.actions; track a.route) {
+                    <button type="button" class="action-link" (click)="navigate(a.route)">
+                      {{ a.label }}
+                      <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Loading indicator -->
+      @if (loading()) {
+        <div class="msg-row msg-row--bot">
+          <div class="bot-avatar">J</div>
+          <div class="bubble bubble--bot bubble--typing">
+            <span class="typing-label">Joaquín está pensando</span>
+            <span class="typing-dots">
+              <span></span><span></span><span></span>
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Input Footer -->
+    <div class="panel-footer">
+      <input
+        type="text"
+        [(ngModel)]="inputMessage"
+        (keydown)="onKeydown($event)"
+        placeholder="Escribe un mensaje..."
+        [disabled]="loading()"
+        class="footer-input"
+        autocomplete="off"
+      />
+      <button
+        type="button"
+        class="footer-send"
+        (click)="sendMessage()"
+        [disabled]="!inputMessage.trim() || loading()"
+        aria-label="Enviar mensaje"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

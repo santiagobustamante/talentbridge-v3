@@ -1,0 +1,350 @@
+<div class="page-content">
+  <header class="page-header animate-fade-in">
+    <div class="header-icon">
+      <mat-icon>work</mat-icon>
+    </div>
+    <div class="header-text">
+      <h1>Trabajos</h1>
+      <p class="subtitle">Encuentra ofertas laborales que coincidan con tu perfil</p>
+    </div>
+  </header>
+
+  <div class="tabs-bar animate-fade-in-up">
+    <button class="tab-btn" [class.active]="activeTab() === 'available'" (click)="setTab('available')">
+      <mat-icon>search</mat-icon>
+      Ofertas disponibles
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'my-applications'" (click)="setTab('my-applications')">
+      <mat-icon>assignment</mat-icon>
+      Mis postulaciones
+    </button>
+  </div>
+
+  @if (activeTab() === 'available') {
+    <div class="filters-bar animate-fade-in-up">
+      <div class="search-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" [formControl]="qCtrl" placeholder="Buscar por título, descripción o habilidad..."
+          (keydown.enter)="applyFilters()" />
+      </div>
+      <input type="text" class="filter-select" [formControl]="cityCtrl" placeholder="Ciudad" />
+      <select class="filter-select" [formControl]="modalityCtrl">
+        <option value="">Modalidad</option>
+        @for (m of modalities; track m) {
+          <option [value]="m">{{ m }}</option>
+        }
+      </select>
+      <select class="filter-select" [formControl]="contractTypeCtrl">
+        <option value="">Tipo de contrato</option>
+        @for (ct of contractTypes; track ct) {
+          <option [value]="ct">{{ ct }}</option>
+        }
+      </select>
+      <button class="btn-apply" (click)="applyFilters()">Filtrar</button>
+      <button class="btn-detail" (click)="clearFilters()">
+        <mat-icon>clear_all</mat-icon>Limpiar
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-bar">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Cargando ofertas...</p>
+      </div>
+    }
+
+    @if (!loading() && jobOffers.length === 0 && hasSearched) {
+      <div class="empty-state animate-fade-in-scale">
+        <div class="empty-icon">
+          <mat-icon>search_off</mat-icon>
+        </div>
+        <h3>No encontramos ofertas con esos filtros</h3>
+        <p>Prueba con menos filtros o busca en otra ciudad</p>
+      </div>
+    }
+
+    @if (jobOffers.length > 0) {
+      <div class="jobs-priority-note animate-fade-in-up">
+        <mat-icon>verified</mat-icon>
+        Mostramos primero las ofertas que coinciden con tus habilidades.
+      </div>
+      <div class="jobs-grid">
+        @for (job of jobOffers; track job.id) {
+          <div class="job-card animate-fade-in-scale">
+            <div class="job-card-header">
+              <div class="company-avatar">
+                {{ (job.company?.companyName || 'E').charAt(0).toUpperCase() }}
+              </div>
+              <div class="job-info">
+                <h3>{{ job.title }}</h3>
+                <p class="company-name">{{ job.company?.companyName || 'Empresa' }}</p>
+              </div>
+              @if (job.hasApplied) {
+                <div class="applied-chip" [class]="getStatusClass(job.applicationStatus || '')">
+                  <mat-icon>check_circle</mat-icon>
+                  {{ getStatusLabel(job.applicationStatus || '') }}
+                </div>
+              }
+            </div>
+
+            <div class="job-meta">
+              @if (job.city) {
+                <span class="meta-chip">
+                  <mat-icon>location_on</mat-icon>{{ job.city }}
+                </span>
+              }
+              @if (job.modality) {
+                <span class="meta-chip">
+                  <mat-icon>laptop</mat-icon>{{ job.modality }}
+                </span>
+              }
+              @if (job.contractType) {
+                <span class="meta-chip">
+                  <mat-icon>description</mat-icon>{{ job.contractType }}
+                </span>
+              }
+            </div>
+
+            @if (formatSalary(job); as salary) {
+              <div class="salary-range">{{ salary }}</div>
+            }
+
+            @if (job.skillsRequired) {
+              <div class="skills-row">
+                @for (skill of job.skillsRequired.split(','); track skill) {
+                  <span class="skill-chip">{{ skill.trim() }}</span>
+                }
+              </div>
+            }
+
+            @if (job.matchedSkills?.length) {
+              <div class="matched-skills">
+                <mat-icon>check_circle</mat-icon>
+                Coincides con: {{ job.matchedSkills?.join(', ') }}
+              </div>
+            }
+
+            @if (job.canApplyBySkills === false) {
+              <div class="skill-warning">
+                <mat-icon>warning</mat-icon>
+                No coincides con los requisitos principales
+              </div>
+            }
+
+            <div class="job-card-actions">
+              <button class="btn-detail" (click)="openDetail(job)">
+                <mat-icon>visibility</mat-icon>Ver detalle
+              </button>
+              @if (!job.hasApplied) {
+                <button class="btn-apply" (click)="applyToJob(job.id)"
+                  [disabled]="applyingId() === job.id || job.canApplyBySkills === false">
+                  {{ applyingId() === job.id ? 'Aplicando...' : 'Aplicar' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button class="page-btn" [disabled]="page <= 1" (click)="goToPage(page - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          @for (p of pagesArray; track p) {
+            @if (p === '...') {
+              <span class="page-ellipsis">...</span>
+            } @else {
+              <button class="page-btn" [class.active]="p === page" (click)="goToPage(+p)">{{ p }}</button>
+            }
+          }
+          <button class="page-btn" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    }
+  }
+
+  @if (activeTab() === 'my-applications') {
+    @if (loading()) {
+      <div class="loading-bar">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Cargando postulaciones...</p>
+      </div>
+    }
+
+    @if (!loading() && applications.length === 0) {
+      <div class="empty-state animate-fade-in-scale">
+        <div class="empty-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <h3>No has aplicado a ninguna oferta</h3>
+        <p>Explora las ofertas disponibles y aplica a las que te interesen</p>
+      </div>
+    }
+
+    @if (applications.length > 0) {
+      <div class="applications-list">
+        @for (app of applications; track app.id) {
+          <div class="application-card animate-fade-in-up">
+            <div class="app-header">
+              <div>
+                <div class="app-job-title">{{ app.jobOffer.title }}</div>
+                <div class="app-company">{{ app.jobOffer.company?.companyName || 'Empresa' }}</div>
+              </div>
+              <span class="status-chip" [class]="getStatusClass(app.status)">
+                <span class="status-dot"></span>
+                {{ getStatusLabel(app.status) }}
+              </span>
+            </div>
+            <div class="app-meta">
+              @if (app.jobOffer.city) {
+                <span class="meta-chip">
+                  <mat-icon>location_on</mat-icon>{{ app.jobOffer.city }}
+                </span>
+              }
+              @if (app.jobOffer.modality) {
+                <span class="meta-chip">
+                  <mat-icon>laptop</mat-icon>{{ app.jobOffer.modality }}
+                </span>
+              }
+              @if (app.jobOffer.contractType) {
+                <span class="meta-chip">
+                  <mat-icon>description</mat-icon>{{ app.jobOffer.contractType }}
+                </span>
+              }
+              <span class="meta-chip">
+                <mat-icon>event</mat-icon>{{ app.createdAt | date:'mediumDate' }}
+              </span>
+            </div>
+            @if (app.coverMessage) {
+              <p style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">
+                "{{ app.coverMessage }}"
+              </p>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+@if (selectedJob(); as job) {
+  <div class="overlay" (click)="closeDetail()">
+    <div class="detail-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeDetail()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="detail-company">
+        <div class="detail-company-avatar">
+          {{ (job.company?.companyName || 'E').charAt(0).toUpperCase() }}
+        </div>
+        <div>
+          <h2 class="detail-title">{{ job.title }}</h2>
+          <p class="detail-company-name">{{ job.company?.companyName || 'Empresa' }}</p>
+        </div>
+      </div>
+
+      @if (job.hasApplied) {
+        <div class="job-detail-status">
+          <span class="status-chip" [class]="getStatusClass(job.applicationStatus || '')">
+            <span class="status-dot"></span>
+            Ya aplicaste — {{ getStatusLabel(job.applicationStatus || '') }}
+          </span>
+        </div>
+      }
+
+      <div class="detail-meta">
+        @if (job.city) {
+          <span class="meta-chip"><mat-icon>location_on</mat-icon>{{ job.city }}</span>
+        }
+        @if (job.modality) {
+          <span class="meta-chip"><mat-icon>laptop</mat-icon>{{ job.modality }}</span>
+        }
+        @if (job.contractType) {
+          <span class="meta-chip"><mat-icon>description</mat-icon>{{ job.contractType }}</span>
+        }
+        @if (formatSalary(job); as salary) {
+          <span class="meta-chip"><mat-icon>payments</mat-icon>{{ salary }}</span>
+        }
+      </div>
+
+      <div class="detail-section">
+        <h4>Descripción</h4>
+        <p>{{ job.description }}</p>
+      </div>
+
+      @if (job.requirements) {
+        <div class="detail-section">
+          <h4>Requisitos</h4>
+          <p>{{ job.requirements }}</p>
+        </div>
+      }
+
+      @if (job.responsibilities) {
+        <div class="detail-section">
+          <h4>Responsabilidades</h4>
+          <p>{{ job.responsibilities }}</p>
+        </div>
+      }
+
+      @if (job.skillsRequired) {
+        <div class="detail-section">
+          <h4>Habilidades requeridas</h4>
+          <div class="skills-row">
+            @for (skill of job.skillsRequired.split(','); track skill) {
+              <span class="skill-chip">{{ skill.trim() }}</span>
+            }
+          </div>
+          @if (job.matchedSkills?.length) {
+            <div class="matched-skills">
+              <mat-icon>check_circle</mat-icon>
+              Coincides con: {{ job.matchedSkills?.join(', ') }}
+            </div>
+          }
+          @if (job.canApplyBySkills === false) {
+            <div class="skill-warning">
+              <mat-icon>warning</mat-icon>
+              No coincides con los requisitos principales de esta oferta. Agrega habilidades relacionadas en tu perfil.
+            </div>
+          }
+        </div>
+      }
+
+      @if (job.company?.description) {
+        <div class="detail-section">
+          <h4>Sobre la empresa</h4>
+          <p>{{ job.company?.description }}</p>
+        </div>
+      }
+
+      <div class="detail-actions">
+        @if (!job.hasApplied) {
+          @if (!showApplyForm) {
+            <button class="btn-apply" (click)="showApplyForm = true"
+              [disabled]="job.canApplyBySkills === false">
+              Aplicar ahora
+            </button>
+          } @else {
+            <div style="width: 100%;">
+              <div class="apply-form">
+                <textarea [(ngModel)]="coverMessage" placeholder="Cuéntale a la empresa por qué te interesa esta oferta (opcional)..."
+                  maxlength="1000"></textarea>
+              </div>
+              <div class="apply-actions">
+                <button class="btn-detail" (click)="showApplyForm = false; coverMessage = ''">Cancelar</button>
+                <button class="btn-apply" (click)="applyToJob(job.id)"
+                  [disabled]="applyingId() === job.id || job.canApplyBySkills === false">
+                  {{ applyingId() === job.id ? 'Enviando...' : 'Enviar postulación' }}
+                </button>
+              </div>
+            </div>
+          }
+        }
+        <button class="btn-detail" (click)="closeDetail()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}

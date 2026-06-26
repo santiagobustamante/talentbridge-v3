@@ -1,0 +1,144 @@
+<div class="company-profile-page">
+
+  <header class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>business</mat-icon>
+      </div>
+      <div>
+        <h1>Perfil empresarial</h1>
+        <p>Gestiona la información que verán los candidatos sobre tu empresa.</p>
+      </div>
+    </div>
+    @if (!isEditing && !loading && !loadError) {
+      <button type="button" class="edit-btn" (click)="editProfile()">
+        <mat-icon>edit</mat-icon>
+        Editar perfil empresarial
+      </button>
+    }
+  </header>
+
+  <div *ngIf="loading" class="state-card state-loading">
+    <mat-icon>hourglass_top</mat-icon>
+    <span>Cargando perfil empresarial...</span>
+  </div>
+
+  <div *ngIf="loadError && !loading" class="state-card state-error">
+    <strong>No se pudo cargar el perfil empresarial.</strong>
+    <p>{{ loadError }}</p>
+    <button type="button" class="btn-retry" (click)="loadProfile()">Reintentar</button>
+  </div>
+
+  <!-- ===================== MODO LECTURA ===================== -->
+  @if (!isEditing && !loading && !loadError) {
+    <div class="company-summary">
+      <div class="summary-header">
+        <div class="company-avatar">{{ getInitials(summaryProfile.companyName) }}</div>
+        <div>
+          <h2>{{ displayValue(summaryProfile.companyName, 'Nombre de empresa no agregado') }}</h2>
+          <p>{{ displayValue(summaryProfile.sector, 'Sector no agregado') }}</p>
+          <span class="summary-location">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
+        </div>
+      </div>
+
+      <div class="summary-block">
+        <h3>Descripción empresarial</h3>
+        <p>{{ displayValue(summaryProfile.description) }}</p>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span>Teléfono</span>
+          <strong>{{ displayValue(summaryProfile.phone) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Sitio web</span>
+          <strong>{{ displayValue(summaryProfile.websiteUrl) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>NIT</span>
+          <strong>{{ displayValue(summaryProfile.nit) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span>Logo</span>
+          <strong>{{ displayValue(summaryProfile.logoUrl) }}</strong>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===================== MODO EDICIÓN ===================== -->
+  @if (isEditing && !loading && !loadError) {
+    <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off" class="company-form">
+
+      <div class="form-card">
+        <div class="form-card-header">
+          <mat-icon>business</mat-icon>
+          <h2>Información principal</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Nombre de la empresa</label>
+            <input class="app-input" formControlName="companyName" placeholder="Ej. Tech Solutions S.A." />
+          </div>
+          <div class="form-field">
+            <label>NIT</label>
+            <input class="app-input" formControlName="nit" placeholder="Ej. 900.123.456-7" />
+          </div>
+          <div class="form-field">
+            <label>Sector</label>
+            <input class="app-input" formControlName="sector" placeholder="Ej. Tecnología, Salud, Educación" />
+          </div>
+          <div class="form-field">
+            <label>Ciudad</label>
+            <input class="app-input" formControlName="city" placeholder="Ej. Bogotá, Colombia" />
+          </div>
+          <div class="form-field form-field--full">
+            <label>Descripción</label>
+            <textarea class="app-textarea" formControlName="description" rows="4" placeholder="Describe tu empresa, misión, y el tipo de talento que buscas..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header">
+          <mat-icon>contact_phone</mat-icon>
+          <h2>Contacto</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-field form-field--full">
+            <label>Teléfono</label>
+            <input class="app-input" formControlName="phone" placeholder="+57 300 000 0000" />
+          </div>
+          <div class="form-field form-field--full">
+            <label>Sitio web</label>
+            <input class="app-input" formControlName="websiteUrl" placeholder="https://miempresa.com" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header">
+          <mat-icon>image</mat-icon>
+          <h2>Logo</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-field form-field--full">
+            <label>URL del logo</label>
+            <input class="app-input" formControlName="logoUrl" placeholder="https://miempresa.com/logo.png" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
+        <button type="submit" class="btn-save" [disabled]="saving">
+          <mat-icon>save</mat-icon>
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+    </form>
+  }
+
+</div>

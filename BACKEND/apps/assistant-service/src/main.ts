@@ -1,0 +1,22 @@
+import 'dotenv/config';
+import { NestFactory } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
+import { AssistantModule } from './assistant.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AssistantModule);
+  app.setGlobalPrefix('api');
+  app.use(cookieParser());
+  app.enableCors({
+    origin: process.env['FRONTEND_URL'] || 'http://localhost:4200',
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
+  const port = process.env['ASSISTANT_SERVICE_PORT'] || 3009;
+  await app.listen(port);
+  console.log(`Assistant Service corriendo en http://localhost:${port}`);
+}
+
+bootstrap();

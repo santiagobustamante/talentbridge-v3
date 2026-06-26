@@ -1,0 +1,275 @@
+<div class="company-jobs-page">
+  <header class="page-header animate-fade-in">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>work</mat-icon>
+      </div>
+      <div>
+        <h1>Ofertas laborales</h1>
+        <p>Publica vacantes y gestiona postulaciones</p>
+      </div>
+    </div>
+    <button class="btn-create" (click)="openCreateForm()">
+      <mat-icon>add</mat-icon>Nueva oferta
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-bar">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p>Cargando ofertas...</p>
+    </div>
+  }
+
+  @if (!loading() && jobOffers.length === 0 && !showForm()) {
+    <div class="empty-state animate-fade-in-scale">
+      <div class="empty-icon">
+        <mat-icon>work_off</mat-icon>
+      </div>
+      <h3>No tienes ofertas publicadas</h3>
+      <p>Crea tu primera oferta laboral para empezar a recibir postulaciones</p>
+    </div>
+  }
+
+  @if (jobOffers.length > 0) {
+    <div class="jobs-table animate-fade-in-up">
+      <div class="table-header">
+        <span class="col-title">Título</span>
+        <span class="col-city">Ciudad</span>
+        <span class="col-modality">Modalidad</span>
+        <span class="col-status">Estado</span>
+        <span class="col-count">Post.</span>
+        <span class="col-date">Fecha</span>
+        <span class="col-actions">Acciones</span>
+      </div>
+      @for (job of jobOffers; track job.id) {
+        <div class="table-row">
+          <span class="col-title">{{ job.title }}</span>
+          <span class="col-city">{{ job.city || '—' }}</span>
+          <span class="col-modality">{{ job.modality || '—' }}</span>
+          <span class="col-status">
+            <span class="status-badge" [class]="'status-' + job.status">
+              {{ statusLabel(job.status) }}
+            </span>
+            @if (job.status === 'ARCHIVED') {
+              <span class="status-hint">Puedes restaurarla</span>
+            }
+          </span>
+          <span class="col-count">{{ job._count?.applications ?? 0 }}</span>
+          <span class="col-date">{{ job.createdAt | date:'shortDate' }}</span>
+          <span class="col-actions">
+            <button class="action-btn" (click)="editJob(job)" title="Editar oferta" aria-label="Editar oferta">
+              <mat-icon>edit</mat-icon>
+            </button>
+            @if (job.status === 'DRAFT') {
+              <button class="action-btn publish" (click)="publishJob(job)" title="Publicar oferta" aria-label="Publicar oferta">
+                <mat-icon>publish</mat-icon>
+              </button>
+            }
+            @if (job.status === 'PUBLISHED') {
+              <button class="action-btn view" (click)="viewApplications(job)" title="Ver postulaciones" aria-label="Ver postulaciones">
+                <mat-icon>people</mat-icon>
+              </button>
+              <button class="action-btn close" (click)="closeJob(job)" title="Cerrar oferta" aria-label="Cerrar oferta">
+                <mat-icon>do_not_disturb</mat-icon>
+              </button>
+            }
+            @if (job.status === 'CLOSED') {
+              <button class="action-btn publish" (click)="publishJob(job)" title="Republicar oferta" aria-label="Republicar oferta">
+                <mat-icon>publish</mat-icon>
+              </button>
+              <button class="action-btn view" (click)="viewApplications(job)" title="Ver postulaciones" aria-label="Ver postulaciones">
+                <mat-icon>people</mat-icon>
+              </button>
+            }
+            @if (job.status === 'ARCHIVED') {
+              <button class="action-btn publish" (click)="restoreJob(job)" title="Restaurar oferta como borrador" aria-label="Restaurar oferta">
+                <mat-icon>undo</mat-icon>
+              </button>
+            }
+            @if (job.status !== 'PUBLISHED' && job.status !== 'CLOSED') {
+              <button class="action-btn archive" (click)="archiveJob(job)" title="Archivar oferta" aria-label="Archivar oferta">
+                <mat-icon>archive</mat-icon>
+              </button>
+            }
+            @if (job.status === 'ARCHIVED') {
+              <button class="action-btn delete" (click)="deleteJob(job)" title="Eliminar oferta" aria-label="Eliminar oferta">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </span>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showForm()) {
+  <div class="overlay" (click)="closeForm()">
+    <div class="form-modal" (click)="$event.stopPropagation()">
+      <h2>{{ editingId() ? 'Editar oferta' : 'Nueva oferta laboral' }}</h2>
+
+      <div class="form-body">
+        <div class="form-group">
+          <label>Título <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="formData.title" placeholder="Ej. Desarrollador Full Stack" maxlength="120" />
+        </div>
+
+        <div class="form-group">
+          <label>Descripción <span class="req">*</span></label>
+          <textarea [(ngModel)]="formData.description" placeholder="Describe el cargo y lo que buscas..." rows="4"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input type="text" [(ngModel)]="formData.city" placeholder="Ej. Villavicencio" />
+          </div>
+          <div class="form-group">
+            <label>Modalidad</label>
+            <select [(ngModel)]="formData.modality">
+              <option value="">Seleccionar</option>
+              <option value="Remoto">Remoto</option>
+              <option value="Presencial">Presencial</option>
+              <option value="Híbrido">Híbrido</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de contrato</label>
+            <select [(ngModel)]="formData.contractType">
+              <option value="">Seleccionar</option>
+              <option value="Tiempo completo">Tiempo completo</option>
+              <option value="Medio tiempo">Medio tiempo</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Por proyecto">Por proyecto</option>
+              <option value="Prácticas">Prácticas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Moneda</label>
+            <select [(ngModel)]="formData.currency">
+              <option value="COP">COP</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Salario mínimo</label>
+            <input type="text" inputmode="numeric" [(ngModel)]="formData.salaryMin" placeholder="Ej. 2500000" />
+          </div>
+          <div class="form-group">
+            <label>Salario máximo</label>
+            <input type="text" inputmode="numeric" [(ngModel)]="formData.salaryMax" placeholder="Ej. 4500000" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Requisitos</label>
+          <textarea [(ngModel)]="formData.requirements" placeholder="Ej. Angular, NestJS, PostgreSQL..." rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Responsabilidades</label>
+          <textarea [(ngModel)]="formData.responsibilities" placeholder="Describe las responsabilidades del cargo..." rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Habilidades requeridas</label>
+          <input type="text" [(ngModel)]="formData.skillsRequired" placeholder="Ej. Angular, PostgreSQL, Docker, Git" />
+          <span class="field-help">Escribe las habilidades separadas por coma. Ejemplo: Angular, PostgreSQL, Docker, Git</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-detail" (click)="closeForm()">Cancelar</button>
+        <button class="btn-save" (click)="saveJob()" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar' : 'Crear oferta' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showApplications()) {
+  <div class="overlay" (click)="closeApplications()">
+    <div class="applications-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Postulaciones: {{ selectedJobForApps()?.title }}</h2>
+        <button class="modal-close" (click)="closeApplications()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      @if (loadingApps()) {
+        <div class="loading-bar">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </div>
+      }
+
+      @if (!loadingApps() && applications.length === 0) {
+        <div class="empty-state" style="padding: 2rem 1rem;">
+          <div class="empty-icon">
+            <mat-icon>person_off</mat-icon>
+          </div>
+          <h3>Sin postulaciones</h3>
+          <p>Ningún candidato ha aplicado a esta oferta aún</p>
+        </div>
+      }
+
+      @if (applications.length > 0) {
+        <div class="applications-list">
+          @for (app of applications; track app.id) {
+            <div class="app-card">
+              <div class="app-card-main">
+                <div class="app-avatar">
+                  {{ (app.candidate?.profile?.fullName || 'C').charAt(0).toUpperCase() }}
+                </div>
+                <div class="app-info">
+                  <h4>{{ app.candidate?.profile?.fullName || 'Candidato' }}</h4>
+                  <p class="app-title">{{ app.candidate?.profile?.professionalTitle || 'Sin título' }}</p>
+                  <div class="app-meta">
+                    @if (app.candidate?.profile?.city) {
+                      <span><mat-icon>location_on</mat-icon>{{ app.candidate?.profile?.city }}</span>
+                    }
+                    <span><mat-icon>event</mat-icon>{{ app.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                  @if (app.coverMessage) {
+                    <p class="app-cover">"{{ app.coverMessage }}"</p>
+                  }
+                </div>
+                <div class="app-status-area">
+                  <span class="status-badge" [class]="'status-' + app.status">{{ statusLabel(app.status) }}</span>
+                  <select class="status-select" [ngModel]="app.status"
+                    (ngModelChange)="updateStatus(app.id, $event)">
+                    <option value="PENDING">Pendiente</option>
+                    <option value="REVIEWED">Revisado</option>
+                    <option value="PRESELECTED">Preseleccionado</option>
+                    <option value="REJECTED">Rechazado</option>
+                    <option value="HIRED">Contratado</option>
+                  </select>
+                </div>
+              </div>
+              <div class="app-card-actions">
+                @if (app.candidate?.profile?.slug) {
+                  <a class="btn-detail" [routerLink]="'/portfolio/' + app.candidate?.profile?.slug">
+                    <mat-icon>visibility</mat-icon>Ver portafolio
+                  </a>
+                }
+                <button class="btn-contact" (click)="contactCandidate(app.candidate?.id || 0)"
+                  [disabled]="contactingId() === (app.candidate?.id || 0)">
+                  <mat-icon>chat</mat-icon>Contactar
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

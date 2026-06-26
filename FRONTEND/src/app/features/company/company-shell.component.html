@@ -1,0 +1,99 @@
+<div class="app-shell">
+  <!-- Desktop Sidebar -->
+  <aside class="desktop-sidebar">
+    <a routerLink="/company/dashboard" class="brand">
+      <div class="brand-icon">
+        <mat-icon>business</mat-icon>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">TalentBridge</span>
+        <span class="brand-sub">Panel Empresa</span>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.route) {
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          [class.active]="isActive(item.route)"
+          [attr.aria-current]="isActive(item.route) ? 'page' : null"
+        >
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          <div class="nav-text">
+            <span class="nav-label">{{ item.subtitle || item.label }}</span>
+            <span class="nav-desc">{{ item.label }}</span>
+          </div>
+          @if (isActive(item.route)) {
+            <div class="active-indicator"></div>
+          }
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Mobile Drawer -->
+  @if (mobileOpen()) {
+    <div class="mobile-backdrop" (click)="closeMobile()"></div>
+  }
+  <aside class="mobile-drawer" [class.open]="mobileOpen()" aria-label="Menú de navegación" [attr.aria-hidden]="!mobileOpen()">
+    <div class="mobile-drawer-header">
+      <a routerLink="/company/dashboard" class="brand" (click)="closeMobile()">
+        <div class="brand-icon"><mat-icon>business</mat-icon></div>
+        <div class="brand-text">
+          <span class="brand-name">TalentBridge</span>
+        </div>
+      </a>
+      <button class="mobile-close-btn" (click)="closeMobile()" aria-label="Cerrar menú">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <nav class="mobile-nav">
+      @for (item of navItems; track item.route) {
+        <a
+          class="mobile-nav-item"
+          [routerLink]="item.route"
+          [class.active]="isActive(item.route)"
+          (click)="closeMobile()"
+        >
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <div class="nav-text">
+            <span class="nav-label">{{ item.subtitle || item.label }}</span>
+            <span class="nav-desc">{{ item.label }}</span>
+          </div>
+        </a>
+      }
+      <div class="nav-divider"></div>
+      <button class="mobile-nav-item logout-item" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span class="nav-label">Cerrar sesión</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" (click)="toggleMobile()" aria-label="Abrir menú de navegación">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <h2 class="topbar-title" [matTooltip]="userEmail">
+          Hola,&nbsp;<span class="greeting-name">{{ userEmail }}</span>
+        </h2>
+      </div>
+      <div class="topbar-right">
+        <div class="user-avatar">{{ userInitial }}</div>
+        <button class="logout-btn" (click)="logout()" matTooltip="Cerrar sesión" aria-label="Cerrar sesión">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <router-outlet />
+    </section>
+  </main>
+
+  <app-assistant-chat />
+</div>

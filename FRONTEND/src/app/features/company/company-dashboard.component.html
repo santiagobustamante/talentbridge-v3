@@ -1,0 +1,200 @@
+<div class="dashboard">
+  @if (loading()) {
+    <div class="loading-card">
+      <mat-icon>hourglass_top</mat-icon>
+      <span>Cargando panel...</span>
+    </div>
+  } @else if (error() || !data()) {
+    <div class="error-card">
+      <mat-icon>error_outline</mat-icon>
+      <span>No pudimos cargar el panel. Recarga la página.</span>
+    </div>
+  } @else {
+    <!-- Hero -->
+    <div class="hero-card animate-fade-in-scale">
+      <div class="hero-content">
+        <div class="hero-left">
+          <span class="hero-badge">
+            <mat-icon>business</mat-icon>Panel Empresa
+          </span>
+          <h1 class="hero-greeting">
+            Bienvenido, <span class="hero-name">{{ companyName }}</span>
+          </h1>
+          <p class="hero-desc">Gestiona tus vacantes, revisa postulaciones y encuentra talento para tu equipo.</p>
+        </div>
+        <div class="hero-actions">
+          <a class="btn-primary" routerLink="/company/candidates">
+            <mat-icon>search</mat-icon>Buscar candidatos
+          </a>
+          <a class="btn-primary" routerLink="/company/jobs">
+            <mat-icon>add</mat-icon>Nueva oferta
+          </a>
+          <a class="btn-secondary" routerLink="/company/profile">
+            <mat-icon>edit</mat-icon>Editar perfil
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid animate-fade-in-up">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-candidates"><mat-icon>people</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ data()?.candidatesCount ?? 0 }}</span>
+          <span class="kpi-label">Candidatos disponibles</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-published"><mat-icon>publish</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ data()?.publishedJobsCount ?? 0 }}</span>
+          <span class="kpi-label">Vacantes publicadas</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-draft"><mat-icon>edit_note</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ data()?.draftJobsCount ?? 0 }}</span>
+          <span class="kpi-label">Vacantes en borrador</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-closed"><mat-icon>do_not_disturb</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ data()?.closedJobsCount ?? 0 }}</span>
+          <span class="kpi-label">Vacantes cerradas</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-apps"><mat-icon>assignment</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ data()?.applicationsCount ?? 0 }}</span>
+          <span class="kpi-label">Postulaciones recibidas</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-msgs"><mat-icon>chat</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ unreadMessagesCount() }}</span>
+          <span class="kpi-label">Mensajes sin leer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick access -->
+    <div class="section-block animate-fade-in-up">
+      <h3 class="section-title">Accesos rápidos</h3>
+      <div class="quick-grid">
+        <a class="quick-card" routerLink="/company/candidates">
+          <div class="quick-icon"><mat-icon>search</mat-icon></div>
+          <div class="quick-info"><strong>Buscar candidatos</strong><span>Encuentra talento</span></div>
+        </a>
+        <a class="quick-card" routerLink="/company/jobs">
+          <div class="quick-icon"><mat-icon>work</mat-icon></div>
+          <div class="quick-info"><strong>Ver vacantes</strong><span>Gestiona tus ofertas</span></div>
+        </a>
+        <a class="quick-card" routerLink="/company/messages">
+          <div class="quick-icon"><mat-icon>chat</mat-icon></div>
+          <div class="quick-info"><strong>Mensajes</strong><span>Chat con candidatos</span></div>
+        </a>
+        <a class="quick-card" routerLink="/company/profile">
+          <div class="quick-icon"><mat-icon>business</mat-icon></div>
+          <div class="quick-info"><strong>Perfil empresarial</strong><span>Tu información</span></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent jobs -->
+    <div class="section-block animate-fade-in-up">
+      <div class="section-header">
+        <h3 class="section-title">Vacantes recientes</h3>
+        <a class="section-link" routerLink="/company/jobs">Gestionar vacantes <mat-icon>arrow_forward</mat-icon></a>
+      </div>
+      @if (!data()?.recentJobs?.length) {
+        <p class="empty-text">No has creado vacantes aún.</p>
+      } @else {
+        <div class="job-table">
+          <div class="job-row job-header">
+            <span class="jc-title">Título</span>
+            <span class="jc-city">Ciudad</span>
+            <span class="jc-status">Estado</span>
+            <span class="jc-count">Post.</span>
+          </div>
+          @for (job of data()?.recentJobs; track job.id) {
+            <a class="job-row job-data" routerLink="/company/jobs">
+              <span class="jc-title">{{ job.title }}</span>
+              <span class="jc-city">{{ job.city || '—' }}</span>
+              <span class="jc-status">
+                <span class="status-badge" [class]="'st-' + job.status">{{ statusLabel(job.status) }}</span>
+              </span>
+              <span class="jc-count">{{ job.applicationsCount }}</span>
+            </a>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Recent applications -->
+    <div class="section-block animate-fade-in-up">
+      <div class="section-header">
+        <h3 class="section-title">Postulaciones recientes</h3>
+        <a class="section-link" routerLink="/company/jobs">Ver todas <mat-icon>arrow_forward</mat-icon></a>
+      </div>
+      @if (!data()?.recentApplications?.length) {
+        <p class="empty-text">Aún no tienes postulaciones.</p>
+      } @else {
+        <div class="app-list">
+          @for (app of data()?.recentApplications; track app.id) {
+            <div class="app-card">
+              <div class="app-card-avatar">{{ (app.candidateName || 'C').charAt(0) }}</div>
+              <div class="app-card-info">
+                <strong>{{ app.candidateName }}</strong>
+                <span>{{ app.jobTitle }} · {{ app.createdAt | date:'mediumDate' }}</span>
+              </div>
+              <span class="app-status" [class]="'st-' + app.status">{{ statusLabel(app.status) }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Quick search -->
+    <div class="section-block animate-fade-in-up">
+      <h3 class="section-title">Búsqueda rápida de talento</h3>
+      <div class="search-chips">
+        @for (chip of searchChips; track chip.label) {
+          <a class="search-chip" [routerLink]="'/company/candidates'" [queryParams]="{q: chip.q}">
+            {{ chip.label }}
+          </a>
+        }
+      </div>
+      <a class="search-link" routerLink="/company/candidates">
+        <mat-icon>search</mat-icon>Buscar candidatos
+      </a>
+    </div>
+
+    <!-- Recent messages -->
+    <div class="section-block animate-fade-in-up">
+      <div class="section-header">
+        <h3 class="section-title">Mensajes recientes</h3>
+        <a class="section-link" routerLink="/company/messages">Ir a chat <mat-icon>arrow_forward</mat-icon></a>
+      </div>
+      @if (!data()?.recentConversations?.length) {
+        <p class="empty-text">Aún no tienes mensajes.</p>
+      } @else {
+        <div class="msg-list">
+          @for (conv of data()?.recentConversations; track conv.id) {
+            <a class="msg-item" routerLink="/company/messages">
+              <div class="msg-avatar">{{ (conv.candidateName || 'C').charAt(0) }}</div>
+              <div class="msg-info">
+                <strong>{{ conv.candidateName || 'Candidato' }}</strong>
+                <span>{{ conv.lastMessage || 'Sin mensajes' }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

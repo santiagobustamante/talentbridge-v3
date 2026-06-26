@@ -1,0 +1,2 @@
+export const GITHUB_RESPONSIBILITY_WARNING =
+  'Antes de compartir repositorios o enlaces de GitHub, verifica que no contengan credenciales, información privada, secretos, datos de clientes, código protegido por acuerdos de confidencialidad ni material restringido por políticas de tu empresa, cliente o institución. La información publicada o compartida mediante estos enlaces es responsabilidad del usuario.';

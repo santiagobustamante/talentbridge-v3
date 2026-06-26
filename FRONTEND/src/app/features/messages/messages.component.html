@@ -1,0 +1,242 @@
+<div class="messages-page">
+  <div class="messages-page__header">
+    <h1 class="messages-page__title">Mensajes</h1>
+  </div>
+
+  <div class="messages-layout">
+    <!-- LEFT PANEL — Conversation List -->
+    <aside
+      class="conversations-panel"
+      [class.conversations-panel--hidden]="activeConversation()"
+    >
+      <div class="conversations-panel__header">
+        <span class="conversations-panel__label">Conversaciones</span>
+      </div>
+
+      @if (loadingConversations()) {
+        <div class="conversations-panel__skeleton">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <div class="skeleton-item">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line skeleton-line--name"></div>
+                <div class="skeleton-line skeleton-line--msg"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loadingConversations() && conversations().length === 0) {
+        <div class="conversations-panel__empty">
+          <p>No tienes conversaciones aún</p>
+        </div>
+      }
+
+      @if (!loadingConversations() && conversations().length > 0) {
+        <div class="conversations-panel__list">
+          @for (conv of conversations(); track conv.id) {
+            <button
+              class="conversation-item"
+              [class.active]="activeConversation()?.id === conv.id"
+              (click)="openConversation(conv.id)"
+            >
+              <div class="conversation-avatar">{{ contactName(conv).charAt(0).toUpperCase() }}</div>
+              <div class="conversation-info">
+                <div class="conversation-info__top">
+                  <span class="conversation-name">{{ contactName(conv) }}</span>
+                  @if (conv.lastMessageAt) {
+                    <span class="conversation-date">{{ conv.lastMessageAt | date:'shortDate' }}</span>
+                  }
+                </div>
+                <div class="conversation-info__bottom">
+                  <span class="conversation-preview">
+                    @if (conv.blockedByMe) {
+                      <span class="conversation-preview--blocked">Conversación bloqueada</span>
+                    } @else if (conv.lastMessage) {
+                      {{ conv.lastMessage.body | slice:0:60 }}{{ conv.lastMessage.body.length > 60 ? '...' : '' }}
+                    } @else {
+                      Sin mensajes
+                    }
+                  </span>
+                  @if (conv.unreadCount > 0) {
+                    <span class="conversation-badge">{{ conv.unreadCount }}</span>
+                  }
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    </aside>
+
+    <!-- RIGHT PANEL — Chat -->
+    <main
+      class="chat-panel"
+      [class.chat-panel--hidden]="!activeConversation()"
+    >
+      @if (!activeConversation()) {
+        <div class="empty-chat">
+          <div class="empty-chat__icon">
+            <mat-icon>chat</mat-icon>
+          </div>
+          <h2 class="empty-chat__title">Selecciona una conversación para comenzar</h2>
+          <p class="empty-chat__subtitle">Elige una conversación del panel izquierdo para ver los mensajes</p>
+        </div>
+      }
+
+      @if (activeConversation(); as conv) {
+        <!-- Chat Header -->
+        <header class="chat-header">
+          <button class="chat-header__back" (click)="activeConversation.set(null)" aria-label="Volver a conversaciones">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+
+          <div class="chat-header__avatar">
+            {{ contactName(conv).charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="chat-header__info">
+            <span class="chat-header__name">{{ contactName(conv) }}</span>
+            <span class="chat-header__detail">
+              @if (contactTitle(conv)) {
+                {{ contactTitle(conv) }}
+              }
+              @if (contactCity(conv)) {
+                <span>, {{ contactCity(conv) }}</span>
+              }
+            </span>
+          </div>
+
+          <div class="chat-header__actions">
+            @if (isCompany && conv.candidate.slug) {
+              <a
+                class="chat-header__portfolio-btn"
+                [routerLink]="['/portfolio', conv.candidate.slug]"
+              >
+                <mat-icon>person_search</mat-icon>
+                <span>Ver portafolio</span>
+              </a>
+            }
+            @if (isCandidate && conv.company) {
+              <a
+                class="chat-header__portfolio-btn"
+                [routerLink]="['/app/company-view', conv.company.id]"
+              >
+                <mat-icon>business</mat-icon>
+                <span>Ver empresa</span>
+              </a>
+            }
+
+            @if (conv.blockedByMe) {
+              <button class="chat-header__block-btn chat-header__block-btn--unblock" (click)="unblockConversation()" [disabled]="unblockLoading">
+                {{ unblockLoading ? 'Desbloqueando...' : 'Desbloquear' }}
+              </button>
+            } @else {
+              <button class="chat-header__block-btn" (click)="blockConversation()">
+                <mat-icon>block</mat-icon>
+              </button>
+            }
+          </div>
+        </header>
+
+        <!-- Blocked Banner -->
+        @if (conv.blockedByMe) {
+          <div class="blocked-banner">
+            <mat-icon>block</mat-icon>
+            <span>Has bloqueado esta conversación. No podrás recibir nuevos mensajes.</span>
+          </div>
+        }
+        @if (conv.blockedByOther) {
+          <div class="blocked-banner">
+            <mat-icon>block</mat-icon>
+            <span>Esta conversación ha sido bloqueada por la otra parte.</span>
+          </div>
+        }
+
+        <!-- Messages Body -->
+        <div class="messages-body">
+          @if (loadingMessages() && messages().length === 0) {
+            <div class="messages-body__loading">
+              <div class="spinner"></div>
+              <span>Cargando mensajes...</span>
+            </div>
+          }
+
+          @for (msg of messages(); track msg.id) {
+            <div class="message-row" [class.message-row--me]="getBubbleSender(msg) === 'me'" [class.message-row--other]="getBubbleSender(msg) === 'other'">
+              <div
+                class="message-bubble"
+                [class.message-bubble--me]="getBubbleSender(msg) === 'me'"
+                [class.message-bubble--other]="getBubbleSender(msg) === 'other'"
+              >
+                <p class="message-bubble__text">{{ msg.body }}</p>
+                <div class="message-bubble__meta">
+                  <span class="message-time">{{ msg.createdAt | date:'shortTime' }}</span>
+                  @if (getBubbleSender(msg) === 'me') {
+                    <span class="message-read">
+                      @if (msg.readAt) {
+                        <mat-icon class="message-read__icon">done_all</mat-icon>
+                      } @else {
+                        <mat-icon class="message-read__icon">check</mat-icon>
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Typing indicator placeholder -->
+        </div>
+
+        <!-- Composer -->
+        <div class="composer">
+          @if (conv.blockedByMe || conv.blockedByOther) {
+            <div class="composer--blocked">
+              <span>No puedes enviar mensajes en esta conversación</span>
+            </div>
+          } @else {
+            <textarea
+              class="composer__input"
+              [(ngModel)]="inputMessage"
+              (keydown)="onKeydown($event)"
+              placeholder="Escribe un mensaje..."
+              rows="1"
+              maxlength="2000"
+              [disabled]="sending()"
+            ></textarea>
+            <button
+              class="composer__send"
+              (click)="send()"
+              [disabled]="!inputMessage.trim() || sending()"
+              [attr.aria-label]="'Enviar mensaje'"
+            >
+              @if (sending()) {
+                <span class="composer__send-spinner"></span>
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
+            </button>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>
+
+<!-- Block Confirm Dialog -->
+@if (showBlockConfirm) {
+  <div class="block-confirm-overlay" (click)="showBlockConfirm = false">
+    <div class="block-confirm-dialog" (click)="$event.stopPropagation()">
+      <h3 class="block-confirm-dialog__title">Bloquear conversación</h3>
+      <p class="block-confirm-dialog__body">
+        ¿Estás seguro de que deseas bloquear esta conversación? No recibirás más mensajes de este usuario.
+      </p>
+      <div class="block-confirm-dialog__actions">
+        <button class="block-confirm-dialog__cancel" (click)="showBlockConfirm = false">Cancelar</button>
+        <button class="block-confirm-dialog__confirm" (click)="confirmBlock()">Bloquear</button>
+      </div>
+    </div>
+  </div>
+}

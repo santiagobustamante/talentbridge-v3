@@ -1,0 +1,119 @@
+<div class="company-view-page">
+  <header class="page-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Volver a mensajes">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Volver</span>
+    </button>
+    <div class="header-icon">
+      <mat-icon>business</mat-icon>
+    </div>
+    <div class="header-text">
+      <h1>Perfil empresarial</h1>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="state-card state-loading">
+      <mat-icon>hourglass_top</mat-icon>
+      <span>Cargando información de la empresa...</span>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="state-card state-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>No se pudo cargar la información de la empresa.</span>
+      <button class="retry-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver a Mensajes
+      </button>
+    </div>
+  }
+
+  @if (company(); as c) {
+    <div class="company-card animate-fade-in-scale">
+      <div class="company-hero">
+        <div class="company-avatar">
+          {{ initial(c.companyName) }}
+        </div>
+        <div class="company-hero-text">
+          <h2>{{ c.companyName }}</h2>
+          @if (c.sector || c.city) {
+            <p class="company-tagline">
+              {{ c.sector }}{{ c.sector && c.city ? ', ' : '' }}{{ c.city }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="company-details">
+        @if (c.description) {
+          <div class="detail-section">
+            <h3>
+              <mat-icon>article</mat-icon>
+              Descripción
+            </h3>
+            <p>{{ c.description }}</p>
+          </div>
+        }
+
+        <div class="detail-grid">
+          @if (c.sector) {
+            <div class="detail-item">
+              <mat-icon>category</mat-icon>
+              <div>
+                <span class="detail-label">Sector</span>
+                <span class="detail-value">{{ c.sector }}</span>
+              </div>
+            </div>
+          }
+          @if (c.city) {
+            <div class="detail-item">
+              <mat-icon>location_on</mat-icon>
+              <div>
+                <span class="detail-label">Ciudad</span>
+                <span class="detail-value">{{ c.city }}</span>
+              </div>
+            </div>
+          }
+          @if (c.phone) {
+            <div class="detail-item">
+              <mat-icon>phone</mat-icon>
+              <div>
+                <span class="detail-label">Teléfono</span>
+                <span class="detail-value">{{ c.phone }}</span>
+              </div>
+            </div>
+          }
+          @if (c.websiteUrl) {
+            <div class="detail-item">
+              <mat-icon>language</mat-icon>
+              <div>
+                <span class="detail-label">Sitio web</span>
+                <a [href]="c.websiteUrl" target="_blank" rel="noopener" class="detail-link">{{ c.websiteUrl }}</a>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (c.createdAt) {
+          <p class="member-since">
+            <mat-icon>calendar_today</mat-icon>
+            Miembro desde {{ c.createdAt | date:'longDate' }}
+          </p>
+        }
+      </div>
+
+      <div class="company-actions">
+        <button class="btn-secondary" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button class="btn-primary" routerLink="/app/messages">
+          <mat-icon>chat</mat-icon>
+          Ir a Mensajes
+        </button>
+      </div>
+    </div>
+  }
+</div>

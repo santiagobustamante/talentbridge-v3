@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Builds
+dist/
+build/
+.angular/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Prisma / generated if applicable
+BACKEND/libs/database/src/generated/
+BACKEND/prisma/generated/
+
+# Uploads / files
+uploads/
+BACKEND/uploads/
+FRONTEND/uploads/
+
+# Docker local data
+*.pid

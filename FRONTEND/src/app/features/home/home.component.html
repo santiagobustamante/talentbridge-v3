@@ -1,0 +1,375 @@
+<div class="home">
+
+  <!-- ─── Navbar ─── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a routerLink="/" class="navbar-brand">
+        <div class="brand-icon">
+          <mat-icon>work</mat-icon>
+        </div>
+        <span class="brand-name">TalentBridge</span>
+      </a>
+      <div class="navbar-links">
+        <button type="button" class="nav-link" (click)="scrollToSection('audiencia')">Candidatos</button>
+        <button type="button" class="nav-link" (click)="scrollToSection('audiencia')">Empresas</button>
+        <button type="button" class="nav-link" (click)="scrollToSection('trabajos')">Trabajos</button>
+        <button type="button" class="nav-link" (click)="scrollToSection('como-funciona')">C&oacute;mo funciona</button>
+      </div>
+      <div class="navbar-actions">
+        <a routerLink="/login" class="btn-outline">Iniciar sesi&oacute;n</a>
+        <a routerLink="/register" class="btn-primary-nav">Crear portafolio</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge animate-fade-in-up">
+        <span class="badge-dot"></span>
+        Plataforma Profesional
+      </div>
+      <h1 class="hero-title animate-fade-in-up stagger-1">
+        Conecta talento profesional con empresas que buscan perfiles reales
+      </h1>
+      <p class="hero-subtitle animate-fade-in-up stagger-2">
+        Crea tu portafolio, aplica a ofertas laborales, conversa con empresas y permite que tu experiencia, habilidades y proyectos hablen por ti.
+      </p>
+      <div class="hero-actions animate-fade-in-up stagger-3">
+        <a routerLink="/register" class="btn-primary">
+          Soy candidato
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <a routerLink="/company/register" class="btn-secondary">
+          Soy empresa
+        </a>
+      </div>
+      <div class="hero-separator animate-fade-in-up stagger-4">
+        <span class="sep-line"></span>
+        <span>Buscar talento</span>
+        <span class="sep-line"></span>
+      </div>
+      <div class="hero-search animate-fade-in-up stagger-5">
+        <mat-icon>search</mat-icon>
+        <input type="text" [formControl]="searchCtrl" placeholder="Buscar talento por profesi&oacute;n, habilidad o ciudad..."
+          (keydown.enter)="onSearch()" />
+        <button class="search-btn" (click)="onSearch()">
+          <mat-icon>search</mat-icon>
+          Buscar talento
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Audience ─── -->
+  <section class="audience" id="audiencia">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">&iquest;A qui&eacute;n est&aacute; dirigido?</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">Tanto si buscas empleo como si necesitas contratar, TalentBridge es para ti.</p>
+      <div class="audience-grid">
+        <div class="audience-card animate-fade-in-up stagger-1">
+          <div class="audience-icon icon-candidate">
+            <mat-icon>person</mat-icon>
+          </div>
+          <h3>Para candidatos</h3>
+          <p>Crea un perfil profesional completo, organiza tus habilidades, experiencia, educaci&oacute;n y proyectos, genera tu portafolio p&uacute;blico y aplica a ofertas laborales.</p>
+          <ul class="audience-features">
+            <li><mat-icon>check_circle</mat-icon> Portafolio p&uacute;blico profesional</li>
+            <li><mat-icon>check_circle</mat-icon> Habilidades, experiencia y proyectos</li>
+            <li><mat-icon>check_circle</mat-icon> Postulaciones a ofertas laborales</li>
+            <li><mat-icon>check_circle</mat-icon> Chat directo con empresas</li>
+            <li><mat-icon>check_circle</mat-icon> Asistente profesional Joaqu&iacute;n</li>
+          </ul>
+          <div class="audience-actions">
+            <a routerLink="/register">Crear portafolio</a>
+          </div>
+        </div>
+        <div class="audience-card animate-fade-in-up stagger-2">
+          <div class="audience-icon icon-company">
+            <mat-icon>business</mat-icon>
+          </div>
+          <h3>Para empresas</h3>
+          <p>Publica vacantes, busca candidatos con filtros avanzados por profesi&oacute;n, habilidades, ciudad y coincidencias relacionadas. Revisa portafolios reales y conversa con los perfiles que encajan.</p>
+          <ul class="audience-features">
+            <li><mat-icon>check_circle</mat-icon> Perfil empresarial</li>
+            <li><mat-icon>check_circle</mat-icon> Buscador avanzado de candidatos</li>
+            <li><mat-icon>check_circle</mat-icon> Publicaci&oacute;n de vacantes</li>
+            <li><mat-icon>check_circle</mat-icon> Gesti&oacute;n de postulaciones</li>
+            <li><mat-icon>check_circle</mat-icon> Chat con candidatos</li>
+          </ul>
+          <div class="audience-actions">
+            <a routerLink="/company/register">Registrar empresa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Features ─── -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">Todo lo que necesitas en un solo lugar</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">TalentBridge re&uacute;ne perfil profesional, ofertas laborales, b&uacute;squeda de talento y comunicaci&oacute;n directa.</p>
+      <div class="features-grid">
+        <div class="feature-card animate-fade-in-up stagger-1">
+          <div class="feature-icon"><mat-icon>dashboard_customize</mat-icon></div>
+          <h3>Portafolio profesional</h3>
+          <p>Los candidatos muestran habilidades, experiencia, educaci&oacute;n, proyectos, CV y enlaces profesionales.</p>
+        </div>
+        <div class="feature-card animate-fade-in-up stagger-2">
+          <div class="feature-icon"><mat-icon>work</mat-icon></div>
+          <h3>Ofertas laborales</h3>
+          <p>Las empresas publican vacantes y los candidatos aplican directamente desde la plataforma.</p>
+        </div>
+        <div class="feature-card animate-fade-in-up stagger-3">
+          <div class="feature-icon"><mat-icon>person_search</mat-icon></div>
+          <h3>Buscador avanzado</h3>
+          <p>Las empresas filtran candidatos por profesi&oacute;n, ciudad, habilidades y coincidencias relacionadas.</p>
+        </div>
+        <div class="feature-card animate-fade-in-up stagger-4">
+          <div class="feature-icon"><mat-icon>chat</mat-icon></div>
+          <h3>Chat directo</h3>
+          <p>Empresas y candidatos conversan dentro de la plataforma sin perder el contexto profesional.</p>
+        </div>
+        <div class="feature-card animate-fade-in-up stagger-1">
+          <div class="feature-icon"><mat-icon>assignment</mat-icon></div>
+          <h3>Postulaciones</h3>
+          <p>Los candidatos revisan sus aplicaciones y las empresas gestionan estados: pendiente, revisado o contratado.</p>
+        </div>
+        <div class="feature-card animate-fade-in-up stagger-2">
+          <div class="feature-icon"><mat-icon>smart_toy</mat-icon></div>
+          <h3>Asistente Joaqu&iacute;n</h3>
+          <p>Un asistente profesional orienta a candidatos y empresas dentro de la plataforma.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Jobs & Applications ─── -->
+  <section class="jobs-highlight" id="trabajos">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">Ofertas laborales y postulaciones</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">Las empresas publican vacantes y los candidatos aplican, hacen seguimiento y reciben respuestas.</p>
+      <div class="jobs-grid">
+        <div class="job-highlight-card animate-fade-in-up stagger-1">
+          <div class="jh-icon"><mat-icon>publish</mat-icon></div>
+          <h4>Publica vacantes</h4>
+          <p>Las empresas crean ofertas con t&iacute;tulo, descripci&oacute;n, requisitos, ciudad, modalidad, salario y habilidades requeridas.</p>
+        </div>
+        <div class="job-highlight-card animate-fade-in-up stagger-2">
+          <div class="jh-icon"><mat-icon>how_to_reg</mat-icon></div>
+          <h4>Aplica a trabajos</h4>
+          <p>Los candidatos exploran ofertas, filtran por lo que les interesa y aplican en un clic con mensaje opcional.</p>
+        </div>
+        <div class="job-highlight-card animate-fade-in-up stagger-3">
+          <div class="jh-icon"><mat-icon>track_changes</mat-icon></div>
+          <h4>Gestiona estados</h4>
+          <p>Las empresas cambian el estado de cada postulaci&oacute;n: Pendiente, Revisado, Preseleccionado, Rechazado o Contratado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Chat ─── -->
+  <section class="chat-highlight">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">Comunicaci&oacute;n directa entre empresas y candidatos</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">Cuando una empresa encuentra un perfil interesante, puede iniciar una conversaci&oacute;n. Los candidatos reciben mensajes y responden desde su panel.</p>
+      <div class="chat-features-row">
+        <div class="chat-feature-item animate-fade-in-up stagger-1">
+          <mat-icon>bolt</mat-icon>
+          <span>Chat en tiempo real</span>
+        </div>
+        <div class="chat-feature-item animate-fade-in-up stagger-2">
+          <mat-icon>history</mat-icon>
+          <span>Historial de conversaciones</span>
+        </div>
+        <div class="chat-feature-item animate-fade-in-up stagger-3">
+          <mat-icon>mark_chat_unread</mat-icon>
+          <span>Mensajes no le&iacute;dos</span>
+        </div>
+        <div class="chat-feature-item animate-fade-in-up stagger-4">
+          <mat-icon>connect_without_contact</mat-icon>
+          <span>Contacto desde postulaciones</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Security ─── -->
+  <section class="security-note">
+    <div class="container">
+      <div class="security-card animate-fade-in-up">
+        <mat-icon>shield</mat-icon>
+        <div>
+          <h3>Comparte informaci&oacute;n profesional con responsabilidad</h3>
+          <p>TalentBridge permite compartir enlaces como LinkedIn, GitHub o portafolios. Antes de publicar repositorios, verifica que no contengan credenciales, secretos, datos de clientes o c&oacute;digo protegido por acuerdos de confidencialidad.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── How it works ─── -->
+  <section class="how-it-works" id="como-funciona">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">C&oacute;mo funciona</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">Dos caminos claros para candidatos y empresas</p>
+      <div class="how-grid">
+        <div class="how-column animate-fade-in-up stagger-1">
+          <div class="how-col-header candidate">
+            <mat-icon>person</mat-icon>
+            <span>Para candidatos</span>
+          </div>
+          <div class="how-steps">
+            <div class="how-step">
+              <div class="how-step-num">1</div>
+              <div>
+                <strong>Crea tu perfil</strong>
+                <p>Reg&iacute;strate y completa tu informaci&oacute;n profesional.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">2</div>
+              <div>
+                <strong>Completa habilidades, experiencia y proyectos</strong>
+                <p>Agrega todo lo que demuestre tu trayectoria.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">3</div>
+              <div>
+                <strong>Publica tu portafolio</strong>
+                <p>Genera tu enlace p&uacute;blico y comp&aacute;rtelo.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">4</div>
+              <div>
+                <strong>Aplica a trabajos</strong>
+                <p>Explora ofertas laborales y post&uacute;late.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">5</div>
+              <div>
+                <strong>Responde mensajes de empresas</strong>
+                <p>Conversa con reclutadores interesados en tu perfil.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="how-column animate-fade-in-up stagger-2">
+          <div class="how-col-header company">
+            <mat-icon>business</mat-icon>
+            <span>Para empresas</span>
+          </div>
+          <div class="how-steps">
+            <div class="how-step">
+              <div class="how-step-num">1</div>
+              <div>
+                <strong>Crea tu perfil empresarial</strong>
+                <p>Registra tu empresa con nombre, sector y datos de contacto.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">2</div>
+              <div>
+                <strong>Publica vacantes</strong>
+                <p>Crea ofertas con t&iacute;tulo, descripci&oacute;n, requisitos y condiciones.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">3</div>
+              <div>
+                <strong>Busca candidatos</strong>
+                <p>Filtra por profesi&oacute;n, ciudad, habilidades y coincidencias.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">4</div>
+              <div>
+                <strong>Revisa portafolios</strong>
+                <p>Explora perfiles completos con experiencia y proyectos.</p>
+              </div>
+            </div>
+            <div class="how-step">
+              <div class="how-step-num">5</div>
+              <div>
+                <strong>Contacta y gestiona postulaciones</strong>
+                <p>Conversa con candidatos y actualiza estados de aplicaciones.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Professions ─── -->
+  <section class="professions">
+    <div class="container">
+      <h2 class="section-title animate-fade-in-up">Profesiones destacadas</h2>
+      <p class="section-subtitle animate-fade-in-up stagger-1">Encuentra talento en las &aacute;reas m&aacute;s demandadas</p>
+      <div class="professions-grid">
+        <a class="profession-card animate-fade-in-up stagger-1" routerLink="/company/candidates" [queryParams]="{q: 'desarrollador'}">
+          <div class="pro-icon"><mat-icon>code</mat-icon></div>
+          <span class="pro-name">Desarrollador</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-2" routerLink="/company/candidates" [queryParams]="{q: 'ingeniero'}">
+          <div class="pro-icon"><mat-icon>engineering</mat-icon></div>
+          <span class="pro-name">Ingeniero</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-3" routerLink="/company/candidates" [queryParams]="{q: 'contador'}">
+          <div class="pro-icon"><mat-icon>account_balance</mat-icon></div>
+          <span class="pro-name">Contador</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-4" routerLink="/company/candidates" [queryParams]="{q: 'diseñador'}">
+          <div class="pro-icon"><mat-icon>palette</mat-icon></div>
+          <span class="pro-name">Dise&ntilde;ador</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-1" routerLink="/company/candidates" [queryParams]="{q: 'enfermero'}">
+          <div class="pro-icon"><mat-icon>medical_services</mat-icon></div>
+          <span class="pro-name">Enfermero</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-2" routerLink="/company/candidates" [queryParams]="{q: 'mecánico'}">
+          <div class="pro-icon"><mat-icon>build</mat-icon></div>
+          <span class="pro-name">Mec&aacute;nico</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-3" routerLink="/company/candidates" [queryParams]="{q: 'administrativo'}">
+          <div class="pro-icon"><mat-icon>folder</mat-icon></div>
+          <span class="pro-name">Administrativo</span>
+        </a>
+        <a class="profession-card animate-fade-in-up stagger-4" routerLink="/company/candidates" [queryParams]="{q: 'vendedor'}">
+          <div class="pro-icon"><mat-icon>store</mat-icon></div>
+          <span class="pro-name">Vendedor</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ─── -->
+  <section class="cta">
+    <div class="cta-card animate-fade-in-scale">
+      <h2>Empieza a construir conexiones profesionales reales</h2>
+      <p>Crea tu portafolio o registra tu empresa para encontrar talento con informaci&oacute;n clara y verificable.</p>
+      <div class="cta-actions">
+        <a routerLink="/register" class="btn-primary">
+          Crear portafolio
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <a routerLink="/company/register" class="btn-secondary-cta">
+          Registrar empresa
+        </a>
+        <a routerLink="/login" class="btn-outline">
+          Iniciar sesi&oacute;n
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer class="footer">
+    <p>TalentBridge &mdash; Plataforma de Portafolio Profesional Inteligente</p>
+  </footer>
+
+</div>

@@ -1,0 +1,197 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart_portfolio_db_v3
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smart_portfolio
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_v3:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: api-gateway
+    container_name: talentbridge_api_gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+    networks:
+      - talentbridge_net
+
+  auth-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: auth-service
+    container_name: talentbridge_auth_service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  candidate-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: candidate-service
+    container_name: talentbridge_candidate_service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  portfolio-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: portfolio-service
+    container_name: talentbridge_portfolio_service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  company-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: company-service
+    container_name: talentbridge_company_service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  jobs-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: jobs-service
+    container_name: talentbridge_jobs_service
+    restart: unless-stopped
+    ports:
+      - "3006:3006"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  applications-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: applications-service
+    container_name: talentbridge_applications_service
+    restart: unless-stopped
+    ports:
+      - "3007:3007"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  chat-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: chat-service
+    container_name: talentbridge_chat_service
+    restart: unless-stopped
+    ports:
+      - "3008:3008"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  assistant-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: assistant-service
+    container_name: talentbridge_assistant_service
+    restart: unless-stopped
+    ports:
+      - "3009:3009"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+  dashboard-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: dashboard-service
+    container_name: talentbridge_dashboard_service
+    restart: unless-stopped
+    ports:
+      - "3010:3010"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
+volumes:
+  pgdata_v3:
+
+networks:
+  talentbridge_net:
+    driver: bridge

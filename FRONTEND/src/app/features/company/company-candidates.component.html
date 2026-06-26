@@ -1,0 +1,205 @@
+<div class="candidates-page">
+
+  <header class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>person_search</mat-icon>
+      </div>
+      <div>
+        <h1>Buscar candidatos</h1>
+        <p>Encuentra el talento ideal para tu empresa</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="search-card">
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" class="search-input" [formControl]="qCtrl"
+          placeholder="Buscar por nombre, profesión, habilidad o palabra clave..."
+          (keydown.enter)="doSearch()" />
+      </div>
+      <button type="button" class="btn-search" (click)="doSearch()">
+        <mat-icon>search</mat-icon>Buscar
+      </button>
+      <button type="button" class="btn-toggle-filters" (click)="toggleFilters()">
+        <mat-icon>tune</mat-icon>Filtros
+        @if (selectedSkills.length > 0) {
+          <span class="filter-badge">{{ selectedSkills.length }}</span>
+        }
+      </button>
+    </div>
+
+    @if (filtersOpen()) {
+      <div class="filters-panel">
+        <div class="filter-group">
+          <label>Habilidades</label>
+          <div class="chips-area">
+            @for (skill of selectedSkills; track skill) {
+              <span class="chip">{{ skill }}
+                <button type="button" class="chip-remove" (click)="removeSkill(skill)">&times;</button>
+              </span>
+            }
+            <div class="skill-input-wrap">
+              <input type="text" class="chip-input" [(ngModel)]="skillInput"
+                (keydown)="onSkillKeydown($event)"
+                [placeholder]="selectedSkills.length ? 'Agregar otra...' : 'Ej. Angular, PostgreSQL...'" />
+              @if (filteredSkillSuggestions.length > 0 && skillInput.trim()) {
+                <div class="suggestions-dropdown">
+                  @for (s of filteredSkillSuggestions; track s) {
+                    <button type="button" class="suggestion-item" (click)="addSkill(s)">{{ s }}</button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          @if (selectedSkills.length > 1) {
+            <div class="skill-match-toggle">
+              <span>Coincidencia:</span>
+              <button type="button" class="toggle-option" [class.active]="skillMatch === 'any'" (click)="skillMatch = 'any'">Cualquiera</button>
+              <button type="button" class="toggle-option" [class.active]="skillMatch === 'all'" (click)="skillMatch = 'all'">Todas</button>
+            </div>
+          }
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Ciudad</label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="filter-input" [formControl]="cityCtrl"
+                placeholder="Ej. Bogotá" (input)="cityInput = cityCtrl.value || ''" />
+              @if (filteredCitySuggestions.length > 0 && cityInput.trim()) {
+                <div class="suggestions-dropdown">
+                  @for (c of filteredCitySuggestions; track c) {
+                    <button type="button" class="suggestion-item" (click)="selectCity(c)">{{ c }}</button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label>Profesión</label>
+            <div class="autocomplete-wrap">
+              <input type="text" class="filter-input" [formControl]="professionCtrl"
+                placeholder="Ej. Full Stack" (input)="professionInput = professionCtrl.value || ''" />
+              @if (filteredProfessionSuggestions.length > 0 && professionInput.trim()) {
+                <div class="suggestions-dropdown">
+                  @for (p of filteredProfessionSuggestions; track p) {
+                    <button type="button" class="suggestion-item" (click)="selectProfession(p)">{{ p }}</button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-clear" (click)="clearFilters()">
+          <mat-icon>clear_all</mat-icon>Limpiar filtros
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-bar">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p>Buscando candidatos...</p>
+    </div>
+  }
+
+  @if (!loading() && hasSearched) {
+    <div class="results-header">
+      <span class="results-count">{{ total }} candidato(s) encontrado(s)</span>
+      @if (totalPages > 1) {
+        <span class="results-page">Página {{ page }} de {{ totalPages }}</span>
+      }
+    </div>
+  }
+
+  @if (!loading() && hasSearched && candidates.length === 0) {
+    <div class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <h3>No encontramos candidatos con esos filtros</h3>
+      <div class="empty-hints">
+        <span>Prueba con menos habilidades</span>
+        <span>Cambia de "Todas" a "Cualquiera"</span>
+        <span>Elimina la ciudad</span>
+        <span>Revisa la escritura</span>
+      </div>
+      <button type="button" class="btn-clear" (click)="clearFilters()">Limpiar filtros</button>
+    </div>
+  }
+
+  @if (candidates.length > 0) {
+    <div class="results-grid">
+      @for (c of candidates; track c.id) {
+        <div class="candidate-card">
+          <div class="card-top">
+            <div class="candidate-avatar">{{ (c.fullName || 'C').charAt(0).toUpperCase() }}</div>
+            <div class="candidate-main">
+              <h3>{{ c.fullName || 'Sin nombre' }}</h3>
+              <p class="candidate-title">{{ c.professionalTitle || 'Sin título profesional' }}</p>
+              <div class="candidate-meta">
+                @if (c.city) {
+                  <span><mat-icon>location_on</mat-icon>{{ c.city }}</span>
+                }
+                @if (c.experiencesCount) {
+                  <span><mat-icon>work</mat-icon>{{ c.experiencesCount }}</span>
+                }
+                @if (c.educationCount) {
+                  <span><mat-icon>school</mat-icon>{{ c.educationCount }}</span>
+                }
+                @if (c.projectsCount) {
+                  <span><mat-icon>code</mat-icon>{{ c.projectsCount }}</span>
+                }
+              </div>
+            </div>
+            <a class="view-btn" [routerLink]="'/portfolio/' + c.slug">
+              <mat-icon>visibility</mat-icon>Ver
+            </a>
+            <button type="button" class="contact-btn"
+              [disabled]="contactingCandidateId === c.userId"
+              (click)="contactCandidate(c.userId)">
+              <mat-icon>chat</mat-icon>Contactar
+            </button>
+          </div>
+
+          @if (c.summary) {
+            <p class="candidate-summary">{{ c.summary | slice:0:200 }}{{ c.summary.length > 200 ? '...' : '' }}</p>
+          }
+
+          @if (c.skills.length) {
+            <div class="skills-row">
+              @for (s of c.skills; track s.name) {
+                <span class="skill-chip" [class.skill-matched]="!!c.matchedSkills?.includes(s.name)">
+                  {{ s.name }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (totalPages > 1) {
+    <div class="pagination">
+      <button class="page-btn" [disabled]="page <= 1" (click)="goToPage(page - 1)">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      @for (p of pagesArray; track p) {
+        @if (p === '...') {
+          <span class="page-ellipsis">...</span>
+        } @else {
+          <button class="page-btn" [class.active]="p === page" (click)="goToPage(+p)">{{ p }}</button>
+        }
+      }
+      <button class="page-btn" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
+
+</div>
