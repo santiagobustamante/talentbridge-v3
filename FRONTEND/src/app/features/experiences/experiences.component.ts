@@ -22,6 +22,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { Experience } from '../../core/auth/auth.models';
 import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/services/skill-catalog';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 
 @Component({
   selector: 'app-experiences',
@@ -30,7 +31,7 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule, MatChipsModule, MatAutocompleteModule,
     MatSnackBarModule, MatCheckboxModule, MatDatepickerModule, MatNativeDateModule,
-    MatSelectModule, MatSlideToggleModule,
+    MatSelectModule, MatSlideToggleModule, AppDatePipe,
   ],
   styleUrl: './experiences.component.scss',
   template: `
@@ -85,7 +86,7 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
                     <mat-option value="HYBRID">Híbrido</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" class="span-full">
                   <mat-label>Tipo de contrato</mat-label>
                   <mat-select formControlName="contractType">
                     <mat-option value="">—</mat-option>
@@ -177,7 +178,6 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
 
       <ng-container *ngIf="items.length > 0; else emptyState">
         <div class="timeline">
-          <div class="timeline-line"></div>
           <div *ngFor="let e of items; let i = index" class="timeline-item animate-fade-in-up" [ngClass]="'stagger-' + ((i % 6) + 1)">
             <div class="timeline-dot"><mat-icon>work</mat-icon></div>
             <div class="timeline-card">
@@ -195,7 +195,7 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
               </div>
               <div class="date-range">
                 <mat-icon>calendar_today</mat-icon>
-                <span>{{ e.startDate | date:'MMM y' }} — {{ e.isCurrent ? 'Actualidad' : (e.endDate | date:'MMM y') }}</span>
+                <span>{{ e.startDate | appDate:'monthYear' }} — {{ e.isCurrent ? 'Actualidad' : (e.endDate | appDate:'monthYear') }}</span>
               </div>
               <p class="description" *ngIf="e.functions">{{ e.functions }}</p>
               <p class="description" *ngIf="e.achievements">{{ e.achievements }}</p>
@@ -355,7 +355,16 @@ export class ExperiencesComponent implements OnInit {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Eliminar', message: '¿Eliminar esta experiencia?' },
     });
-    ref.afterClosed().subscribe((ok) => { if (ok) this.service.delete(id).subscribe(() => this.load()); });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.service.delete(id).subscribe({
+        next: () => this.load(),
+        error: (err: HttpErrorResponse) => {
+          const msg = err?.error?.message || err?.message || 'Error al eliminar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
+    });
   }
 
   workModeLabel(m: string): string {

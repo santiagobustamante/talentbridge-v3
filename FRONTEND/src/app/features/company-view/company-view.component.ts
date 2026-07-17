@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CompanyService, PublicCompany } from '../../core/services/company.service';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
 
 @Component({
   selector: 'app-company-view',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, AppDatePipe, ButtonDirective],
   templateUrl: './company-view.component.html',
   styleUrl: './company-view.component.scss',
 })

@@ -5,19 +5,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ProfileService } from '../../core/services/profile.service';
-import { AuthService } from '../../core/auth/auth.service';
 import { Profile } from '../../core/auth/auth.models';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { PortfolioContentComponent } from '../../shared/components/portfolio-content/portfolio-content.component';
 
 @Component({
   selector: 'app-public-preview',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatSnackBarModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, PortfolioContentComponent],
   templateUrl: './public-preview.component.html',
   styleUrl: './public-preview.component.scss',
 })
 export class PublicPreviewComponent implements OnInit {
   private profileService = inject(ProfileService);
-  private auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
   private clipboard = inject(Clipboard);
   private router = inject(Router);
@@ -38,10 +38,6 @@ export class PublicPreviewComponent implements OnInit {
         this.loadError = err?.error?.message || err?.message || 'No se pudo cargar el perfil';
       },
     });
-  }
-
-  get avatarLetter(): string {
-    return (this.profile?.fullName || this.auth.currentUser()?.email || 'U').charAt(0).toUpperCase();
   }
 
   get publicUrl(): string {
@@ -66,17 +62,5 @@ export class PublicPreviewComponent implements OnInit {
       return;
     }
     this.router.navigate(['/portfolio', this.profile.slug]);
-  }
-
-  levelLabel(level: string): string {
-    const map: Record<string, string> = { BASIC: 'Básico', INTERMEDIATE: 'Intermedio', ADVANCED: 'Avanzado', EXPERT: 'Experto' };
-    return map[level] || level;
-  }
-
-  levelClass(level: string): string {
-    const l = level?.toUpperCase() || '';
-    if (l === 'EXPERT' || l === 'ADVANCED') return 'level-high';
-    if (l === 'INTERMEDIATE') return 'level-mid';
-    return 'level-low';
   }
 }

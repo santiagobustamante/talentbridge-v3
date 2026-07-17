@@ -115,14 +115,13 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
             this.cdr.detectChanges();
           });
         },
-        error: (err) => {
+        error: () => {
           this.zone.run(() => {
-            const detail = err?.error?.message || err?.message || 'Error de conexión';
             this.messages = [
               ...this.messages,
               {
                 from: 'assistant' as const,
-                text: `Lo siento, ocurrió un error: ${detail}. Intenta nuevamente.`,
+                text: 'Lo siento, no pude procesar tu mensaje. Intenta nuevamente en unos momentos.',
               },
             ];
             this.loading.set(false);

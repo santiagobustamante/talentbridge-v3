@@ -78,7 +78,8 @@ const passwordHash = '$2b$10$placeholder_will_be_replaced';
 
 const cities = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Cúcuta', 'Villavicencio', 'Pereira', 'Manizales', 'Armenia', 'Santa Marta', 'Ibagué', 'Pasto', 'Montería', 'Neiva', 'Popayán', 'Tunja', 'Valledupar', 'Riohacha', 'Remoto'];
 const modalities = ['Remoto', 'Presencial', 'Híbrido'];
-const contractTypes = ['Tiempo completo', 'Medio tiempo', 'Prestación de servicios', 'Término fijo', 'Término indefinido', 'Prácticas', 'Freelance'];
+const contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas'];
+const workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Flexible'];
 
 interface JobTemplate {
   title: string;
@@ -251,6 +252,7 @@ async function main() {
       const city = randomPick([company.companyProfile?.city, ...cities].filter(Boolean) as string[]);
       const modality = randomPick(modalities);
       const contractType = randomPick(contractTypes);
+      const workload = randomPick(workloads);
       const salaryMin = randomInt(1200000, 6000000);
       const salaryMax = salaryMin + randomInt(500000, 3000000);
 
@@ -278,6 +280,7 @@ async function main() {
         city,
         modality,
         contractType,
+        workload,
         salaryMin,
         salaryMax,
         currency: 'COP',

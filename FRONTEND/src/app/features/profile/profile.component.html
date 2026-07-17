@@ -26,7 +26,7 @@
   <div *ngIf="loadError && !loading" class="state-card state-error">
     <strong>No se pudo cargar el perfil.</strong>
     <p>{{ loadError }}</p>
-    <button type="button" class="btn-retry" (click)="loadProfile()">Reintentar</button>
+    <button type="button" appButton="secondary" size="sm" (click)="loadProfile()">Reintentar</button>
   </div>
 
   <!-- ===================== MODO LECTURA ===================== -->
@@ -106,7 +106,7 @@
       @if (summaryProfile.slug) {
         <div class="summary-slug">
           <h3>URL pública</h3>
-          <div class="slug-url">{{ 'localhost:4200/portfolio/' + summaryProfile.slug }}</div>
+          <div class="slug-url">{{ publicUrl }}</div>
         </div>
       }
     </div>
@@ -114,7 +114,7 @@
 
   <!-- ===================== MODO EDICIÓN ===================== -->
   @if (isEditing && !loading && !loadError) {
-    <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off" class="profile-form">
+    <form [formGroup]="form" (ngSubmit)="save()" class="profile-form">
 
       <!-- Card 1: Información principal -->
       <div class="form-card">
@@ -125,7 +125,7 @@
         <div class="form-grid">
           <div class="form-field">
             <label>Nombre completo</label>
-            <input class="app-input" formControlName="fullName" placeholder="Ej. María García López" />
+            <input class="app-input" formControlName="fullName" autocomplete="name" placeholder="Ej. María García López" />
           </div>
           <div class="form-field">
             <label>Título profesional</label>
@@ -137,7 +137,7 @@
           </div>
           <div class="form-field full-width">
             <label>Ciudad</label>
-            <input class="app-input" formControlName="city" placeholder="Ej. Madrid, España" />
+            <input class="app-input" formControlName="city" autocomplete="address-level2" placeholder="Ej. Madrid, España" />
             <div class="inline-visibility-control">
               <span>Mostrar ciudad en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showCity')?.value" [attr.aria-pressed]="form.get('showCity')?.value" (click)="toggleLocalVisibility('showCity')">
@@ -157,7 +157,7 @@
         <div class="form-grid">
           <div class="form-field full-width">
             <label>Teléfono</label>
-            <input class="app-input" formControlName="phone" placeholder="+34 600 000 000" />
+            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" placeholder="+57 300 000 0000" />
             <div class="inline-visibility-control">
               <span>Mostrar teléfono en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showPhone')?.value" [attr.aria-pressed]="form.get('showPhone')?.value" (click)="toggleLocalVisibility('showPhone')">
@@ -177,7 +177,7 @@
         <div class="form-grid">
           <div class="form-field full-width">
             <label>LinkedIn</label>
-            <input class="app-input" formControlName="linkedinUrl" placeholder="https://linkedin.com/in/usuario" />
+            <input class="app-input" type="url" formControlName="linkedinUrl" autocomplete="url" placeholder="https://linkedin.com/in/usuario" />
             <div class="inline-visibility-control">
               <span>Mostrar LinkedIn en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showLinkedin')?.value" [attr.aria-pressed]="form.get('showLinkedin')?.value" (click)="toggleLocalVisibility('showLinkedin')">
@@ -187,21 +187,18 @@
           </div>
           <div class="form-field full-width">
             <label>GitHub</label>
-            <input class="app-input" formControlName="githubUrl" placeholder="https://github.com/usuario" />
+            <input class="app-input" type="url" formControlName="githubUrl" autocomplete="url" placeholder="https://github.com/usuario" />
             <div class="inline-visibility-control">
               <span>Mostrar GitHub en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showGithub')?.value" [attr.aria-pressed]="form.get('showGithub')?.value" (click)="toggleLocalVisibility('showGithub')">
                 <span></span>
               </button>
             </div>
-            <div class="github-warning">
-              <mat-icon>info</mat-icon>
-              <p>Antes de compartir repositorios o enlaces de GitHub, verifica que no contengan credenciales, información privada, secretos, datos de clientes, código protegido por acuerdos de confidencialidad ni material restringido por políticas de tu empresa, cliente o institución. La información publicada o compartida mediante estos enlaces es responsabilidad del usuario.</p>
-            </div>
+            <app-github-warning />
           </div>
           <div class="form-field full-width">
             <label>Sitio web</label>
-            <input class="app-input" formControlName="websiteUrl" placeholder="https://tusitio.com" />
+            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" placeholder="https://tusitio.com" />
             <div class="inline-visibility-control">
               <span>Mostrar sitio web en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showWebsite')?.value" [attr.aria-pressed]="form.get('showWebsite')?.value" (click)="toggleLocalVisibility('showWebsite')">
@@ -223,7 +220,7 @@
             <label>Slug (identificador único)</label>
             <div class="slug-row">
               <input class="app-input" formControlName="slug" placeholder="tu-nombre-profesional" />
-              <button type="button" class="btn-outline" (click)="generateSlug()">
+              <button type="button" appButton="secondary" (click)="generateSlug()">
                 <mat-icon>auto_fix_high</mat-icon>
                 Generar
               </button>
@@ -235,11 +232,11 @@
             <strong>{{ publicUrl }}</strong>
           </div>
           <div class="slug-actions">
-            <button type="button" class="btn-outline" (click)="copyLink()">
+            <button type="button" appButton="secondary" (click)="copyLink()">
               <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
               {{ copied ? 'Copiado' : 'Copiar enlace' }}
             </button>
-            <a class="btn-outline" [routerLink]="'/portfolio/' + currentSlug" target="_blank">
+            <a appButton="secondary" [routerLink]="'/portfolio/' + currentSlug" target="_blank">
               <mat-icon>visibility</mat-icon>
               Ver perfil público
             </a>
@@ -248,8 +245,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
-        <button type="submit" class="btn-save" [disabled]="saving">
+        <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>
+        <button type="submit" appButton="primary" [disabled]="saving">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}
         </button>

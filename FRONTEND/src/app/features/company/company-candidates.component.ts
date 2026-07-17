@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CompanyService, CandidateResult, FilterOptions } from '../../core/services/company.service';
 import { ChatService } from '../../core/services/chat.service';
-import { Router } from '@angular/router';
+import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
 
 @Component({
   selector: 'app-company-candidates',
@@ -16,6 +17,7 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
     MatIconModule, MatTooltipModule, MatProgressBarModule, MatSnackBarModule,
+    BadgeComponent, ButtonDirective,
   ],
   styleUrl: './company-candidates.component.scss',
   templateUrl: './company-candidates.component.html',
@@ -24,6 +26,7 @@ export class CompanyCandidatesComponent implements OnInit {
   private companyService = inject(CompanyService);
   private chatService = inject(ChatService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
 
   loading = signal(false);
@@ -39,6 +42,7 @@ export class CompanyCandidatesComponent implements OnInit {
   cityInput = '';
   professionInput = '';
   contactingCandidateId: number | null = null;
+  endorsingSkillId: number | null = null;
 
   filterOptions = signal<FilterOptions>({ skills: [], cities: [], professions: [] });
 
@@ -78,6 +82,12 @@ export class CompanyCandidatesComponent implements OnInit {
       next: (opts) => this.filterOptions.set(opts),
       error: () => {},
     });
+
+    const q = this.route.snapshot.queryParamMap.get('q');
+    if (q) {
+      this.qCtrl.setValue(q);
+      this.doSearch();
+    }
   }
 
   toggleFilters(): void {
@@ -98,6 +108,29 @@ export class CompanyCandidatesComponent implements OnInit {
         this.contactingCandidateId = null;
         const msg = err?.error?.message || err?.message || 'No se pudo iniciar la conversación';
         this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+      },
+    });
+  }
+
+  toggleEndorse(candidate: CandidateResult, skill: { id: number; endorsedByMe?: boolean; endorsementCount?: number }): void {
+    if (this.endorsingSkillId === skill.id) return;
+    this.endorsingSkillId = skill.id;
+
+    const wasEndorsed = !!skill.endorsedByMe;
+    const request = wasEndorsed
+      ? this.companyService.unendorseSkill(skill.id)
+      : this.companyService.endorseSkill(skill.id);
+
+    request.subscribe({
+      next: () => {
+        this.endorsingSkillId = null;
+        skill.endorsedByMe = !wasEndorsed;
+        skill.endorsementCount = (skill.endorsementCount || 0) + (wasEndorsed ? -1 : 1);
+      },
+      error: (err) => {
+        this.endorsingSkillId = null;
+        const msg = err?.error?.message || 'No se pudo avalar esta habilidad';
+        this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
       },
     });
   }

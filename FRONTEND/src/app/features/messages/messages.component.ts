@@ -4,16 +4,20 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription, finalize } from 'rxjs';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import type { ConversationDto, MessageDto } from '../../core/models/chat.models';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIconModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule, RouterModule, MatIconModule, MatSnackBarModule, EmptyStateComponent, AppDatePipe],
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
@@ -23,6 +27,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   isCandidate = this.auth.isCandidate();
   isCompany = this.auth.isCompany();
@@ -36,7 +41,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
   sending = signal(false);
   currentUserId: number | null = null;
 
-  showBlockConfirm = false;
   unblockLoading = false;
 
   private subs: Subscription[] = [];
@@ -50,7 +54,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
       this.chatSocket.message$.subscribe((msg) => {
         const active = this.activeConversation();
         if (active && msg.conversationId === active.id) {
-          this.messages.update((prev) => [...prev, msg]);
+          this.appendMessage(msg);
           if (msg.senderId !== this.currentUserId) {
             this.chatService.markAsRead(active.id).subscribe(() => {
               this.chatService.refreshUnreadCount();
@@ -74,6 +78,15 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach((s) => s.unsubscribe());
+  }
+
+  /**
+   * El mensaje propio llega dos veces (respuesta REST optimista + eco por
+   * WebSocket del mismo conversation:room) — sin este guard aparecía
+   * duplicado/triplicado en pantalla aunque en la base solo hay una fila.
+   */
+  private appendMessage(msg: MessageDto): void {
+    this.messages.update((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
   }
 
   loadConversations(): void {
@@ -126,7 +139,6 @@ export class MessagesComponent implements OnInit, OnDestroy {
         setTimeout(() => this.scrollToBottom(), 50);
       },
       error: (err) => {
-        console.error('[MESSAGES] load error', err);
         const msg = err?.error?.message || err?.message || 'No se pudieron cargar los mensajes';
         this.snackBar.open(msg, 'Cerrar', { duration: 3500 });
       },
@@ -149,7 +161,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.sending.set(true);
     this.chatService.sendMessage(conv.id, body).subscribe({
       next: (msg) => {
-        this.messages.update((prev) => [...prev, msg]);
+        this.appendMessage(msg);
         this.inputMessage = '';
         this.sending.set(false);
         this.loadConversations();
@@ -173,13 +185,21 @@ export class MessagesComponent implements OnInit, OnDestroy {
   blockConversation(): void {
     const conv = this.activeConversation();
     if (!conv) return;
-    this.showBlockConfirm = true;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Bloquear conversación',
+        message: '¿Estás seguro de que deseas bloquear esta conversación? No recibirás más mensajes de este usuario.',
+        confirmLabel: 'Bloquear',
+      },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (ok) this.confirmBlock();
+    });
   }
 
-  confirmBlock(): void {
+  private confirmBlock(): void {
     const conv = this.activeConversation();
     if (!conv) return;
-    this.showBlockConfirm = false;
     this.chatService.blockConversation(conv.id).subscribe({
       next: () => {
         this.snackBar.open('Conversación bloqueada', 'Cerrar', { duration: 2000 });
@@ -217,8 +237,17 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   contactName(conv: ConversationDto): string {
-    if (this.isCandidate) return conv.company?.companyName || 'Empresa';
+    if (this.isCandidate) return conv.company?.companyName || 'Empresa no especificada';
     return conv.candidate?.fullName || 'Candidato';
+  }
+
+  contactLogo(conv: ConversationDto): string | undefined | null {
+    if (this.isCandidate) return conv.company?.logoUrl;
+    return undefined;
+  }
+
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).style.display = 'none';
   }
 
   contactTitle(conv: ConversationDto): string {

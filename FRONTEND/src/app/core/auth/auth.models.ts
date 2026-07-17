@@ -30,7 +30,7 @@ export interface CandidateSearchResult {
   summary: string;
   slug: string;
   isPublished: boolean;
-  skills: { name: string; level: string }[];
+  skills: { id: number; name: string; level: string; endorsementCount?: number; endorsedByMe?: boolean }[];
   _count?: { experiences: number };
 }
 
@@ -73,6 +73,7 @@ export interface Skill {
   id: number;
   name: string;
   level: string;
+  endorsements?: string[];
 }
 
 export interface Experience {

@@ -1,0 +1,34 @@
+<ng-container *ngIf="profile === null && !notFound; else content">
+  <div class="loading-state">
+    <div class="loading-skeleton">
+      <div class="skeleton-line w-60"></div>
+      <div class="skeleton-line w-40"></div>
+      <div class="skeleton-line w-80"></div>
+    </div>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</ng-container>
+
+<ng-template #notFoundTmpl>
+  <div class="error-state animate-fade-in">
+    <div class="error-card">
+      <div class="error-icon">
+        <mat-icon>person_off</mat-icon>
+      </div>
+      <h2>Portafolio no encontrado</h2>
+      <p>El perfil que buscas no existe o no está disponible públicamente.</p>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #content>
+  <ng-container *ngIf="profile; else notFoundTmpl">
+    <div class="public-backbar">
+      <button type="button" class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </div>
+    <app-portfolio-content [profile]="profile" />
+  </ng-container>
+</ng-template>

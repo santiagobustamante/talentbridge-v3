@@ -14,22 +14,29 @@
     <div class="hero-card animate-fade-in-scale">
       <div class="hero-content">
         <div class="hero-left">
-          <span class="hero-badge">
+          <app-badge tone="primary" class="hero-badge">
             <mat-icon>business</mat-icon>Panel Empresa
-          </span>
-          <h1 class="hero-greeting">
-            Bienvenido, <span class="hero-name">{{ companyName }}</span>
-          </h1>
+          </app-badge>
+          <div class="hero-title-row">
+            @if (data()?.logoUrl; as logo) {
+              <img [src]="logo" class="hero-logo" [alt]="companyName" />
+            } @else {
+              <div class="hero-logo hero-logo-fallback">{{ companyInitials }}</div>
+            }
+            <h1 class="hero-greeting">
+              Bienvenido, <span class="hero-name">{{ companyName }}</span>
+            </h1>
+          </div>
           <p class="hero-desc">Gestiona tus vacantes, revisa postulaciones y encuentra talento para tu equipo.</p>
         </div>
         <div class="hero-actions">
-          <a class="btn-primary" routerLink="/company/candidates">
+          <a appButton="primary" routerLink="/company/candidates">
             <mat-icon>search</mat-icon>Buscar candidatos
           </a>
-          <a class="btn-primary" routerLink="/company/jobs">
+          <a appButton="primary" routerLink="/company/jobs">
             <mat-icon>add</mat-icon>Nueva oferta
           </a>
-          <a class="btn-secondary" routerLink="/company/profile">
+          <a appButton="secondary" routerLink="/company/profile">
             <mat-icon>edit</mat-icon>Editar perfil
           </a>
         </div>
@@ -82,29 +89,6 @@
       </div>
     </div>
 
-    <!-- Quick access -->
-    <div class="section-block animate-fade-in-up">
-      <h3 class="section-title">Accesos rápidos</h3>
-      <div class="quick-grid">
-        <a class="quick-card" routerLink="/company/candidates">
-          <div class="quick-icon"><mat-icon>search</mat-icon></div>
-          <div class="quick-info"><strong>Buscar candidatos</strong><span>Encuentra talento</span></div>
-        </a>
-        <a class="quick-card" routerLink="/company/jobs">
-          <div class="quick-icon"><mat-icon>work</mat-icon></div>
-          <div class="quick-info"><strong>Ver vacantes</strong><span>Gestiona tus ofertas</span></div>
-        </a>
-        <a class="quick-card" routerLink="/company/messages">
-          <div class="quick-icon"><mat-icon>chat</mat-icon></div>
-          <div class="quick-info"><strong>Mensajes</strong><span>Chat con candidatos</span></div>
-        </a>
-        <a class="quick-card" routerLink="/company/profile">
-          <div class="quick-icon"><mat-icon>business</mat-icon></div>
-          <div class="quick-info"><strong>Perfil empresarial</strong><span>Tu información</span></div>
-        </a>
-      </div>
-    </div>
-
     <!-- Recent jobs -->
     <div class="section-block animate-fade-in-up">
       <div class="section-header">
@@ -112,7 +96,7 @@
         <a class="section-link" routerLink="/company/jobs">Gestionar vacantes <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (!data()?.recentJobs?.length) {
-        <p class="empty-text">No has creado vacantes aún.</p>
+        <app-empty-state compact icon="work_outline" message="No has creado vacantes aún." actionLabel="Crear oferta" actionRoute="/company/jobs" />
       } @else {
         <div class="job-table">
           <div class="job-row job-header">
@@ -126,7 +110,7 @@
               <span class="jc-title">{{ job.title }}</span>
               <span class="jc-city">{{ job.city || '—' }}</span>
               <span class="jc-status">
-                <span class="status-badge" [class]="'st-' + job.status">{{ statusLabel(job.status) }}</span>
+                <app-badge [tone]="statusTone(job.status)">{{ statusLabel(job.status) }}</app-badge>
               </span>
               <span class="jc-count">{{ job.applicationsCount }}</span>
             </a>
@@ -142,7 +126,7 @@
         <a class="section-link" routerLink="/company/jobs">Ver todas <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (!data()?.recentApplications?.length) {
-        <p class="empty-text">Aún no tienes postulaciones.</p>
+        <app-empty-state compact icon="assignment" message="Aún no tienes postulaciones." />
       } @else {
         <div class="app-list">
           @for (app of data()?.recentApplications; track app.id) {
@@ -150,9 +134,9 @@
               <div class="app-card-avatar">{{ (app.candidateName || 'C').charAt(0) }}</div>
               <div class="app-card-info">
                 <strong>{{ app.candidateName }}</strong>
-                <span>{{ app.jobTitle }} · {{ app.createdAt | date:'mediumDate' }}</span>
+                <span>{{ app.jobTitle }} · {{ app.createdAt | appDate:'short' }}</span>
               </div>
-              <span class="app-status" [class]="'st-' + app.status">{{ statusLabel(app.status) }}</span>
+              <app-badge [tone]="statusTone(app.status)">{{ statusLabel(app.status) }}</app-badge>
             </div>
           }
         </div>
@@ -181,7 +165,7 @@
         <a class="section-link" routerLink="/company/messages">Ir a chat <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (!data()?.recentConversations?.length) {
-        <p class="empty-text">Aún no tienes mensajes.</p>
+        <app-empty-state compact icon="chat_bubble_outline" message="Aún no tienes mensajes." />
       } @else {
         <div class="msg-list">
           @for (conv of data()?.recentConversations; track conv.id) {

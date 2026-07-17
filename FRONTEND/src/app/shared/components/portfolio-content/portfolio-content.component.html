@@ -1,0 +1,174 @@
+<div class="portfolio animate-fade-in">
+
+  <header class="hero">
+    <div class="hero-content animate-fade-in-up">
+      <h1 class="hero-name">{{ profile.fullName || 'Sin nombre' }}</h1>
+      <p class="hero-title">{{ profile.professionalTitle || 'Sin título profesional' }}</p>
+      <p class="hero-location" *ngIf="profile.showCity !== false && profile.city">
+        <mat-icon>location_on</mat-icon>
+        {{ profile.city }}
+      </p>
+      <p class="hero-contact" *ngIf="profile.showPhone !== false && profile.phone">
+        <mat-icon>phone</mat-icon>
+        {{ profile.phone }}
+      </p>
+      <p class="hero-summary" *ngIf="profile.summary">{{ profile.summary }}</p>
+
+      <div class="hero-links" *ngIf="(profile.showLinkedin !== false && profile.linkedinUrl) || (profile.showGithub !== false && profile.githubUrl) || (profile.showWebsite !== false && profile.websiteUrl)">
+        <a *ngIf="profile.showLinkedin !== false && profile.linkedinUrl" [href]="profile.linkedinUrl" target="_blank" class="link-btn linkedin animate-fade-in-up stagger-1">
+          <mat-icon>link</mat-icon>
+          LinkedIn
+        </a>
+        <a *ngIf="profile.showGithub !== false && profile.githubUrl" [href]="profile.githubUrl" target="_blank" class="link-btn github animate-fade-in-up stagger-2">
+          <mat-icon>code</mat-icon>
+          GitHub
+        </a>
+        <a *ngIf="profile.showWebsite !== false && profile.websiteUrl" [href]="profile.websiteUrl" target="_blank" class="link-btn website animate-fade-in-up stagger-3">
+          <mat-icon>language</mat-icon>
+          Sitio Web
+        </a>
+      </div>
+
+      <app-github-warning *ngIf="profile.showGithub !== false && profile.githubUrl" />
+    </div>
+  </header>
+
+  <section class="section skills-section" *ngIf="profile.showSkills !== false">
+    <div class="section-header">
+      <h2 class="section-heading animate-fade-in-up">
+        <mat-icon>bolt</mat-icon>
+        Habilidades
+      </h2>
+      <a *ngIf="editable" class="edit-link" routerLink="/app/skills">Editar</a>
+    </div>
+    <div class="skills-grid animate-fade-in-up stagger-1" *ngIf="profile.skills?.length; else emptySkills">
+      <div class="skill-pill" *ngFor="let s of profile.skills" [class]="levelClass(s.level)">
+        <span class="skill-name">{{ s.name }}</span>
+        <span class="skill-level">{{ levelLabel(s.level) }}</span>
+      </div>
+    </div>
+    <ng-template #emptySkills>
+      <p class="empty-msg" *ngIf="editable">Esta sección todavía no tiene información visible.</p>
+    </ng-template>
+  </section>
+
+  <section class="section experience-section" *ngIf="profile.showExperience !== false">
+    <div class="section-header">
+      <h2 class="section-heading animate-fade-in-up">
+        <mat-icon>work</mat-icon>
+        Experiencia profesional
+      </h2>
+      <a *ngIf="editable" class="edit-link" routerLink="/app/experience">Editar</a>
+    </div>
+    <div class="timeline" *ngIf="profile.experiences?.length; else emptyExperience">
+      <div class="timeline-card glass-card animate-fade-in-up" *ngFor="let e of profile.experiences; let i = index; let last = last" [class.is-last]="last" [style.animation-delay]="(i * 0.08) + 's'">
+        <div class="timeline-dot">
+          <div class="dot-inner" [class.current]="e.isCurrent"></div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-header">
+            <h3>{{ e.position }}</h3>
+            <span class="current-badge" *ngIf="e.isCurrent">Actual</span>
+          </div>
+          <p class="timeline-company">{{ e.company }}</p>
+          <div class="timeline-meta" *ngIf="e.city || e.workMode || e.contractType">
+            <span class="meta-pill" *ngIf="e.city">{{ e.city }}</span>
+            <span class="meta-pill" *ngIf="e.workMode">{{ workModeLabel(e.workMode) }}</span>
+            <span class="meta-pill" *ngIf="e.contractType">{{ contractTypeLabel(e.contractType) }}</span>
+          </div>
+          <p class="timeline-dates">
+            {{ e.startDate | appDate:'monthYear' }} —
+            {{ e.isCurrent ? 'Actualidad' : (e.endDate | appDate:'monthYear') }}
+          </p>
+          <p class="timeline-desc" *ngIf="e.description">{{ e.description }}</p>
+          <p class="timeline-desc" *ngIf="e.functions"><strong>Funciones:</strong> {{ e.functions }}</p>
+          <p class="timeline-desc" *ngIf="e.achievements"><strong>Logros:</strong> {{ e.achievements }}</p>
+          <div class="learned-chips" *ngIf="e.learnedSkills?.length">
+            <span class="learned-chip" *ngFor="let s of e.learnedSkills">{{ s }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #emptyExperience>
+      <p class="empty-msg" *ngIf="editable">Esta sección todavía no tiene información visible.</p>
+    </ng-template>
+  </section>
+
+  <section class="section education-section" *ngIf="profile.showEducation !== false">
+    <div class="section-header">
+      <h2 class="section-heading animate-fade-in-up">
+        <mat-icon>school</mat-icon>
+        Formación académica
+      </h2>
+      <a *ngIf="editable" class="edit-link" routerLink="/app/education">Editar</a>
+    </div>
+    <div class="edu-grid" *ngIf="profile.educations?.length; else emptyEducation">
+      <div class="edu-card glass-card animate-fade-in-scale" *ngFor="let e of profile.educations; let i = index" [style.animation-delay]="(i * 0.08) + 's'">
+        <div class="edu-icon">
+          <mat-icon>school</mat-icon>
+        </div>
+        <div class="edu-content">
+          <div class="edu-badges">
+            <span class="edu-type-badge" *ngIf="e.educationType">{{ e.educationType === 'FORMAL' ? 'Formal' : 'No formal' }}</span>
+            <span class="edu-level-badge" *ngIf="e.formationLevel">{{ e.formationLevel }}</span>
+          </div>
+          <h3>{{ e.institution }}</h3>
+          <p class="edu-degree">{{ e.degree }}</p>
+          <p class="edu-field" *ngIf="e.fieldOfStudy">{{ e.fieldOfStudy }}</p>
+          <p class="edu-dates">
+            {{ e.startDate | appDate:'monthYear' }} —
+            {{ e.isCurrent ? 'Actualidad' : (e.endDate | appDate:'monthYear') }}
+          </p>
+          <p class="edu-desc" *ngIf="e.description">{{ e.description }}</p>
+        </div>
+      </div>
+    </div>
+    <ng-template #emptyEducation>
+      <p class="empty-msg" *ngIf="editable">Esta sección todavía no tiene información visible.</p>
+    </ng-template>
+  </section>
+
+  <section class="section projects-section" *ngIf="profile.showProjects !== false">
+    <div class="section-header">
+      <h2 class="section-heading animate-fade-in-up">
+        <mat-icon>rocket_launch</mat-icon>
+        Proyectos
+      </h2>
+      <a *ngIf="editable" class="edit-link" routerLink="/app/projects">Editar</a>
+    </div>
+    <div class="projects-grid" *ngIf="profile.projects?.length; else emptyProjects">
+      <div class="project-card glass-card animate-fade-in-scale" *ngFor="let p of profile.projects; let i = index" [style.animation-delay]="(i * 0.08) + 's'">
+        <div class="project-header">
+          <mat-icon>folder</mat-icon>
+          <h3>{{ p.name }}</h3>
+        </div>
+        <div class="project-badges" *ngIf="p.projectType || p.status">
+          <span class="proj-badge" *ngIf="p.projectType">{{ p.projectType === 'INDIVIDUAL' ? 'Individual' : 'En equipo' }}</span>
+          <span class="proj-badge proj-status" *ngIf="p.status">{{ projectStatusLabel(p.status) }}</span>
+        </div>
+        <p class="proj-role" *ngIf="p.role"><strong>Rol:</strong> {{ p.role }}</p>
+        <p class="proj-responsibilities" *ngIf="p.responsibilities">{{ p.responsibilities }}</p>
+        <p class="project-desc" *ngIf="p.description">{{ p.description }}</p>
+        <div class="project-tech" *ngIf="p.technologies?.length">
+          <span class="tech-chip" *ngFor="let t of p.technologies">{{ t }}</span>
+        </div>
+        <div class="project-links" *ngIf="p.repositoryUrl || p.demoUrl">
+          <a *ngIf="p.repositoryUrl" [href]="p.repositoryUrl" target="_blank" class="proj-link">
+            <mat-icon>code</mat-icon> Repositorio
+          </a>
+          <a *ngIf="p.demoUrl" [href]="p.demoUrl" target="_blank" class="proj-link demo">
+            <mat-icon>open_in_new</mat-icon> Demo
+          </a>
+        </div>
+      </div>
+    </div>
+    <ng-template #emptyProjects>
+      <p class="empty-msg" *ngIf="editable">Esta sección todavía no tiene información visible.</p>
+    </ng-template>
+  </section>
+
+  <footer class="portfolio-footer animate-fade-in">
+    <div class="footer-line"></div>
+    <p>Portafolio generado con TalentBridge</p>
+  </footer>
+</div>

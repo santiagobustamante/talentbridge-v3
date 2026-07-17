@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { JobOffer, JobApplication, PaginatedJobs } from '../models/jobs.models';
+import { JobOffer, JobApplication, PaginatedJobs, PaginatedApplications } from '../models/jobs.models';
 
 @Injectable({ providedIn: 'root' })
 export class JobsService {
@@ -24,8 +24,10 @@ export class JobsService {
     return this.http.post<JobApplication>(`${this.api}/jobs/${jobId}/apply`, payload || {});
   }
 
-  getMyApplications(): Observable<JobApplication[]> {
-    return this.http.get<JobApplication[]>(`${this.api}/jobs/my-applications`);
+  getMyApplications(params?: {
+    page?: number; limit?: number; status?: string; fromDate?: string; toDate?: string;
+  }): Observable<PaginatedApplications> {
+    return this.http.get<PaginatedApplications>(`${this.api}/jobs/my-applications`, { params });
   }
 
   getCompanyJobs(): Observable<JobOffer[]> {

@@ -15,3 +15,13 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+export {
+  parseSkillsRequired,
+  stringifySkillsRequired,
+  computeSkillMatch,
+  type SkillLevel,
+  type RequiredSkill,
+  type SkillMatchEntry,
+  type SkillMatchResult,
+} from './skill-match.util';

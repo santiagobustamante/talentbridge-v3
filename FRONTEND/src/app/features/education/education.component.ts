@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,12 +14,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import { DatePipe } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { EducationService } from '../../core/services/education.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { Education } from '../../core/auth/auth.models';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 
 @Component({
   selector: 'app-education',
@@ -27,7 +28,7 @@ import { Education } from '../../core/auth/auth.models';
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule,
     MatSnackBarModule, MatCheckboxModule, MatDatepickerModule, MatNativeDateModule,
-    MatSelectModule, MatSlideToggleModule,
+    MatSelectModule, MatSlideToggleModule, AppDatePipe,
   ],
   styleUrl: './education.component.scss',
   template: `
@@ -146,7 +147,7 @@ import { Education } from '../../core/auth/auth.models';
               <p class="field-study" *ngIf="e.fieldOfStudy">{{ e.fieldOfStudy }}</p>
               <div class="date-range">
                 <mat-icon>calendar_today</mat-icon>
-                <span>{{ e.startDate | date:'MMM y' }} — {{ e.isCurrent ? 'En curso' : (e.endDate | date:'MMM y') }}</span>
+                <span>{{ e.startDate | appDate:'monthYear' }} — {{ e.isCurrent ? 'En curso' : (e.endDate | appDate:'monthYear') }}</span>
               </div>
               <p class="edu-description" *ngIf="e.description">{{ e.description }}</p>
               <span class="current-badge" *ngIf="e.isCurrent">En curso</span>
@@ -222,7 +223,13 @@ export class EducationComponent implements OnInit {
       description: v.description || undefined,
     };
     const req = this.editing ? this.service.update(this.editing, data) : this.service.create(data);
-    req.subscribe({ next: () => { this.load(); this.cancel(); this.snackBar.open('Guardado', 'Cerrar', { duration: 2000 }); }});
+    req.subscribe({
+      next: () => { this.load(); this.cancel(); this.snackBar.open('Guardado', 'Cerrar', { duration: 2000 }); },
+      error: (err: HttpErrorResponse) => {
+        const msg = err?.error?.message || err?.message || 'Error al guardar';
+        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+      },
+    });
   }
 
   startEdit(e: Education) {
@@ -240,6 +247,15 @@ export class EducationComponent implements OnInit {
 
   remove(id: number) {
     const ref = this.dialog.open(ConfirmDialogComponent, { data: { title: 'Eliminar', message: '¿Eliminar esta educación?' } });
-    ref.afterClosed().subscribe((ok) => { if (ok) this.service.delete(id).subscribe(() => this.load()); });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.service.delete(id).subscribe({
+        next: () => this.load(),
+        error: (err: HttpErrorResponse) => {
+          const msg = err?.error?.message || err?.message || 'Error al eliminar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
+    });
   }
 }

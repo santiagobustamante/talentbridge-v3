@@ -36,8 +36,10 @@ export class DashboardService {
       take: 5,
       select: {
         id: true, title: true, city: true, modality: true, contractType: true,
+        customContractType: true, workload: true, customWorkload: true,
         skillsRequired: true, salaryMin: true, salaryMax: true, currency: true,
-        company: { select: { companyProfile: { select: { companyName: true } } } },
+        publishedAt: true, createdAt: true,
+        company: { select: { companyProfile: { select: { companyName: true, logoUrl: true } } } },
       },
     });
 
@@ -53,7 +55,7 @@ export class DashboardService {
       orderBy: { lastMessageAt: 'desc' },
       take: 3,
       include: {
-        company: { select: { companyProfile: { select: { companyName: true } } } },
+        company: { select: { companyProfile: { select: { companyName: true, logoUrl: true } } } },
         messages: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
     });
@@ -81,14 +83,17 @@ export class DashboardService {
       isPublished: profile.isPublished,
       recentJobs: recentJobs.map((j) => ({
         id: j.id, title: j.title, city: j.city, modality: j.modality, contractType: j.contractType,
+        customContractType: j.customContractType, workload: j.workload, customWorkload: j.customWorkload,
         skillsRequired: j.skillsRequired, salaryMin: j.salaryMin, salaryMax: j.salaryMax, currency: j.currency,
-        company: j.company?.companyProfile ? { companyName: j.company.companyProfile.companyName } : null,
+        publishedAt: j.publishedAt, createdAt: j.createdAt,
+        company: j.company?.companyProfile ? { companyName: j.company.companyProfile.companyName, logoUrl: j.company.companyProfile.logoUrl } : null,
       })),
       recentApplications: recentApplications.map((a) => ({
         id: a.id, jobId: a.jobOffer?.id || 0, jobTitle: a.jobOffer?.title || '', status: a.status, createdAt: a.createdAt.toISOString(),
       })),
       recentConversations: recentConversations.map((c) => ({
         id: c.id, companyName: c.company?.companyProfile?.companyName,
+        logoUrl: c.company?.companyProfile?.logoUrl,
         lastMessage: c.messages[0]?.body || null, lastMessageAt: c.lastMessageAt?.toISOString() || null,
       })),
       nextStep,
@@ -143,6 +148,7 @@ export class DashboardService {
 
     return {
       companyName: companyProfile.companyName,
+      logoUrl: companyProfile.logoUrl,
       candidatesCount: publishedCandidates,
       publishedJobsCount: publishedJobs,
       draftJobsCount: draftJobs,

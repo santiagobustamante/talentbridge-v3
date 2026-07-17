@@ -112,7 +112,8 @@ const jobTemplates = [
 
 const cities = ['Bogotá, Colombia', 'Medellín, Colombia', 'Cali, Colombia', 'Barranquilla, Colombia', 'Bucaramanga, Colombia', 'Neiva, Colombia', 'Pereira, Colombia', 'Villavicencio, Colombia', 'Remoto, Colombia'];
 const modalities = ['Remoto', 'Híbrido', 'Presencial'];
-const contractTypes = ['Término indefinido', 'Término fijo', 'Prestación de servicios', 'Prácticas'];
+const contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas'];
+const workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Flexible'];
 
 async function main() {
   console.log('\n🏢 Creando 10 empresas demo...\n');
@@ -149,6 +150,7 @@ async function main() {
       const city = cities[Math.floor(Math.random() * cities.length)];
       const mod = modalities[Math.floor(Math.random() * modalities.length)];
       const ct = contractTypes[Math.floor(Math.random() * contractTypes.length)];
+      const wl = workloads[Math.floor(Math.random() * workloads.length)];
 
       await prisma.jobOffer.create({
         data: {
@@ -157,7 +159,7 @@ async function main() {
           description: `Buscamos ${tpl.title.toLowerCase()} para unirse a nuestro equipo de tecnología. Trabajarás en proyectos innovadores con tecnologías modernas.`,
           requirements: `Experiencia con ${tpl.skills}.\nCapacidad de trabajo en equipo.\nBuena comunicación.\nDeseo de aprender y crecer profesionalmente.`,
           responsibilities: `Desarrollar y mantener funcionalidades.\nParticipar en revisiones de código.\nColaborar con el equipo.\nDocumentar soluciones.\nApoyar pruebas y despliegues.`,
-          city, modality: mod, contractType: ct,
+          city, modality: mod, contractType: ct, workload: wl,
           salaryMin: tpl.salaryMin, salaryMax: tpl.salaryMax,
           currency: 'COP',
           skillsRequired: tpl.skills,

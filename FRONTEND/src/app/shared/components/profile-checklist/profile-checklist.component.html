@@ -1,0 +1,36 @@
+<div class="checklist-card">
+  <div class="checklist-header">
+    <div class="progress-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="ring-bg" cx="50" cy="50" r="42" />
+        <circle
+          class="ring-fill"
+          cx="50" cy="50" r="42"
+          [style.stroke-dasharray]="ringCircumference"
+          [style.stroke-dashoffset]="ringOffset"
+        />
+      </svg>
+      <div class="progress-ring-inner">
+        <span class="progress-value">{{ percent }}%</span>
+      </div>
+    </div>
+    <div class="checklist-title">
+      <h3>Completa tu perfil</h3>
+      <p>Un perfil completo recibe más vistas y postulaciones exitosas.</p>
+    </div>
+  </div>
+
+  <ul class="checklist-list">
+    @for (item of items; track item.label) {
+      <li class="checklist-item" [class.done]="item.done">
+        <a [routerLink]="item.route">
+          <mat-icon>{{ item.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>{{ item.label }}</span>
+          @if (!item.done) {
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+          }
+        </a>
+      </li>
+    }
+  </ul>
+</div>

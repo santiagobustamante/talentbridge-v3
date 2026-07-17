@@ -19,6 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ProjectsService } from '../../core/services/projects.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
+import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
 import { Project } from '../../core/auth/auth.models';
 import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/services/skill-catalog';
 
@@ -31,6 +32,7 @@ const URL_PATTERN = /^https?:\/\/.+/i;
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule, MatChipsModule, MatSnackBarModule,
     MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatNativeDateModule, MatSlideToggleModule,
+    GithubWarningComponent,
   ],
   styleUrl: './projects.component.scss',
   template: `
@@ -119,15 +121,12 @@ const URL_PATTERN = /^https?:\/\/.+/i;
                 </mat-chip>
               </div>
 
-              <div class="github-warning">
-                <mat-icon class="warn-icon">info</mat-icon>
-                <p class="warn-text">Antes de compartir repositorios o enlaces de GitHub, verifica que no contengan credenciales, información privada, secretos, datos de clientes, código protegido por acuerdos de confidencialidad ni material restringido por políticas de tu empresa, cliente o institución. La información publicada o compartida mediante estos enlaces es responsabilidad del usuario.</p>
-              </div>
+              <app-github-warning />
 
               <div class="form-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Repositorio GitHub</mat-label>
-                  <input matInput formControlName="repositoryUrl" placeholder="https://github.com/user/repo" />
+                  <mat-label>URL del repositorio</mat-label>
+                  <input matInput formControlName="repositoryUrl" placeholder="https://github.com/usuario/proyecto, https://gitlab.com/usuario/proyecto o enlace similar" />
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Demo URL</mat-label>
@@ -354,7 +353,16 @@ export class ProjectsComponent implements OnInit {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Eliminar', message: '¿Eliminar este proyecto?' },
     });
-    ref.afterClosed().subscribe((ok) => { if (ok) this.service.delete(id).subscribe(() => this.load()); });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.service.delete(id).subscribe({
+        next: () => this.load(),
+        error: (err: HttpErrorResponse) => {
+          const msg = err?.error?.message || err?.message || 'Error al eliminar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
+    });
   }
 
   statusLabel(s: string): string {

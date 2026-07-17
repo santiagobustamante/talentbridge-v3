@@ -6,11 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CompanyService } from '../../core/services/company.service';
 import { CompanyProfile } from '../../core/auth/auth.models';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { formatColombianPhone, formatColombianNit } from '../../shared/utils/phone-format.util';
 
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective],
   templateUrl: './company-profile.component.html',
   styleUrl: './company-profile.component.scss',
 })
@@ -43,6 +45,18 @@ export class CompanyProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
+    this.form.get('phone')?.valueChanges.subscribe((val) => {
+      const formatted = formatColombianPhone(val || '');
+      if (formatted !== val) {
+        this.form.get('phone')?.setValue(formatted, { emitEvent: false });
+      }
+    });
+    this.form.get('nit')?.valueChanges.subscribe((val) => {
+      const formatted = formatColombianNit(val || '');
+      if (formatted !== val) {
+        this.form.get('nit')?.setValue(formatted, { emitEvent: false });
+      }
+    });
   }
 
   loadProfile(): void {

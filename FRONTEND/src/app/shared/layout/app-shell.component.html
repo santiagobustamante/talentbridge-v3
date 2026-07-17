@@ -79,7 +79,7 @@
           <mat-icon>menu</mat-icon>
         </button>
         <h2 class="topbar-title" [matTooltip]="userEmail">
-          Hola,&nbsp;<span class="greeting-name">{{ userEmail }}</span>
+          Hola,&nbsp;<span class="greeting-name">{{ greetingName }}</span>
         </h2>
       </div>
       <div class="topbar-right">
@@ -97,4 +97,6 @@
 
 </div>
 
-<app-assistant-chat />
+@if (!isActive('/app/messages')) {
+  <app-assistant-chat />
+}

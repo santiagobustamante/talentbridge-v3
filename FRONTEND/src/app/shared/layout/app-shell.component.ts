@@ -43,16 +43,16 @@ export class AppShellComponent implements OnInit, OnDestroy {
   private unreadSub: Subscription | null = null;
 
   readonly navItems: NavItem[] = [
-    { label: 'Inicio', icon: 'home', route: '/app/inicio' },
-    { label: 'Perfil', icon: 'person', route: '/app/profile' },
-    { label: 'Trabajos', icon: 'work', route: '/app/jobs' },
-    { label: 'Mensajes', icon: 'chat', route: '/app/messages' },
-    { label: 'Habilidades', icon: 'psychology', route: '/app/skills' },
-    { label: 'Experiencia', icon: 'work_history', route: '/app/experience' },
-    { label: 'Educación', icon: 'school', route: '/app/education' },
-    { label: 'Proyectos', icon: 'code', route: '/app/projects' },
-    { label: 'CV', icon: 'document_scanner', route: '/app/cv-analysis' },
-    { label: 'Vista pública', icon: 'visibility', route: '/app/public-view' },
+    { label: 'Tu centro profesional', subtitle: 'Inicio', icon: 'home', route: '/app/inicio' },
+    { label: 'Tu información pública', subtitle: 'Perfil', icon: 'person', route: '/app/profile' },
+    { label: 'Explora oportunidades', subtitle: 'Trabajos', icon: 'work', route: '/app/jobs' },
+    { label: 'Habla con empresas', subtitle: 'Mensajes', icon: 'chat', route: '/app/messages' },
+    { label: 'Tu mapa de competencias', subtitle: 'Habilidades', icon: 'psychology', route: '/app/skills' },
+    { label: 'Tu trayectoria laboral', subtitle: 'Experiencia', icon: 'work_history', route: '/app/experience' },
+    { label: 'Tu formación académica', subtitle: 'Educación', icon: 'school', route: '/app/education' },
+    { label: 'Lo que has construido', subtitle: 'Proyectos', icon: 'code', route: '/app/projects' },
+    { label: 'Análisis inteligente', subtitle: 'CV', icon: 'document_scanner', route: '/app/cv-analysis' },
+    { label: 'Así te ven las empresas', subtitle: 'Vista pública', icon: 'visibility', route: '/app/public-view' },
   ];
 
   constructor() {
@@ -92,8 +92,12 @@ export class AppShellComponent implements OnInit, OnDestroy {
     return this.auth.currentUser()?.email || 'Usuario';
   }
 
+  get greetingName(): string {
+    return this.auth.currentUser()?.profile?.fullName || this.userEmail;
+  }
+
   get userInitial(): string {
-    return this.userEmail.charAt(0).toUpperCase();
+    return this.greetingName.charAt(0).toUpperCase();
   }
 
   get publicSlug(): string {

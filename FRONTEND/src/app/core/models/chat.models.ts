@@ -1,7 +1,7 @@
 export interface ConversationDto {
   id: number;
   candidate: { id: number; fullName: string | null; professionalTitle: string | null; city: string | null; slug: string };
-  company: { id: number; companyName: string | null; sector: string | null; city: string | null };
+  company: { id: number; companyName: string | null; logoUrl?: string | null; sector: string | null; city: string | null };
   lastMessage: { body: string; createdAt: string; senderId: number } | null;
   lastMessageAt: string | null;
   unreadCount: number;

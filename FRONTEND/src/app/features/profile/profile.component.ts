@@ -10,6 +10,9 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { ProfileService } from '../../core/services/profile.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Profile } from '../../core/auth/auth.models';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
+import { formatColombianPhone } from '../../shared/utils/phone-format.util';
 
 type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' | 'showWebsite';
 
@@ -19,6 +22,7 @@ type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' 
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule,
     MatIconModule, MatSlideToggleModule, MatSnackBarModule, MatTooltipModule,
+    ButtonDirective, GithubWarningComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -62,6 +66,12 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
+    this.form.get('phone')?.valueChanges.subscribe((val) => {
+      const formatted = formatColombianPhone(val || '');
+      if (formatted !== val) {
+        this.form.get('phone')?.setValue(formatted, { emitEvent: false });
+      }
+    });
   }
 
   loadProfile(): void {
@@ -193,11 +203,6 @@ export class ProfileComponent implements OnInit {
       showGithub: Boolean(raw.showGithub),
       showWebsite: Boolean(raw.showWebsite),
     };
-
-    const slug = this.normalizeSlug(raw.slug);
-    if (slug) {
-      payload.slug = slug;
-    }
 
     this.profileService.updateProfile(payload as any).subscribe({
       next: (profile) => {

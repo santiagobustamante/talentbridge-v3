@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { ApplicationsService } from './applications.service';
@@ -15,8 +15,15 @@ export class ApplicationsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('jobs/my-applications')
-  async getMyApplications(@CurrentUser() user: { sub: number }) {
-    return this.applicationsService.getMyApplications(user.sub);
+  async getMyApplications(
+    @CurrentUser() user: { sub: number },
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    return this.applicationsService.getMyApplications(user.sub, { page, limit, status, fromDate, toDate });
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

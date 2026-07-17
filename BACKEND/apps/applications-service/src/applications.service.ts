@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService, JobOfferStatus, JobApplicationStatus } from '@app/database';
+import { computeSkillMatch } from '@app/contracts';
 
 @Injectable()
 export class ApplicationsService {
@@ -18,17 +19,13 @@ export class ApplicationsService {
     });
     if (existing) throw new ConflictException('Ya aplicaste a esta oferta');
 
-    const requiredSkills = (job.skillsRequired || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-
-    if (requiredSkills.length > 0) {
-      const candidateSkills = (
-        await this.prisma.skill.findMany({ where: { profileId: profile.id } })
-      ).map((s) => s.normalizedName.toLowerCase());
-
-      const hasMatch = requiredSkills.some((s) => candidateSkills.includes(s));
-      if (!hasMatch) {
-        throw new BadRequestException('No tienes al menos una habilidad que coincida con los requisitos de esta oferta');
-      }
+    const candidateSkills = await this.prisma.skill.findMany({
+      where: { profileId: profile.id },
+      select: { normalizedName: true, level: true },
+    });
+    const match = computeSkillMatch(job.skillsRequired, candidateSkills);
+    if (!match.hasAnyMatch) {
+      throw new BadRequestException('No tienes al menos una habilidad que coincida con los requisitos de esta oferta');
     }
 
     return this.prisma.jobApplication.create({
@@ -41,30 +38,79 @@ export class ApplicationsService {
     });
   }
 
-  async getMyApplications(candidateUserId: number) {
-    return this.prisma.jobApplication.findMany({
-      where: { candidateId: candidateUserId },
-      include: {
-        jobOffer: {
-          select: {
-            id: true,
-            title: true,
-            city: true,
-            modality: true,
-            status: true,
-            skillsRequired: true,
-            company: {
-              select: {
-                companyProfile: {
-                  select: { companyName: true, logoUrl: true },
+  async getMyApplications(
+    candidateUserId: number,
+    params?: { page?: string; limit?: string; status?: string; fromDate?: string; toDate?: string },
+  ) {
+    const page = Math.max(1, parseInt(params?.page || '1', 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(params?.limit || '10', 10) || 10));
+
+    const where: any = { candidateId: candidateUserId };
+
+    if (params?.status) {
+      const validStatuses = Object.values(JobApplicationStatus);
+      if (validStatuses.includes(params.status as JobApplicationStatus)) {
+        where.status = params.status;
+      }
+    }
+
+    if (params?.fromDate || params?.toDate) {
+      where.createdAt = {};
+      if (params.fromDate) {
+        const from = new Date(params.fromDate);
+        if (isNaN(from.getTime())) throw new BadRequestException('fromDate inválida. Usa formato YYYY-MM-DD');
+        where.createdAt.gte = from;
+      }
+      if (params.toDate) {
+        const to = new Date(params.toDate);
+        if (isNaN(to.getTime())) throw new BadRequestException('toDate inválida. Usa formato YYYY-MM-DD');
+        to.setHours(23, 59, 59, 999);
+        where.createdAt.lte = to;
+      }
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.jobApplication.findMany({
+        where,
+        include: {
+          jobOffer: {
+            select: {
+              id: true,
+              title: true,
+              city: true,
+              modality: true,
+              contractType: true,
+              customContractType: true,
+              workload: true,
+              customWorkload: true,
+              salaryMin: true,
+              salaryMax: true,
+              currency: true,
+              status: true,
+              skillsRequired: true,
+              publishedAt: true,
+              createdAt: true,
+              company: {
+                select: {
+                  companyProfile: {
+                    select: { companyName: true, logoUrl: true, city: true },
+                  },
                 },
               },
             },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.jobApplication.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async getJobApplications(companyUserId: number, jobId: number) {

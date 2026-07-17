@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, map, of } from 'rxjs';
+import { Observable, tap, map, of, catchError } from 'rxjs';
 import { User, Profile } from './auth.models';
 
 @Injectable({ providedIn: 'root' })
@@ -83,11 +83,9 @@ export class AuthService {
   initAuth(): Observable<User | null> {
     this._authReady.set(false);
     return this.fetchMe().pipe(
-      map((user) => user),
-      tap({
-        error: () => {
-          this._authReady.set(true);
-        },
+      catchError(() => {
+        this._authReady.set(true);
+        return of(null);
       }),
     );
   }

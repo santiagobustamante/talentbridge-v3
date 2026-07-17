@@ -86,7 +86,7 @@ export class CandidateSearchService {
       this.prisma.profile.findMany({
         where,
         include: {
-          skills: true,
+          skills: { include: { endorsements: true } },
           _count: { select: { experiences: true } },
         },
         orderBy: { updatedAt: 'desc' },
@@ -111,7 +111,13 @@ export class CandidateSearchService {
         summary: profile.summary,
         slug: profile.slug,
         isPublished: profile.isPublished,
-        skills: profile.skills.map((s) => ({ name: s.name, level: s.level })),
+        skills: profile.skills.map((s) => ({
+          id: s.id,
+          name: s.name,
+          level: s.level,
+          endorsementCount: s.endorsements.length,
+          endorsedByMe: s.endorsements.some((e) => e.companyId === companyUserId),
+        })),
         matchedSkills,
         experiencesCount: profile._count.experiences,
       };

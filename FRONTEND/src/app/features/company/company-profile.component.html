@@ -26,14 +26,20 @@
   <div *ngIf="loadError && !loading" class="state-card state-error">
     <strong>No se pudo cargar el perfil empresarial.</strong>
     <p>{{ loadError }}</p>
-    <button type="button" class="btn-retry" (click)="loadProfile()">Reintentar</button>
+    <button type="button" appButton="secondary" size="sm" (click)="loadProfile()">Reintentar</button>
   </div>
 
   <!-- ===================== MODO LECTURA ===================== -->
   @if (!isEditing && !loading && !loadError) {
     <div class="company-summary">
       <div class="summary-header">
-        <div class="company-avatar">{{ getInitials(summaryProfile.companyName) }}</div>
+        <div class="company-avatar">
+          @if (summaryProfile.logoUrl; as logo) {
+            <img [src]="logo" [alt]="summaryProfile.companyName" />
+          } @else {
+            {{ getInitials(summaryProfile.companyName) }}
+          }
+        </div>
         <div>
           <h2>{{ displayValue(summaryProfile.companyName, 'Nombre de empresa no agregado') }}</h2>
           <p>{{ displayValue(summaryProfile.sector, 'Sector no agregado') }}</p>
@@ -69,7 +75,7 @@
 
   <!-- ===================== MODO EDICIÓN ===================== -->
   @if (isEditing && !loading && !loadError) {
-    <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off" class="company-form">
+    <form [formGroup]="form" (ngSubmit)="save()" class="company-form">
 
       <div class="form-card">
         <div class="form-card-header">
@@ -79,11 +85,11 @@
         <div class="form-grid">
           <div class="form-field">
             <label>Nombre de la empresa</label>
-            <input class="app-input" formControlName="companyName" placeholder="Ej. Tech Solutions S.A." />
+            <input class="app-input" formControlName="companyName" autocomplete="organization" placeholder="Ej. Tech Solutions S.A." />
           </div>
           <div class="form-field">
             <label>NIT</label>
-            <input class="app-input" formControlName="nit" placeholder="Ej. 900.123.456-7" />
+            <input class="app-input" inputmode="numeric" formControlName="nit" placeholder="Ej. 900.123.456-7" />
           </div>
           <div class="form-field">
             <label>Sector</label>
@@ -91,7 +97,7 @@
           </div>
           <div class="form-field">
             <label>Ciudad</label>
-            <input class="app-input" formControlName="city" placeholder="Ej. Bogotá, Colombia" />
+            <input class="app-input" formControlName="city" autocomplete="address-level2" placeholder="Ej. Bogotá, Colombia" />
           </div>
           <div class="form-field form-field--full">
             <label>Descripción</label>
@@ -108,11 +114,11 @@
         <div class="form-grid">
           <div class="form-field form-field--full">
             <label>Teléfono</label>
-            <input class="app-input" formControlName="phone" placeholder="+57 300 000 0000" />
+            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" placeholder="+57 300 000 0000" />
           </div>
           <div class="form-field form-field--full">
             <label>Sitio web</label>
-            <input class="app-input" formControlName="websiteUrl" placeholder="https://miempresa.com" />
+            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" placeholder="https://miempresa.com" />
           </div>
         </div>
       </div>
@@ -125,13 +131,13 @@
         <div class="form-grid">
           <div class="form-field form-field--full">
             <label>URL del logo</label>
-            <input class="app-input" formControlName="logoUrl" placeholder="https://miempresa.com/logo.png" />
+            <input class="app-input" type="url" formControlName="logoUrl" autocomplete="url" placeholder="https://miempresa.com/logo.png" />
           </div>
         </div>
       </div>
 
       <div class="form-actions">
-        <button type="button" class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
+        <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>
         <button type="submit" class="btn-save" [disabled]="saving">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}

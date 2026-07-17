@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 // ── Auth Container ──────────────────────────
 
 .auth {
@@ -40,11 +42,11 @@
   margin: 0 auto var(--space-md);
 }
 
-.brand-letters {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -0.02em;
+.brand-mark mat-icon {
+  color: var(--text-on-color);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 .brand-name {
@@ -90,20 +92,6 @@
   }
 }
 
-.submit-btn {
-  height: 46px !important;
-  font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  border-radius: var(--radius-sm) !important;
-  background: var(--primary) !important;
-  color: #fff !important;
-  transition: all var(--transition-fast) !important;
-
-  &:not(:disabled):hover {
-    background: var(--primary-hover) !important;
-  }
-}
-
 .btn-content {
   display: flex;
   align-items: center;
@@ -129,7 +117,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@include bp.mobile {
   .auth {
     padding: var(--space-md);
     align-items: flex-start;

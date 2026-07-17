@@ -7,13 +7,19 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { JobsService } from '../../core/services/jobs.service';
 import { JobOffer, JobApplication } from '../../core/models/jobs.models';
+import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
+import { statusToTone } from '../../shared/components/badge/status-tone.util';
+import { statusToLabel } from '../../shared/components/badge/status-label.util';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { formatAppDate } from '../../shared/utils/format-date.util';
 
 @Component({
   selector: 'app-candidate-jobs',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
-    MatIconModule, MatProgressBarModule, MatSnackBarModule,
+    MatIconModule, MatProgressBarModule, MatSnackBarModule, BadgeComponent, ButtonDirective, AppDatePipe,
   ],
   styleUrl: './candidate-jobs.component.scss',
   templateUrl: './candidate-jobs.component.html',
@@ -24,6 +30,7 @@ export class CandidateJobsComponent implements OnInit {
 
   activeTab = signal<'available' | 'my-applications'>('available');
   loading = signal(false);
+  loadingApps = signal(false);
   applyingId = signal<number | null>(null);
 
   qCtrl = new FormControl('');
@@ -38,6 +45,14 @@ export class CandidateJobsComponent implements OnInit {
   total = 0;
   totalPages = 1;
 
+  appPage = 1;
+  appLimit = 10;
+  appTotal = 0;
+  appTotalPages = 1;
+  appStatusFilter = '';
+  appFromDate = '';
+  appToDate = '';
+
   selectedJob = signal<JobOffer | null>(null);
   coverMessage = '';
   showApplyForm = false;
@@ -45,7 +60,8 @@ export class CandidateJobsComponent implements OnInit {
   hasSearched = false;
 
   readonly modalities = ['Remoto', 'Presencial', 'Híbrido'];
-  readonly contractTypes = ['Tiempo completo', 'Medio tiempo', 'Freelance', 'Por proyecto', 'Prácticas'];
+  readonly contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro'];
+  readonly workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
 
   ngOnInit(): void {
     this.loadJobs();
@@ -98,14 +114,21 @@ export class CandidateJobsComponent implements OnInit {
   }
 
   loadMyApplications(): void {
-    this.loading.set(true);
-    this.jobsService.getMyApplications().subscribe({
-      next: (apps) => {
-        this.applications = apps;
-        this.loading.set(false);
+    this.loadingApps.set(true);
+    const params: any = { page: this.appPage, limit: this.appLimit };
+    if (this.appStatusFilter) params.status = this.appStatusFilter;
+    if (this.appFromDate) params.fromDate = this.appFromDate;
+    if (this.appToDate) params.toDate = this.appToDate;
+
+    this.jobsService.getMyApplications(params).subscribe({
+      next: (res) => {
+        this.applications = res.data;
+        this.appTotal = res.meta.total;
+        this.appTotalPages = res.meta.totalPages;
+        this.loadingApps.set(false);
       },
       error: (err) => {
-        this.loading.set(false);
+        this.loadingApps.set(false);
         const msg = err?.error?.message || 'Error al cargar postulaciones';
         this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
       },
@@ -173,6 +196,22 @@ export class CandidateJobsComponent implements OnInit {
     this.coverMessage = '';
   }
 
+  openDetailFromApp(app: JobApplication): void {
+    const job = app.jobOffer;
+    this.selectedJob.set({
+      ...job,
+      companyId: job.company ? 0 : 0,
+      description: (job as any).description || '',
+      status: job.status as any,
+      hasApplied: true,
+      applicationStatus: app.status,
+      applicationId: app.id,
+      appliedAt: app.createdAt,
+    } as JobOffer);
+    this.showApplyForm = false;
+    this.coverMessage = '';
+  }
+
   applyToJob(jobId: number): void {
     if (this.applyingId()) return;
 
@@ -209,19 +248,80 @@ export class CandidateJobsComponent implements OnInit {
     });
   }
 
-  getStatusLabel(status: string): string {
-    const map: Record<string, string> = {
-      PENDING: 'Pendiente',
-      REVIEWED: 'Revisado',
-      PRESELECTED: 'Preseleccionado',
-      REJECTED: 'Rechazado',
-      HIRED: 'Contratado',
-    };
-    return map[status] || status;
+  contractTypeLabel(job: JobOffer): string {
+    if (job.contractType === 'Otro' && job.customContractType) return job.customContractType;
+    return job.contractType || '';
   }
 
-  getStatusClass(status: string): string {
-    return `status-${status}`;
+  workloadLabel(job: JobOffer): string {
+    if (job.workload === 'Otra' && job.customWorkload) return job.customWorkload;
+    return job.workload || '';
+  }
+
+  formatDate(job: JobOffer): string {
+    const date = job.publishedAt || job.createdAt;
+    if (!date) return '';
+    return 'Publicado el ' + formatAppDate(date, 'short');
+  }
+
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).style.display = 'none';
+  }
+
+  companyName(job: JobOffer): string {
+    const c: any = job.company;
+    if (!c) return 'Empresa no especificada';
+    return c.companyName || c.companyProfile?.companyName || 'Empresa no especificada';
+  }
+
+  matchPercent(job: JobOffer): number {
+    if (job.skillMatch) return job.skillMatch.matchPercent;
+    const total = job.requiredSkillsList?.length || 0;
+    if (!total) return 0;
+    const matched = job.matchedSkills?.length || 0;
+    return Math.round((matched / total) * 100);
+  }
+
+  skillStatusLabel(status: 'met' | 'insufficient' | 'missing'): string {
+    const map = { met: 'Cumple', insufficient: 'Nivel insuficiente', missing: 'Te falta' };
+    return map[status];
+  }
+
+  companyLogo(job: JobOffer): string | undefined {
+    const c: any = job.company;
+    if (!c) return undefined;
+    return c.logoUrl || c.companyProfile?.logoUrl;
+  }
+
+  visibleSkills(job: JobOffer): { chips: string[]; more: number } {
+    const all = (job.skillsRequired || '').split(',').map(s => this.stripRequiredLevel(s)).filter(Boolean);
+    if (all.length <= 5) return { chips: all, more: 0 };
+    return { chips: all.slice(0, 5), more: all.length - 5 };
+  }
+
+  /** El nombre puede venir como "Angular:ADVANCED" (formato interno para pedir nivel mínimo) — acá solo se muestra el nombre. */
+  stripRequiredLevel(raw: string): string {
+    return raw.split(':')[0].trim();
+  }
+
+  formatSalaryCompact(job: JobOffer): string | null {
+    if (job.salaryMin || job.salaryMax) {
+      const currency = job.currency || 'COP';
+      const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
+      const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+      if (min && max) return `${min} – ${max} ${currency}`;
+      if (min) return `Desde ${min} ${currency}`;
+      return `Hasta ${max} ${currency}`;
+    }
+    return null;
+  }
+
+  getStatusLabel(status: string): string {
+    return statusToLabel(status);
+  }
+
+  statusTone(status: string): BadgeTone {
+    return statusToTone(status);
   }
 
   formatSalary(job: JobOffer): string | null {
@@ -248,5 +348,84 @@ export class CandidateJobsComponent implements OnInit {
     if (end < total - 1) pages.push('...');
     if (total > 1) pages.push(total);
     return pages;
+  }
+
+  applyFiltersApps(): void {
+    this.appPage = 1;
+    this.loadMyApplications();
+  }
+
+  clearFiltersApps(): void {
+    this.appStatusFilter = '';
+    this.appFromDate = '';
+    this.appToDate = '';
+    this.appPage = 1;
+    this.loadMyApplications();
+  }
+
+  goToAppPage(p: number): void {
+    if (p < 1 || p > this.appTotalPages) return;
+    this.appPage = p;
+    this.loadMyApplications();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  get appPagesArray(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const total = this.appTotalPages;
+    if (total <= 7) { for (let i = 1; i <= total; i++) pages.push(i); return pages; }
+    pages.push(1);
+    let start = Math.max(2, this.appPage - 1);
+    let end = Math.min(total - 1, this.appPage + 1);
+    if (this.appPage <= 3) end = Math.min(5, total - 1);
+    if (this.appPage >= total - 2) start = Math.max(total - 4, 2);
+    if (start > 2) pages.push('...');
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (end < total - 1) pages.push('...');
+    if (total > 1) pages.push(total);
+    return pages;
+  }
+
+  appStatusLabel(status: string): string {
+    return statusToLabel(status);
+  }
+
+  appFormatDate(date: string | undefined): string {
+    if (!date) return '';
+    return 'Postulado el ' + formatAppDate(date, 'short');
+  }
+
+  appCompanyName(app: JobApplication): string {
+    const c: any = app.jobOffer?.company;
+    if (!c) return 'Empresa no especificada';
+    return c.companyName || c.companyProfile?.companyName || 'Empresa no especificada';
+  }
+
+  appCompanyLogo(app: JobApplication): string | undefined {
+    const c: any = app.jobOffer?.company;
+    if (!c) return undefined;
+    return c.logoUrl || c.companyProfile?.logoUrl;
+  }
+
+  appContractLabel(app: JobApplication): string {
+    const ct = app.jobOffer?.contractType;
+    if (ct === 'Otro' && app.jobOffer?.customContractType) return app.jobOffer.customContractType;
+    return ct || '';
+  }
+
+  appWorkloadLabel(app: JobApplication): string {
+    const wl = app.jobOffer?.workload;
+    if (wl === 'Otra' && app.jobOffer?.customWorkload) return app.jobOffer.customWorkload;
+    return wl || '';
+  }
+
+  appSalary(app: JobApplication): string | null {
+    const job = app.jobOffer;
+    if (!job?.salaryMin && !job?.salaryMax) return null;
+    const c = job.currency || 'COP';
+    const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
+    const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+    if (min && max) return `${min} – ${max} ${c}`;
+    return `${min || max} ${c}`;
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService, UserRole } from '@app/database';
+import { computeSkillMatch } from '@app/contracts';
 
 const PUBLISHED = 'PUBLISHED' as any;
 const DRAFT = 'DRAFT' as any;
@@ -55,6 +56,9 @@ export class JobsService {
         city: dto.city,
         modality: dto.modality,
         contractType: dto.contractType,
+        customContractType: dto.customContractType,
+        workload: dto.workload,
+        customWorkload: dto.customWorkload,
         salaryMin: dto.salaryMin,
         salaryMax: dto.salaryMax,
         currency: dto.currency || 'COP',
@@ -79,6 +83,9 @@ export class JobsService {
     if (dto.city !== undefined) updateData.city = dto.city;
     if (dto.modality !== undefined) updateData.modality = dto.modality;
     if (dto.contractType !== undefined) updateData.contractType = dto.contractType;
+    if (dto.customContractType !== undefined) updateData.customContractType = dto.customContractType;
+    if (dto.workload !== undefined) updateData.workload = dto.workload;
+    if (dto.customWorkload !== undefined) updateData.customWorkload = dto.customWorkload;
     if (dto.salaryMin !== undefined) updateData.salaryMin = dto.salaryMin;
     if (dto.salaryMax !== undefined) updateData.salaryMax = dto.salaryMax;
     if (dto.currency !== undefined) updateData.currency = dto.currency;
@@ -139,7 +146,7 @@ export class JobsService {
   async getCandidateJobs(candidateUserId: number, query?: any) {
     const profile = await this.prisma.profile.findUnique({ where: { userId: candidateUserId } });
     const candidateSkills = profile
-      ? (await this.prisma.skill.findMany({ where: { profileId: profile.id } })).map((s) => s.normalizedName.toLowerCase())
+      ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
       : [];
 
     const page = query?.page ? +query.page : 1;
@@ -175,15 +182,15 @@ export class JobsService {
     ]);
 
     const data = jobs.map((job) => {
-      const requiredSkills = (job.skillsRequired || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-      const matchedSkills = requiredSkills.filter((s) => candidateSkills.includes(s));
+      const match = computeSkillMatch(job.skillsRequired, candidateSkills);
       const hasApplied = job.applications.length > 0;
 
       return {
         ...job,
-        requiredSkillsList: requiredSkills,
-        matchedSkills,
-        canApplyBySkills: requiredSkills.length === 0 || matchedSkills.length > 0,
+        requiredSkillsList: match.breakdown.map((b) => b.name.toLowerCase()),
+        matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLowerCase()),
+        canApplyBySkills: match.hasAnyMatch,
+        skillMatch: match,
         hasApplied,
         applicationStatus: job.applications[0]?.status || null,
         applicationId: job.applications[0]?.id || null,
@@ -216,17 +223,17 @@ export class JobsService {
 
     const profile = await this.prisma.profile.findUnique({ where: { userId: candidateUserId } });
     const candidateSkills = profile
-      ? (await this.prisma.skill.findMany({ where: { profileId: profile.id } })).map((s) => s.normalizedName.toLowerCase())
+      ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
       : [];
 
-    const requiredSkills = (job.skillsRequired || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-    const matchedSkills = requiredSkills.filter((s) => candidateSkills.includes(s));
+    const match = computeSkillMatch(job.skillsRequired, candidateSkills);
 
     return {
       ...job,
-      requiredSkillsList: requiredSkills,
-      matchedSkills,
-      canApplyBySkills: requiredSkills.length === 0 || matchedSkills.length > 0,
+      requiredSkillsList: match.breakdown.map((b) => b.name.toLowerCase()),
+      matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLowerCase()),
+      canApplyBySkills: match.hasAnyMatch,
+      skillMatch: match,
       hasApplied: job.applications.length > 0,
     };
   }

@@ -37,9 +37,7 @@
           <label>Habilidades</label>
           <div class="chips-area">
             @for (skill of selectedSkills; track skill) {
-              <span class="chip">{{ skill }}
-                <button type="button" class="chip-remove" (click)="removeSkill(skill)">&times;</button>
-              </span>
+              <app-badge tone="primary" [removable]="true" (remove)="removeSkill(skill)">{{ skill }}</app-badge>
             }
             <div class="skill-input-wrap">
               <input type="text" class="chip-input" [(ngModel)]="skillInput"
@@ -159,7 +157,7 @@
             <a class="view-btn" [routerLink]="'/portfolio/' + c.slug">
               <mat-icon>visibility</mat-icon>Ver
             </a>
-            <button type="button" class="contact-btn"
+            <button type="button" appButton="secondary" size="sm"
               [disabled]="contactingCandidateId === c.userId"
               (click)="contactCandidate(c.userId)">
               <mat-icon>chat</mat-icon>Contactar
@@ -173,9 +171,25 @@
           @if (c.skills.length) {
             <div class="skills-row">
               @for (s of c.skills; track s.name) {
-                <span class="skill-chip" [class.skill-matched]="!!c.matchedSkills?.includes(s.name)">
-                  {{ s.name }}
-                </span>
+                <div class="skill-chip-wrap">
+                  <app-badge [tone]="c.matchedSkills?.includes(s.name) ? 'success' : 'neutral'">
+                    {{ s.name | titlecase }}
+                  </app-badge>
+                  <button
+                    type="button"
+                    class="endorse-btn"
+                    [class.endorsed]="s.endorsedByMe"
+                    [disabled]="endorsingSkillId === s.id"
+                    [attr.aria-label]="s.endorsedByMe ? 'Quitar aval de ' + s.name : 'Avalar ' + s.name"
+                    [matTooltip]="s.endorsedByMe ? 'Avalada por tu empresa — clic para quitar' : 'Avalar esta habilidad'"
+                    (click)="toggleEndorse(c, s)"
+                  >
+                    <mat-icon>{{ s.endorsedByMe ? 'verified' : 'add_task' }}</mat-icon>
+                    @if (s.endorsementCount) {
+                      <span class="endorse-count">{{ s.endorsementCount }}</span>
+                    }
+                  </button>
+                </div>
               }
             </div>
           }

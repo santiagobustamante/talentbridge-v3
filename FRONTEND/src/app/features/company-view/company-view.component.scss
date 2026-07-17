@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 :host {
   display: block;
 }
@@ -90,20 +92,6 @@
   color: var(--text-secondary);
 }
 
-.retry-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  background: var(--bg-surface);
-  color: var(--text-main);
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
 .company-card {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
@@ -125,7 +113,7 @@
   height: 72px;
   border-radius: 20px;
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -255,41 +243,7 @@
   background: var(--bg-main);
 }
 
-.btn-primary,
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all var(--transition-base);
-  border: none;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-
-  &:hover {
-    filter: brightness(1.1);
-  }
-}
-
-.btn-secondary {
-  background: var(--bg-surface);
-  color: var(--text-main);
-  border: 1px solid var(--border-medium);
-
-  &:hover {
-    background: var(--border-soft);
-  }
-}
-
-@media (max-width: 768px) {
+@include bp.tablet {
   .company-view-page {
     padding: 1rem;
   }

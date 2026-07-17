@@ -69,4 +69,12 @@ export class CompanyService {
       { params },
     );
   }
+
+  endorseSkill(skillId: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/skills/${skillId}/endorse`, {});
+  }
+
+  unendorseSkill(skillId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.api}/skills/${skillId}/endorse`);
+  }
 }

@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 $ring-circumference: 326.7px;
 
 :host {
@@ -102,9 +104,9 @@ $ring-circumference: 326.7px;
   }
 
   &.has-file {
-    border-color: #059669;
+    border-color: var(--success);
     border-style: solid;
-    background: #ecfdf5;
+    background: var(--success-soft);
   }
 }
 
@@ -128,10 +130,10 @@ $ring-circumference: 326.7px;
   }
 
   &.success {
-    background: #ecfdf5;
+    background: var(--success-soft);
 
     mat-icon {
-      color: #059669;
+      color: var(--success);
     }
   }
 }
@@ -167,7 +169,7 @@ $ring-circumference: 326.7px;
   border: none;
   border-radius: var(--radius-lg);
   background: var(--primary);
-  color: #fff;
+  color: var(--text-on-color);
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 600;
@@ -211,8 +213,8 @@ $ring-circumference: 326.7px;
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border: 2px solid color-mix(in srgb, var(--text-on-color) 30%, transparent);
+  border-top-color: var(--text-on-color);
   border-radius: var(--radius-full);
   animation: spin 0.6s linear infinite;
 }
@@ -318,14 +320,14 @@ $ring-circumference: 326.7px;
   width: 44px;
   height: 44px;
   border-radius: var(--radius-lg);
-  background: #fef2f2;
+  background: var(--danger-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
   mat-icon {
-    color: #dc2626;
+    color: var(--danger);
     font-size: 22px;
     width: 22px;
     height: 22px;
@@ -436,15 +438,15 @@ $ring-circumference: 326.7px;
   }
 
   &.score-low .ring-fill {
-    stroke: #dc2626;
+    stroke: var(--danger);
   }
 
   &.score-mid .ring-fill {
-    stroke: #d97706;
+    stroke: var(--warning);
   }
 
   &.score-good .ring-fill {
-    stroke: #059669;
+    stroke: var(--success);
   }
 
   &.score-great .ring-fill {
@@ -519,10 +521,53 @@ $ring-circumference: 326.7px;
   }
 }
 
-.icon-mint { color: #059669; }
-.icon-accent { color: #0a66c2; }
+.icon-mint { color: var(--success); }
+.icon-accent { color: var(--primary); }
 
-@media (max-width: 768px) {
+.detail-card.suggestions {
+  margin-top: var(--space-lg);
+
+  .suggestions-hint {
+    margin: -8px 0 var(--space-md);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+}
+
+.suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-soft);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+
+  &:hover {
+    border-color: var(--primary);
+  }
+
+  input[type='checkbox'] {
+    accent-color: var(--primary);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@include bp.tablet {
   .cv-page {
     padding: var(--space-lg) var(--space-md);
     gap: var(--space-xl);

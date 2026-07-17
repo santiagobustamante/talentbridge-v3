@@ -665,3 +665,29 @@ export function filterCatalog(query: string, limit = 15): SkillCatalogEntry[] {
   const q = query.toLowerCase().trim();
   return SKILL_CATALOG.filter((s) => s.name.toLowerCase().includes(q)).slice(0, limit);
 }
+
+export interface SkillCatalogGroup {
+  category: string;
+  entries: SkillCatalogEntry[];
+}
+
+/**
+ * Catálogo completo agrupado por categoría, opcionalmente filtrado por nombre.
+ * A diferencia de filterCatalog (autocompletado de un campo de texto, limitado
+ * a 15 resultados sin categoría), esta función es para el selector de
+ * habilidades por catálogo — sin límite, agrupada, pensada para explorar.
+ */
+export function groupCatalogByCategory(query = ''): SkillCatalogGroup[] {
+  const q = query.toLowerCase().trim();
+  const byCategory = new Map<string, SkillCatalogEntry[]>();
+
+  for (const entry of SKILL_CATALOG) {
+    if (q && !entry.name.toLowerCase().includes(q)) continue;
+    if (!byCategory.has(entry.category)) byCategory.set(entry.category, []);
+    byCategory.get(entry.category)!.push(entry);
+  }
+
+  return Array.from(byCategory.entries())
+    .map(([category, entries]) => ({ category, entries }))
+    .sort((a, b) => a.category.localeCompare(b.category, 'es'));
+}

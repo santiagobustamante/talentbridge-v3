@@ -23,7 +23,7 @@
     <div class="state-card state-error">
       <mat-icon>error_outline</mat-icon>
       <span>No se pudo cargar la información de la empresa.</span>
-      <button class="retry-btn" (click)="goBack()">
+      <button appButton="secondary" (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
         Volver a Mensajes
       </button>
@@ -99,17 +99,17 @@
         @if (c.createdAt) {
           <p class="member-since">
             <mat-icon>calendar_today</mat-icon>
-            Miembro desde {{ c.createdAt | date:'longDate' }}
+            Miembro desde {{ c.createdAt | appDate:'long' }}
           </p>
         }
       </div>
 
       <div class="company-actions">
-        <button class="btn-secondary" (click)="goBack()">
+        <button appButton="secondary" (click)="goBack()">
           <mat-icon>arrow_back</mat-icon>
           Volver
         </button>
-        <button class="btn-primary" routerLink="/app/messages">
+        <button appButton="primary" routerLink="/app/messages">
           <mat-icon>chat</mat-icon>
           Ir a Mensajes
         </button>

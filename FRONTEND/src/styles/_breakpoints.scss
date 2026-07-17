@@ -1,0 +1,26 @@
+// Breakpoints compartidos. Reemplazan los @media ad hoc (768/480/1024/1023/900/600px)
+// repartidos por los componentes. Uso: @use 'breakpoints' as bp; luego @include bp.mobile { ... }
+
+@mixin mobile {
+  @media (max-width: 480px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin until-desktop {
+  @media (max-width: 1023px) {
+    @content;
+  }
+}

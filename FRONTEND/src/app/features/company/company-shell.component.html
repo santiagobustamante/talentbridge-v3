@@ -79,11 +79,17 @@
           <mat-icon>menu</mat-icon>
         </button>
         <h2 class="topbar-title" [matTooltip]="userEmail">
-          Hola,&nbsp;<span class="greeting-name">{{ userEmail }}</span>
+          Hola,&nbsp;<span class="greeting-name">{{ greetingName }}</span>
         </h2>
       </div>
       <div class="topbar-right">
-        <div class="user-avatar">{{ userInitial }}</div>
+        <div class="user-avatar">
+          @if (companyLogoUrl(); as logo) {
+            <img [src]="logo" [alt]="greetingName" />
+          } @else {
+            {{ userInitial }}
+          }
+        </div>
         <button class="logout-btn" (click)="logout()" matTooltip="Cerrar sesión" aria-label="Cerrar sesión">
           <mat-icon>logout</mat-icon>
         </button>

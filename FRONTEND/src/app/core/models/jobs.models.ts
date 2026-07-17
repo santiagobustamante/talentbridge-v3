@@ -8,6 +8,9 @@ export interface JobOffer {
   city?: string;
   modality?: string;
   contractType?: string;
+  customContractType?: string;
+  workload?: string;
+  customWorkload?: string;
   salaryMin?: number;
   salaryMax?: number;
   currency?: string;
@@ -25,6 +28,23 @@ export interface JobOffer {
   requiredSkillsList?: string[];
   matchedSkills?: string[];
   canApplyBySkills?: boolean;
+  skillMatch?: SkillMatchResult;
+  appliedAt?: string;
+}
+
+export interface SkillMatchEntry {
+  name: string;
+  requiredLevel: string | null;
+  candidateLevel: string | null;
+  status: 'met' | 'insufficient' | 'missing';
+}
+
+export interface SkillMatchResult {
+  breakdown: SkillMatchEntry[];
+  matchedCount: number;
+  totalCount: number;
+  matchPercent: number;
+  hasAnyMatch: boolean;
 }
 
 export interface JobCompany {
@@ -33,6 +53,12 @@ export interface JobCompany {
   city?: string;
   logoUrl?: string;
   description?: string;
+  companyProfile?: {
+    companyName?: string;
+    logoUrl?: string;
+    city?: string;
+    description?: string;
+  };
 }
 
 export interface JobApplication {
@@ -49,7 +75,16 @@ export interface JobApplication {
     city?: string;
     modality?: string;
     contractType?: string;
+    customContractType?: string;
+    workload?: string;
+    customWorkload?: string;
+    salaryMin?: number;
+    salaryMax?: number;
+    currency?: string;
     status: string;
+    skillsRequired?: string;
+    publishedAt?: string;
+    createdAt?: string;
     company?: JobCompany;
   };
   candidate?: {
@@ -63,6 +98,11 @@ export interface JobApplication {
       skills?: { name: string; level: string }[];
     };
   };
+}
+
+export interface PaginatedApplications {
+  data: JobApplication[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
 export interface PaginatedJobs {

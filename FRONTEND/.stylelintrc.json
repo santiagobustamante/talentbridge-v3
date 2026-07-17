@@ -1,0 +1,26 @@
+{
+  "extends": "stylelint-config-recommended-scss",
+  "rules": {
+    "no-descending-specificity": null,
+    "no-empty-source": null,
+    "selector-pseudo-element-no-unknown": [true, { "ignorePseudoElements": ["ng-deep"] }]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/**/*.scss"],
+      "rules": {
+        "declaration-property-value-disallowed-list": [
+          {
+            "/^(color|background|background-color|border|border-color|border-top-color|border-right-color|border-bottom-color|border-left-color|outline-color|box-shadow|fill|stroke)$/": [
+              "/#[0-9a-fA-F]{3,8}\\b/",
+              "/rgba?\\(/"
+            ]
+          },
+          {
+            "message": "No hardcodees colores: usá un token de src/styles.scss (var(--primary), var(--text-main), var(--danger), etc.). Ver docs/plan-consistencia-css.md."
+          }
+        ]
+      }
+    }
+  ]
+}

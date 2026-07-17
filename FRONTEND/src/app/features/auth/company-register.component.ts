@@ -4,11 +4,12 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
 
 @Component({
   selector: 'app-company-register',
@@ -19,10 +20,11 @@ import { AuthService } from '../../core/auth/auth.service';
     RouterModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
     MatCardModule,
     MatSnackBarModule,
     MatProgressBarModule,
+    MatIconModule,
+    ButtonDirective,
   ],
   styleUrl: './company-register.component.scss',
   template: `
@@ -30,9 +32,9 @@ import { AuthService } from '../../core/auth/auth.service';
       <div class="auth-card animate-fade-in-scale">
         <div class="auth-brand">
           <div class="brand-mark">
-            <span class="brand-letters">PI</span>
+            <mat-icon>work</mat-icon>
           </div>
-          <p class="brand-name">Portafolio Inteligente</p>
+          <p class="brand-name">TalentBridge</p>
         </div>
 
         <h1 class="auth-title">Registra tu empresa</h1>
@@ -41,7 +43,7 @@ import { AuthService } from '../../core/auth/auth.service';
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nombre de la empresa</mat-label>
-            <input matInput formControlName="companyName" placeholder="Ej. Tech Solutions S.A." />
+            <input matInput formControlName="companyName" autocomplete="organization" placeholder="Ej. Tech Solutions S.A." />
             <mat-error *ngIf="form.get('companyName')?.hasError('required')">Requerido</mat-error>
           </mat-form-field>
 
@@ -59,7 +61,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Ciudad</mat-label>
-            <input matInput formControlName="city" placeholder="Ej. Bogotá, Colombia" />
+            <input matInput formControlName="city" autocomplete="address-level2" placeholder="Ej. Bogotá, Colombia" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -81,11 +83,11 @@ import { AuthService } from '../../core/auth/auth.service';
           </div>
 
           <button
-            mat-raised-button
-            color="primary"
+            appButton="primary"
+            size="lg"
             type="submit"
             [disabled]="form.invalid || loading"
-            class="full-width submit-btn">
+            class="full-width">
             <span class="btn-content" *ngIf="!loading">Registrar empresa</span>
             <span class="btn-content" *ngIf="loading">Creando cuenta...</span>
           </button>

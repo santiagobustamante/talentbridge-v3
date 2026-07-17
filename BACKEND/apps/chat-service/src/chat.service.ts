@@ -68,6 +68,7 @@ export class ChatService {
           company: {
             id: conv.company.id,
             companyName: conv.company.companyProfile?.companyName,
+            logoUrl: conv.company.companyProfile?.logoUrl,
             sector: conv.company.companyProfile?.sector,
             city: conv.company.companyProfile?.city,
           },
@@ -128,6 +129,7 @@ export class ChatService {
       company: {
         id: conv.company.id,
         companyName: conv.company.companyProfile?.companyName,
+        logoUrl: conv.company.companyProfile?.logoUrl,
         sector: conv.company.companyProfile?.sector,
         city: conv.company.companyProfile?.city,
       },

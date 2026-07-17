@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .page-content {
   max-width: 1000px;
   margin: 0 auto;
@@ -128,7 +130,7 @@
     height: 48px;
     border-radius: var(--radius-lg);
     background: var(--primary);
-    color: #fff;
+    color: var(--text-on-color);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -229,8 +231,8 @@
     border-radius: var(--radius-full);
     font-size: 0.7rem;
     font-weight: 600;
-    background: #ecfdf5;
-    color: #059669;
+    background: var(--success-soft);
+    color: var(--success);
   }
 
   .degree-title {
@@ -283,8 +285,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    background: #ecfdf5;
-    color: #059669;
+    background: var(--success-soft);
+    color: var(--success);
   }
 }
 
@@ -314,8 +316,8 @@
     transition: all var(--transition-fast);
 
     &:hover {
-      color: #dc2626;
-      background: #fef2f2;
+      color: var(--danger);
+      background: var(--danger-soft);
     }
   }
 }
@@ -358,7 +360,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@include bp.tablet {
   .page-content {
     padding: 0;
   }

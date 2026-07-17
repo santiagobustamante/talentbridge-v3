@@ -21,15 +21,15 @@ import { GITHUB_RESPONSIBILITY_WARNING } from '../../constants/legal-warnings';
       padding: 12px 14px;
       margin-top: 10px;
       border-radius: 12px;
-      border: 1px solid #bfdbfe;
-      background: #eff6ff;
+      border: 1px solid var(--info-border);
+      background: var(--info-soft);
       line-height: 1.5;
       font-size: 0.84rem;
-      color: #1e3a8a;
+      color: var(--info-strong);
     }
 
     .github-warning mat-icon {
-      color: #2563eb;
+      color: var(--info-strong);
       font-size: 20px;
       width: 20px;
       height: 20px;
@@ -39,7 +39,7 @@ import { GITHUB_RESPONSIBILITY_WARNING } from '../../constants/legal-warnings';
 
     .github-warning p {
       margin: 0;
-      color: #1e3a8a;
+      color: var(--info-strong);
       word-break: break-word;
     }
   `],

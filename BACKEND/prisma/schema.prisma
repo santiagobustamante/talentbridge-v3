@@ -25,13 +25,14 @@ model User {
   cvDocuments    CvDocument[]
   profileViews   ProfileView[]
 
-  candidateConversations Conversation[] @relation("CandidateConversations")
-  companyConversations   Conversation[] @relation("CompanyConversations")
-  sentChatMessages       ChatMessage[]  @relation("SentChatMessages")
-  chatBlocksMade         ChatBlock[]    @relation("ChatBlocksMade")
-  chatBlocksReceived     ChatBlock[]    @relation("ChatBlocksReceived")
+  candidateConversations Conversation[]     @relation("CandidateConversations")
+  companyConversations   Conversation[]     @relation("CompanyConversations")
+  sentChatMessages       ChatMessage[]      @relation("SentChatMessages")
+  chatBlocksMade         ChatBlock[]        @relation("ChatBlocksMade")
+  chatBlocksReceived     ChatBlock[]        @relation("ChatBlocksReceived")
   jobOffers              JobOffer[]
   jobApplications        JobApplication[]
+  skillEndorsementsGiven SkillEndorsement[]
 
   @@map("users")
 }
@@ -102,17 +103,31 @@ model CompanyProfile {
 }
 
 model Skill {
-  id             Int      @id @default(autoincrement())
-  profileId      Int      @map("profile_id")
+  id             Int                @id @default(autoincrement())
+  profileId      Int                @map("profile_id")
   name           String
-  normalizedName String   @map("normalized_name")
-  level          String   @default("BASIC")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-  profile        Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  normalizedName String             @map("normalized_name")
+  level          String             @default("BASIC")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  profile        Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  endorsements   SkillEndorsement[]
 
   @@unique([profileId, normalizedName])
   @@map("skills")
+}
+
+model SkillEndorsement {
+  id        Int      @id @default(autoincrement())
+  skillId   Int      @map("skill_id")
+  companyId Int      @map("company_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  company User  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, companyId])
+  @@map("skill_endorsements")
 }
 
 model Experience {
@@ -206,18 +221,18 @@ model CvAnalysis {
 }
 
 model Conversation {
-  id             Int       @id @default(autoincrement())
-  candidateId    Int       @map("candidate_id")
-  companyId      Int       @map("company_id")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
-  lastMessageAt  DateTime? @map("last_message_at")
+  id            Int       @id @default(autoincrement())
+  candidateId   Int       @map("candidate_id")
+  companyId     Int       @map("company_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  lastMessageAt DateTime? @map("last_message_at")
 
   candidate User @relation("CandidateConversations", fields: [candidateId], references: [id], onDelete: Cascade)
   company   User @relation("CompanyConversations", fields: [companyId], references: [id], onDelete: Cascade)
 
-  messages  ChatMessage[]
-  blocks    ChatBlock[]
+  messages ChatMessage[]
+  blocks   ChatBlock[]
 
   @@unique([candidateId, companyId])
   @@index([candidateId])
@@ -276,26 +291,29 @@ enum JobApplicationStatus {
 }
 
 model JobOffer {
-  id               Int             @id @default(autoincrement())
-  companyId        Int             @map("company_id")
-  title            String
-  description      String
-  requirements     String?
-  responsibilities String?
-  city             String?
-  modality         String?
-  contractType     String?         @map("contract_type")
-  salaryMin        Int?            @map("salary_min")
-  salaryMax        Int?            @map("salary_max")
-  currency         String?         @default("COP")
-  skillsRequired   String?         @map("skills_required")
-  status           JobOfferStatus  @default(DRAFT)
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
-  publishedAt      DateTime?       @map("published_at")
-  closedAt         DateTime?       @map("closed_at")
+  id                 Int            @id @default(autoincrement())
+  companyId          Int            @map("company_id")
+  title              String
+  description        String
+  requirements       String?
+  responsibilities   String?
+  city               String?
+  modality           String?
+  contractType       String?        @map("contract_type")
+  customContractType String?        @map("custom_contract_type")
+  workload           String?
+  customWorkload     String?        @map("custom_workload")
+  salaryMin          Int?           @map("salary_min")
+  salaryMax          Int?           @map("salary_max")
+  currency           String?        @default("COP")
+  skillsRequired     String?        @map("skills_required")
+  status             JobOfferStatus @default(DRAFT)
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  publishedAt        DateTime?      @map("published_at")
+  closedAt           DateTime?      @map("closed_at")
 
-  company      User            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      User             @relation(fields: [companyId], references: [id], onDelete: Cascade)
   applications JobApplication[]
 
   @@index([companyId])

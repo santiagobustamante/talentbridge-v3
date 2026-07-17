@@ -6,11 +6,17 @@ import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { DashboardService, CompanyDashboard } from '../../core/services/dashboard.service';
 import { ChatService } from '../../core/services/chat.service';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
+import { statusToTone } from '../../shared/components/badge/status-tone.util';
+import { statusToLabel } from '../../shared/components/badge/status-label.util';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 
 @Component({
   selector: 'app-company-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, ButtonDirective, BadgeComponent, EmptyStateComponent, AppDatePipe],
   styleUrl: './company-dashboard.component.scss',
   templateUrl: './company-dashboard.component.html',
 })
@@ -57,13 +63,18 @@ export class CompanyDashboardComponent implements OnInit, OnDestroy {
     return this.data()?.companyName || this.auth.currentUser()?.email?.split('@')[0] || 'Empresa';
   }
 
+  get companyInitials(): string {
+    const clean = this.companyName.trim();
+    if (!clean) return 'E';
+    return clean.split(/\s+/).slice(0, 2).map((p) => p.charAt(0).toUpperCase()).join('');
+  }
+
   statusLabel(s: string): string {
-    const map: Record<string, string> = {
-      DRAFT: 'Borrador', PUBLISHED: 'Publicada', CLOSED: 'Cerrada', ARCHIVED: 'Archivada',
-      PENDING: 'Pendiente', REVIEWED: 'Revisado', PRESELECTED: 'Preseleccionado',
-      REJECTED: 'Rechazado', HIRED: 'Contratado',
-    };
-    return map[s] || s;
+    return statusToLabel(s);
+  }
+
+  statusTone(s: string): BadgeTone {
+    return statusToTone(s);
   }
 
   searchChips = [

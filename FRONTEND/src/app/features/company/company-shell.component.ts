@@ -8,6 +8,7 @@ import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
+import { CompanyService } from '../../core/services/company.service';
 import { AssistantChatComponent } from '../../shared/assistant/assistant-chat.component';
 
 interface NavItem {
@@ -29,9 +30,12 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly chatService = inject(ChatService);
   private readonly chatSocket = inject(ChatSocketService);
+  private readonly companyService = inject(CompanyService);
 
   mobileOpen = signal(false);
   currentRoute = signal('');
+  companyName = signal<string | null>(null);
+  companyLogoUrl = signal<string | null>(null);
 
   private unreadSub: Subscription | null = null;
 
@@ -53,6 +57,13 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
     this.chatSocket.connect();
     this.unreadSub = this.chatSocket.unreadCount$.subscribe((data) => {
       this.chatService.setUnreadCount(data.count ?? 0);
+    });
+    this.companyService.getProfile().subscribe({
+      next: (profile) => {
+        this.companyName.set(profile.companyName || null);
+        this.companyLogoUrl.set(profile.logoUrl || null);
+      },
+      error: () => {},
     });
   }
 
@@ -80,8 +91,12 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
     return this.auth.currentUser()?.email || 'Usuario';
   }
 
+  get greetingName(): string {
+    return this.companyName() || this.userEmail;
+  }
+
   get userInitial(): string {
-    return this.userEmail.charAt(0).toUpperCase();
+    return this.greetingName.charAt(0).toUpperCase();
   }
 
   @HostListener('window:resize')

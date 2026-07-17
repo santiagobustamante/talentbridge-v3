@@ -18,6 +18,7 @@ export interface CandidateDashboard {
 
 export interface CompanyDashboard {
   companyName: string | null;
+  logoUrl?: string | null;
   candidatesCount: number;
   publishedJobsCount: number;
   draftJobsCount: number;
@@ -36,11 +37,16 @@ export interface DashboardJob {
   city?: string;
   modality?: string;
   contractType?: string;
+  customContractType?: string;
+  workload?: string;
+  customWorkload?: string;
   skillsRequired?: string;
   salaryMin?: number;
   salaryMax?: number;
   currency?: string;
-  company?: { companyName: string } | null;
+  publishedAt?: string;
+  createdAt?: string;
+  company?: { companyName: string; logoUrl?: string | null } | null;
 }
 
 export interface DashboardApplication {
@@ -67,6 +73,7 @@ export interface CompanyJob {
 export interface DashboardConversation {
   id: number;
   companyName?: string;
+  logoUrl?: string | null;
   candidateName?: string;
   lastMessage?: string | null;
   lastMessageAt?: string;

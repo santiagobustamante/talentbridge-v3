@@ -1,0 +1,65 @@
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.6;
+  white-space: nowrap;
+
+  ::ng-deep mat-icon {
+    font-size: var(--icon-size-xs);
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+    flex-shrink: 0;
+  }
+}
+
+.app-badge--neutral {
+  background: var(--bg-surface-hover);
+  color: var(--text-muted);
+}
+
+.app-badge--success {
+  background: var(--success-soft);
+  color: var(--success-strong);
+}
+
+.app-badge--warning {
+  background: var(--warning-soft);
+  color: var(--warning-strong);
+}
+
+.app-badge--danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.app-badge--info {
+  background: var(--info-soft);
+  color: var(--info-strong);
+}
+
+.app-badge--primary {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.app-badge__remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  font-weight: var(--font-weight-bold);
+  opacity: 0.75;
+
+  &:hover {
+    opacity: 1;
+    color: var(--danger);
+  }
+}

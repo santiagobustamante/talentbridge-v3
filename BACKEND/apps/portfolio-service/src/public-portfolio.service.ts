@@ -5,7 +5,7 @@ import { PrismaService } from '@app/database';
 export class PublicPortfolioService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getBySlug(slug: string) {
+  async getBySlug(slug: string, viewer?: { sub: number; role?: string }) {
     const profile = await this.prisma.profile.findUnique({
       where: { slug },
       include: {
@@ -21,7 +21,24 @@ export class PublicPortfolioService {
       throw new NotFoundException('Portafolio no encontrado o no publicado');
     }
 
+    if (viewer?.role === 'COMPANY' && viewer.sub !== profile.userId) {
+      await this.recordView(profile.id, viewer.sub);
+    }
+
     return this.filterByVisibility(profile);
+  }
+
+  /** No registra un nuevo view si la misma empresa ya vio este perfil en los últimos 10 minutos — evita inflar el contador con refrescos de la misma visita. */
+  private async recordView(profileId: number, companyUserId: number): Promise<void> {
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+    const recent = await this.prisma.profileView.findFirst({
+      where: { profileId, companyUserId, createdAt: { gte: tenMinutesAgo } },
+    });
+    if (recent) return;
+
+    await this.prisma.profileView.create({
+      data: { profileId, companyUserId },
+    });
   }
 
   async getPreview(userId: number) {

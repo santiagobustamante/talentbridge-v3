@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'button';
 
 :root {
   --bg-page: #f3f6f9;
@@ -10,25 +11,59 @@
   --text-secondary: #4b5563;
   --text-muted: #6b7280;
   --text-placeholder: #9ca3af;
+  /* Texto/ícono blanco sobre una superficie de color sólido (botón primario, avatar, badge) */
+  --text-on-color: #ffffff;
 
-  --primary: #0a66c2;
-  --primary-hover: #074a8f;
-  --primary-soft: #e8f1fb;
-  --primary-ghost: #f0f6fd;
+  --primary: #0f766e;
+  --primary-hover: #0b5a53;
+  --primary-soft: #e1f2ef;
+  --primary-ghost: #f0f9f8;
 
   --accent: #0b5cad;
   --accent-soft: #e8f1fb;
 
   --success: #16a34a;
   --success-soft: #dcfce7;
+  --success-strong: #166534;
+  --success-border: #a7f3d0;
   --warning: #f59e0b;
   --warning-soft: #fef3c7;
+  --warning-strong: #92400e;
+  --warning-border: #fde68a;
   --danger: #dc2626;
-  --danger-soft: #fee2e2;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-strong: #991b1b;
+
+  /* Info: estados "pendiente / en curso / cargando" — no existía token para esto,
+     era el azul más repetido del código sin nombre (badges PENDING/REVIEWED, loading-card). */
+  --info: #0369a1;
+  --info-soft: #eff6ff;
+  --info-strong: #1e40af;
+  --info-border: #bae6fd;
+  --info-bright: #0ea5e9;
+
+  /* Acento decorativo secundario (avatares de ícono, segmentos de gráfico) —
+     intencionalmente separado de success/warning/danger/info: no representa un estado. */
+  --accent-purple: #4338ca;
+  --accent-purple-hover: #3730a3;
+  --accent-purple-soft: #e0e7ff;
+
+  /* Colores de marca de terceros (no forman parte de la paleta propia) */
+  --brand-github: #6e5494;
 
   --border-soft: #e5e7eb;
   --border-medium: #d1d5db;
-  --border-focus: #0a66c2;
+  --border-strong: #94a3b8;
+  --border-focus: #0f766e;
+
+  /* Acento sobre superficie oscura (ej. acción del snackbar, que usa fondo casi negro) */
+  --accent-on-dark: #93c5fd;
+
+  /* Fondo semitransparente detrás de modales/diálogos */
+  --overlay-scrim: rgba(0, 0, 0, 0.45);
+
+  --text-heading: #111827;
 
   --radius-xs: 4px;
   --radius-sm: 8px;
@@ -58,6 +93,36 @@
 
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
+  /* Escala tipográfica. Los 4 tamaños grandes coinciden con los h1-h4 ya definidos
+     más abajo; xs-lg cubren el texto de componente, que hoy usa ~24 valores
+     distintos entre 0.68rem y 0.95rem sin ningún criterio. */
+  --font-size-2xs: 0.7rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.85rem;
+  --font-size-md: 0.95rem;
+  --font-size-lg: 1.15rem;
+  --font-size-xl: 1.35rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-3xl: 2.25rem;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Tamaños de ícono (mat-icon). Es una escala aparte de la tipográfica:
+     estos valores casi siempre acompañan width/height iguales, no texto. */
+  --icon-size-xs: 16px;
+  --icon-size-sm: 18px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 28px;
+  --icon-size-2xl: 32px;
+  --icon-size-3xl: 36px;
+  --icon-size-4xl: 40px;
+  --icon-size-5xl: 48px;
+
   --sidebar-width: 264px;
   --topbar-height: 60px;
 }
@@ -65,7 +130,7 @@
 $theme: mat.define-theme((
   color: (
     theme-type: light,
-    primary: mat.$azure-palette,
+    primary: mat.$cyan-palette,
     tertiary: mat.$blue-palette,
   ),
   typography: (
@@ -84,47 +149,47 @@ html {
 /* ─── Material Form Field Overrides ──────── */
 
 .mdc-text-field--outlined {
-  --mdc-outlined-text-field-outline-color: #d1d5db;
-  --mdc-outlined-text-field-hover-outline-color: #94a3b8;
-  --mdc-outlined-text-field-focus-outline-color: #0a66c2;
-  --mdc-outlined-text-field-label-text-color: #6b7280;
-  --mdc-outlined-text-field-hover-label-text-color: #374151;
-  --mdc-outlined-text-field-focus-label-text-color: #0a66c2;
-  --mdc-outlined-text-field-input-text-color: #1f2937;
-  --mdc-outlined-text-field-caret-color: #0a66c2;
+  --mdc-outlined-text-field-outline-color: var(--border-medium);
+  --mdc-outlined-text-field-hover-outline-color: var(--border-strong);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-label-text-color: var(--text-muted);
+  --mdc-outlined-text-field-hover-label-text-color: var(--text-main);
+  --mdc-outlined-text-field-focus-label-text-color: var(--primary);
+  --mdc-outlined-text-field-input-text-color: var(--text-main);
+  --mdc-outlined-text-field-caret-color: var(--primary);
   --mdc-outlined-text-field-container-shape: 10px;
 }
 
 .mdc-notched-outline__fieldset {
-  border-color: #d1d5db !important;
+  border-color: var(--border-medium) !important;
   border-width: 1.5px !important;
 }
 
 .mat-mdc-form-field:hover .mdc-notched-outline__fieldset {
-  border-color: #94a3b8 !important;
+  border-color: var(--border-strong) !important;
 }
 
 .mat-mdc-form-field.mat-focused .mdc-notched-outline__fieldset {
-  border-color: #0a66c2 !important;
+  border-color: var(--primary) !important;
   border-width: 2px !important;
 }
 
 .mdc-text-field--invalid .mdc-notched-outline__fieldset {
-  border-color: #dc2626 !important;
+  border-color: var(--danger) !important;
 }
 
 .mat-mdc-input-element {
-  color: #1f2937 !important;
+  color: var(--text-main) !important;
   font-size: 0.95rem !important;
 }
 
 .mat-mdc-text-field-wrapper {
-  background-color: #ffffff !important;
+  background-color: var(--bg-surface) !important;
   border-radius: 10px !important;
 }
 
 .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
-  background-color: #fafbfc !important;
+  background-color: var(--bg-surface-hover) !important;
 }
 
 .mat-mdc-form-field-flex {
@@ -137,47 +202,47 @@ html {
 }
 
 .mat-mdc-floating-label {
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
 }
 
 .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
-  color: #0a66c2 !important;
+  color: var(--primary) !important;
 }
 
 .mat-mdc-form-field.mat-form-field-invalid .mat-mdc-floating-label {
-  color: #dc2626 !important;
+  color: var(--danger) !important;
 }
 
 .mat-mdc-select-value-text {
-  color: #1f2937 !important;
+  color: var(--text-main) !important;
 }
 
 .mat-mdc-select-arrow {
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
 }
 
 .mat-mdc-form-field.mat-focused .mat-mdc-select-arrow {
-  color: #0a66c2 !important;
+  color: var(--primary) !important;
 }
 
 .mat-mdc-select-panel {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-soft) !important;
   border-radius: 10px !important;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .mat-mdc-option {
-  color: #1f2937 !important;
+  color: var(--text-main) !important;
 }
 
 .mat-mdc-option.mdc-list-item--selected,
 .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
-  background: #e8f1fb !important;
+  background: var(--primary-soft) !important;
 }
 
 .mat-mdc-option.mdc-list-item--selected .mat-pseudo-checkbox-minimal {
-  color: #0a66c2 !important;
+  color: var(--primary) !important;
 }
 
 /* Slide toggle */
@@ -187,60 +252,69 @@ html {
 }
 
 .mat-mdc-slide-toggle .mdc-switch--unselected .mdc-switch__track {
-  background-color: #d1d5db !important;
+  background-color: var(--border-medium) !important;
 }
 
 .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__track {
-  background-color: #0a66c2 !important;
+  background-color: var(--primary) !important;
   opacity: 0.6;
 }
 
 .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__handle-track {
-  background-color: #0a66c2 !important;
+  background-color: var(--primary) !important;
 }
 
 /* Snackbar */
 .mat-mdc-snack-bar-container .mdc-snackbar__surface {
-  background: #1f2937 !important;
-  color: #ffffff !important;
+  background: var(--text-main) !important;
+  color: var(--bg-surface) !important;
   border-radius: 10px !important;
 }
 
 .mat-mdc-snack-bar-container .mat-mdc-snack-bar-action {
-  color: #93c5fd !important;
+  color: var(--accent-on-dark) !important;
 }
 
 /* Dialog */
 .mat-mdc-dialog-container .mdc-dialog__surface {
   border-radius: 14px !important;
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18) !important;
+  box-shadow: var(--shadow-xl) !important;
 }
 
 /* Progress bar */
 .mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
-  border-color: #0a66c2 !important;
+  border-color: var(--primary) !important;
 }
 
 /* Checkbox */
-.mat-mdc-checkbox.mat-accent {
-  --mdc-checkbox-selected-focus-icon-color: #0a66c2;
-  --mdc-checkbox-selected-hover-icon-color: #0a66c2;
-  --mdc-checkbox-selected-icon-color: #0a66c2;
-  --mdc-checkbox-selected-pressed-icon-color: #0a66c2;
+.mat-mdc-checkbox.mat-accent,
+.mat-mdc-checkbox.mat-primary {
+  --mdc-checkbox-selected-focus-icon-color: var(--primary);
+  --mdc-checkbox-selected-hover-icon-color: var(--primary);
+  --mdc-checkbox-selected-icon-color: var(--primary);
+  --mdc-checkbox-selected-pressed-icon-color: var(--primary);
+}
+
+/* Raised button con color="primary" (formularios de auth) — el tema M3 de Material
+   trae su propia paleta azul; se fuerza al token de marca para que no quede
+   desalineado del resto de la app cuando --primary cambia (ej. paleta Teal). */
+.mat-mdc-raised-button.mat-primary:not(:disabled) {
+  --mdc-protected-button-container-color: var(--primary);
+  --mdc-protected-button-label-text-color: var(--text-on-color);
 }
 
 /* Datepicker */
 .mat-datepicker-toggle {
-  color: #6b7280 !important;
+  color: var(--text-muted) !important;
 }
 
 .mat-mdc-icon-button.mat-mdc-button-base {
-  --mdc-icon-button-icon-color: #6b7280;
+  --mdc-icon-button-icon-color: var(--text-muted);
 }
 
 mat-icon,
 .mat-icon {
-  font-family: 'Material Icons';
+  font-family: 'Material Icons', sans-serif;
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -251,7 +325,7 @@ mat-icon,
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  word-wrap: normal;
+  overflow-wrap: normal;
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
@@ -294,10 +368,10 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-main);
 }
 
-h1 { font-size: 2.25rem; letter-spacing: -0.02em; }
-h2 { font-size: 1.75rem; letter-spacing: -0.01em; }
-h3 { font-size: 1.35rem; }
-h4 { font-size: 1.15rem; }
+h1 { font-size: var(--font-size-3xl); letter-spacing: -0.02em; }
+h2 { font-size: var(--font-size-2xl); letter-spacing: -0.01em; }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
 
 p { color: var(--text-secondary); }
 

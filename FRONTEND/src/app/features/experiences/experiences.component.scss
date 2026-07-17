@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .page-content {
   max-width: 850px;
   margin: 0 auto;
@@ -117,6 +119,8 @@
 
 .full-width { width: 100%; }
 
+.span-full { grid-column: 1 / -1; }
+
 .date-right {
   display: flex;
   flex-direction: column;
@@ -147,7 +151,7 @@
     height: 48px;
     border-radius: var(--radius-md);
     background: var(--primary);
-    color: #fff;
+    color: var(--text-on-color);
     font-weight: 600;
     font-size: 0.92rem;
     display: flex;
@@ -177,16 +181,25 @@
   padding-left: 48px;
 }
 
-.timeline-line {
-  position: absolute;
-  left: 23px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--border-medium);
-}
+.timeline-item {
+  position: relative;
+  margin-bottom: var(--space-xl);
 
-.timeline-item { position: relative; margin-bottom: var(--space-xl); }
+  /* Conector hacia el siguiente ítem, no una línea única que atraviesa todo el
+     contenedor — así nunca sigue de largo después de la última experiencia.
+     `top`/`bottom` se apoyan en el propio borde del ítem (no en su alto real,
+     que es variable), por eso llega siempre al centro del siguiente punto sin
+     depender de cuánto texto tenga la tarjeta. */
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 46px;
+    bottom: calc(-46px - var(--space-xl));
+    width: 2px;
+    background: var(--border-medium);
+  }
+}
 
 .timeline-dot {
   position: absolute;
@@ -227,8 +240,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    background: #ecfdf5;
-    color: #059669;
+    background: var(--success-soft);
+    color: var(--success);
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -259,7 +272,7 @@
 
   .card-actions { display: flex; gap: var(--space-xs); justify-content: flex-end; }
   .edit-btn { color: var(--text-muted); &:hover { color: var(--primary); background: var(--primary-soft); } }
-  .delete-btn { color: var(--text-muted); &:hover { color: #dc2626; background: #fef2f2; } }
+  .delete-btn { color: var(--text-muted); &:hover { color: var(--danger); background: var(--danger-soft); } }
 }
 
 /* ─── Suggestion autocomplete ────────────── */
@@ -287,10 +300,10 @@
 
 /* ─── Responsive ─────────────────────────── */
 
-@media (max-width: 768px) {
+@include bp.tablet {
   .page-content { padding: 0; }
   .timeline { padding-left: 36px; }
-  .timeline-line { left: 17px; }
+  .timeline-item:not(:last-child)::before { left: -16px; top: 42px; bottom: calc(-42px - var(--space-xl)); }
   .timeline-dot { left: -33px; width: 36px; height: 36px; mat-icon { font-size: 16px; width: 16px; height: 16px; } }
   .form-grid { grid-template-columns: 1fr; }
   .form-body { padding: var(--space-md); }

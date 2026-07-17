@@ -205,6 +205,12 @@ npm run seed:jobs
 - OAuth 2.0 / Google Login
 - Notificaciones push y email
 
+## Documentación de mejoras en curso
+
+- [`docs/plan-consistencia-css.md`](docs/plan-consistencia-css.md) — sistema de diseño del FRONTEND (tokens, componentes compartidos Button/Badge/Card). **Completo.**
+- [`docs/auditoria-frontend-ux.md`](docs/auditoria-frontend-ux.md) — auditoría UX/UI detallada del FRONTEND (hallazgos con archivo:línea).
+- [`docs/plan-mejoras-frontend-ux.md`](docs/plan-mejoras-frontend-ux.md) — decisiones de producto y plan de fases derivado de esa auditoría. **En curso.**
+
 ## Licencia
 
 Proyecto académico - Seminario UCC 2026

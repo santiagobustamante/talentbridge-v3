@@ -1,0 +1,25 @@
+.app-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+}
+
+.app-card--flat {
+  border: 1px solid var(--border-soft);
+}
+
+.app-card--elevated {
+  border: none;
+  box-shadow: var(--shadow-md);
+}
+
+.app-card--pad-sm {
+  padding: var(--space-md);
+}
+
+.app-card--pad-md {
+  padding: var(--space-lg);
+}
+
+.app-card--pad-lg {
+  padding: var(--space-xl);
+}

@@ -8,8 +8,17 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { forkJoin, of, catchError } from 'rxjs';
 import { CvService } from '../../core/services/cv.service';
+import { SkillsService } from '../../core/services/skills.service';
 import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { SKILL_CATALOG } from '../../core/services/skill-catalog';
+
+interface CvSkillSuggestion {
+  name: string;
+  selected: boolean;
+}
 
 @Component({
   selector: 'app-cv-analysis',
@@ -24,6 +33,7 @@ import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
     MatIconModule,
     MatSnackBarModule,
     MatProgressBarModule,
+    AppDatePipe,
   ],
   styleUrl: './cv-analysis.component.scss',
   template: `
@@ -93,7 +103,7 @@ import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
               </div>
               <div class="doc-details">
                 <span class="doc-name">{{ doc.originalName }}</span>
-                <span class="doc-date">Subido {{ doc.uploadedAt | date:'medium' }}</span>
+                <span class="doc-date">Subido {{ doc.uploadedAt | appDate:'datetime' }}</span>
               </div>
             </div>
             <button class="analyze-btn" [class.loading]="analyzingId === doc.id" [disabled]="analyzingId === doc.id" (click)="analyze(doc.id); $event.stopPropagation()">
@@ -129,7 +139,7 @@ import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
                 <span class="score-label">/ 100</span>
               </div>
             </div>
-            <p class="score-date">Analizado el {{ currentAnalysis.createdAt | date:'medium' }}</p>
+            <p class="score-date">Analizado el {{ currentAnalysis.createdAt | appDate:'datetime' }}</p>
           </div>
 
           <!-- Strengths -->
@@ -160,12 +170,38 @@ import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
             </ul>
           </div>
         </div>
+
+        <!-- ── CV Skill Suggestions ── -->
+        <div class="detail-card glass-card suggestions animate-fade-in-up stagger-4" *ngIf="cvSuggestions.length > 0">
+          <h3>
+            <mat-icon class="icon-accent">auto_awesome</mat-icon>
+            Detectamos estas tecnologías en tu CV
+          </h3>
+          <p class="suggestions-hint">No están todavía en tu perfil. Marca las que quieras agregar.</p>
+          <div class="suggestion-list">
+            <label class="suggestion-item" *ngFor="let s of cvSuggestions">
+              <input type="checkbox" [checked]="s.selected" (change)="toggleSuggestion(s)" />
+              <span>{{ s.name }}</span>
+            </label>
+          </div>
+          <button
+            class="upload-btn"
+            [class.loading]="addingSuggestions"
+            [disabled]="selectedSuggestionCount === 0 || addingSuggestions"
+            (click)="addSelectedSuggestions()"
+          >
+            <mat-icon *ngIf="!addingSuggestions">add</mat-icon>
+            <span class="spinner" *ngIf="addingSuggestions"></span>
+            {{ addingSuggestions ? 'Agregando...' : (selectedSuggestionCount > 0 ? 'Agregar ' + selectedSuggestionCount + ' seleccionada(s)' : 'Ninguna seleccionada') }}
+          </button>
+        </div>
       </section>
     </div>
   `,
 })
 export class CvAnalysisComponent {
   private cvService = inject(CvService);
+  private skillsService = inject(SkillsService);
   private snackBar = inject(MatSnackBar);
 
   selectedFile: File | null = null;
@@ -174,8 +210,17 @@ export class CvAnalysisComponent {
   documents: CvDocument[] = [];
   currentAnalysis: CvAnalysis | null = null;
 
+  cvSuggestions: CvSkillSuggestion[] = [];
+  addingSuggestions = false;
+  private candidateSkillNames = new Set<string>();
+
   constructor() {
     this.loadDocuments();
+    this.loadCandidateSkills();
+  }
+
+  get selectedSuggestionCount(): number {
+    return this.cvSuggestions.filter((s) => s.selected).length;
   }
 
   onFileSelected(event: Event) {
@@ -206,6 +251,7 @@ export class CvAnalysisComponent {
       next: (analysis) => {
         this.analyzingId = null;
         this.currentAnalysis = analysis;
+        this.computeSuggestions(id);
         this.snackBar.open('Análisis completado', 'Cerrar', { duration: 3000 });
       },
       error: (err) => {
@@ -215,7 +261,60 @@ export class CvAnalysisComponent {
     });
   }
 
+  toggleSuggestion(s: CvSkillSuggestion): void {
+    s.selected = !s.selected;
+  }
+
+  addSelectedSuggestions(): void {
+    const names = this.cvSuggestions.filter((s) => s.selected).map((s) => s.name);
+    if (!names.length || this.addingSuggestions) return;
+
+    this.addingSuggestions = true;
+    forkJoin(
+      names.map((name) => this.skillsService.create({ name, level: 'BASIC' }).pipe(catchError(() => of(null)))),
+    ).subscribe((results) => {
+      this.addingSuggestions = false;
+      const added = results.filter((r) => r !== null).length;
+      const failed = results.length - added;
+      names.forEach((name) => this.candidateSkillNames.add(name.toLowerCase()));
+      this.cvSuggestions = this.cvSuggestions.filter((s) => !names.includes(s.name));
+      if (failed === 0) {
+        this.snackBar.open(`${added} habilidad(es) agregada(s) a tu perfil`, 'Cerrar', { duration: 2500 });
+      } else {
+        this.snackBar.open(`${added} agregada(s), ${failed} ya existían o fallaron`, 'Cerrar', { duration: 4000 });
+      }
+    });
+  }
+
   private loadDocuments() {
     this.cvService.getAll().subscribe({ next: (docs) => (this.documents = docs) });
+  }
+
+  private loadCandidateSkills(): void {
+    this.skillsService.getAll().subscribe({
+      next: (skills) => { this.candidateSkillNames = new Set(skills.map((s) => s.name.toLowerCase())); },
+    });
+  }
+
+  private computeSuggestions(cvId: number): void {
+    const doc = this.documents.find((d) => d.id === cvId);
+    const text = doc?.extractedText?.toLowerCase();
+    if (!text) { this.cvSuggestions = []; return; }
+
+    const seen = new Set<string>();
+    const matches: CvSkillSuggestion[] = [];
+    for (const entry of SKILL_CATALOG) {
+      const normalized = entry.name.toLowerCase();
+      if (this.candidateSkillNames.has(normalized) || seen.has(normalized)) continue;
+      // \b\b en vez de .includes(): un catálogo con nombres de 1-3 letras (C, R, Go, iOS)
+      // hacía falsos positivos con .includes() — ej. "C" coincidía dentro de "C1" (nivel de inglés).
+      const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\b${escaped}\\b`, 'i');
+      if (pattern.test(text)) {
+        seen.add(normalized);
+        matches.push({ name: entry.name, selected: true });
+      }
+    }
+    this.cvSuggestions = matches.slice(0, 20);
   }
 }

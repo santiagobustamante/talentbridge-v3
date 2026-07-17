@@ -1,0 +1,137 @@
+:host {
+  display: block;
+}
+
+.checklist-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress-ring {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .ring-bg {
+    fill: none;
+    stroke: var(--border-soft);
+    stroke-width: 7;
+  }
+
+  .ring-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 7;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+.progress-ring-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.checklist-title {
+  h3 {
+    margin: 0 0 2px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+}
+
+.checklist-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checklist-item {
+  a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 6px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: background var(--transition-fast);
+
+    &:hover {
+      background: var(--bg-surface-soft);
+    }
+
+    span {
+      flex: 1;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--text-placeholder);
+      flex-shrink: 0;
+    }
+
+    .arrow {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-placeholder);
+    }
+  }
+
+  &.done a {
+    color: var(--text-muted);
+    text-decoration: line-through;
+
+    mat-icon:first-child {
+      color: var(--success);
+    }
+
+    span {
+      font-weight: 400;
+    }
+  }
+}

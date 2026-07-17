@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, CurrentUser } from '@app/auth';
+import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
+import { UserRole } from '@app/database';
 import { SkillsService } from './skills.service';
 import { SkillDto } from './dto/skill.dto';
 
@@ -29,5 +30,19 @@ export class SkillsController {
   @Delete(':id')
   async removeSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
     return this.skillsService.removeSkill(user.sub, +id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COMPANY)
+  @Post(':id/endorse')
+  async endorseSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
+    return this.skillsService.endorseSkill(user.sub, +id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COMPANY)
+  @Delete(':id/endorse')
+  async unendorseSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
+    return this.skillsService.unendorseSkill(user.sub, +id);
   }
 }

@@ -29,7 +29,7 @@
 
       @if (!loadingConversations() && conversations().length === 0) {
         <div class="conversations-panel__empty">
-          <p>No tienes conversaciones aún</p>
+          <app-empty-state compact icon="forum" message="No tienes conversaciones aún" />
         </div>
       }
 
@@ -41,12 +41,18 @@
               [class.active]="activeConversation()?.id === conv.id"
               (click)="openConversation(conv.id)"
             >
-              <div class="conversation-avatar">{{ contactName(conv).charAt(0).toUpperCase() }}</div>
+              <div class="conversation-avatar">
+                @if (contactLogo(conv); as logo) {
+                  <img [src]="logo" [alt]="contactName(conv)" (error)="onImgError($event)" />
+                } @else {
+                  {{ contactName(conv).charAt(0).toUpperCase() }}
+                }
+              </div>
               <div class="conversation-info">
                 <div class="conversation-info__top">
                   <span class="conversation-name">{{ contactName(conv) }}</span>
                   @if (conv.lastMessageAt) {
-                    <span class="conversation-date">{{ conv.lastMessageAt | date:'shortDate' }}</span>
+                    <span class="conversation-date">{{ conv.lastMessageAt | appDate:'short' }}</span>
                   }
                 </div>
                 <div class="conversation-info__bottom">
@@ -93,7 +99,11 @@
           </button>
 
           <div class="chat-header__avatar">
-            {{ contactName(conv).charAt(0).toUpperCase() }}
+            @if (contactLogo(conv); as logo) {
+              <img [src]="logo" [alt]="contactName(conv)" (error)="onImgError($event)" />
+            } @else {
+              {{ contactName(conv).charAt(0).toUpperCase() }}
+            }
           </div>
 
           <div class="chat-header__info">
@@ -172,7 +182,7 @@
               >
                 <p class="message-bubble__text">{{ msg.body }}</p>
                 <div class="message-bubble__meta">
-                  <span class="message-time">{{ msg.createdAt | date:'shortTime' }}</span>
+                  <span class="message-time">{{ msg.createdAt | appDate:'time' }}</span>
                   @if (getBubbleSender(msg) === 'me') {
                     <span class="message-read">
                       @if (msg.readAt) {
@@ -224,19 +234,3 @@
     </main>
   </div>
 </div>
-
-<!-- Block Confirm Dialog -->
-@if (showBlockConfirm) {
-  <div class="block-confirm-overlay" (click)="showBlockConfirm = false">
-    <div class="block-confirm-dialog" (click)="$event.stopPropagation()">
-      <h3 class="block-confirm-dialog__title">Bloquear conversación</h3>
-      <p class="block-confirm-dialog__body">
-        ¿Estás seguro de que deseas bloquear esta conversación? No recibirás más mensajes de este usuario.
-      </p>
-      <div class="block-confirm-dialog__actions">
-        <button class="block-confirm-dialog__cancel" (click)="showBlockConfirm = false">Cancelar</button>
-        <button class="block-confirm-dialog__confirm" (click)="confirmBlock()">Bloquear</button>
-      </div>
-    </div>
-  </div>
-}

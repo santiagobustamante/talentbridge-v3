@@ -2,6 +2,8 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.27.
 
+> Antes de tocar estilos o crear un botón/badge/card nuevo, mirá la guía del [sistema de diseño](src/styles/README.md) — tiene los tokens disponibles y los componentes compartidos ya hechos.
+
 ## Development server
 
 To start a local development server, run:

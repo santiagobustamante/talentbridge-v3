@@ -1,0 +1,173 @@
+<div class="page-content">
+  <header class="page-header animate-fade-in">
+    <div class="header-icon">
+      <mat-icon>psychology</mat-icon>
+    </div>
+    <div class="header-text">
+      <h1>Mapa de habilidades</h1>
+      <p class="subtitle">Gestiona y organiza tus competencias</p>
+    </div>
+  </header>
+
+  <div class="visibility-bar" *ngIf="profileLoaded">
+    <span class="vis-label">Mostrar habilidades en perfil público</span>
+    <mat-slide-toggle [checked]="showSkills" (change)="toggleVisibility($event)" color="primary"></mat-slide-toggle>
+  </div>
+
+  <!-- Selector por catálogo -->
+  <div class="catalog-card glass-card animate-fade-in-up">
+    <div class="catalog-header">
+      <h2>Agregar habilidades</h2>
+      <p>Busca por nombre o elige una categoría, selecciona varias y agrégalas de una sola vez</p>
+    </div>
+
+    <div class="catalog-search">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        [(ngModel)]="catalogQuery"
+        placeholder="Buscar una habilidad (Angular, Python, Figma...)"
+      />
+      @if (catalogQuery) {
+        <button type="button" class="clear-search" (click)="catalogQuery = ''" aria-label="Limpiar búsqueda">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    @if (!catalogQuery) {
+      <div class="category-pills">
+        @for (cat of categories; track cat) {
+          <button
+            type="button"
+            class="category-pill"
+            [class.active]="activeCategory === cat"
+            (click)="selectCategory(cat)"
+          >
+            {{ cat }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (visibleEntries.length > 0) {
+      <div class="catalog-chips animate-fade-in">
+        @for (entry of visibleEntries; track entry.name) {
+          <button
+            type="button"
+            class="catalog-chip"
+            [class.selected]="isSelected(entry.name)"
+            [class.owned]="isOwned(entry.name)"
+            [disabled]="isOwned(entry.name)"
+            (click)="toggleSelect(entry.name)"
+          >
+            @if (isOwned(entry.name)) {
+              <mat-icon>check_circle</mat-icon>
+            } @else if (isSelected(entry.name)) {
+              <mat-icon>check_box</mat-icon>
+            } @else {
+              <mat-icon>add</mat-icon>
+            }
+            {{ entry.name }}
+          </button>
+        }
+      </div>
+      @if (searchTruncated) {
+        <p class="truncated-note">Mostrando los primeros {{ visibleEntries.length }} resultados — seguí escribiendo para afinar la búsqueda.</p>
+      }
+    } @else if (catalogQuery) {
+      <p class="no-results">No encontramos habilidades que coincidan con "{{ catalogQuery }}".</p>
+    } @else if (!activeCategory) {
+      <p class="no-results">Elige una categoría de arriba o escribe para buscar.</p>
+    }
+
+    @if (selectedNames.size > 0) {
+      <div class="selection-bar animate-fade-in-up">
+        <div class="selection-bar-top">
+          <span class="selection-count">{{ selectedNames.size }} seleccionada(s)</span>
+          <button type="button" class="clear-selection-btn" (click)="clearSelection()">Cancelar</button>
+        </div>
+        <span class="selection-bar-label">Nivel inicial para todas</span>
+        <app-level-meter [level]="batchLevel" [interactive]="true" (levelChange)="batchLevel = $event"></app-level-meter>
+        <button type="button" class="add-selected-btn" [disabled]="addingBatch" (click)="addSelected()">
+          <mat-icon>add</mat-icon>
+          {{ addingBatch ? 'Agregando...' : 'Agregar ' + selectedNames.size + ' seleccionada(s)' }}
+        </button>
+      </div>
+    }
+
+    <div class="custom-add-row">
+      <span class="custom-add-label">¿No la encuentras en el catálogo?</span>
+      <form [formGroup]="customForm" (ngSubmit)="addCustom()" class="custom-add-form">
+        <div class="custom-name-field">
+          <label for="custom-skill-name">Nombre de la habilidad</label>
+          <input id="custom-skill-name" type="text" formControlName="name" placeholder="Ej. Herramienta interna, framework nuevo..." />
+        </div>
+        <div class="custom-level-field">
+          <span class="field-label">Nivel</span>
+          <app-level-meter
+            [level]="customForm.value.level || 'BASIC'"
+            [interactive]="true"
+            [showHint]="false"
+            (levelChange)="setCustomLevel($event)"
+          ></app-level-meter>
+        </div>
+        <button type="submit" class="custom-add-btn" [disabled]="customForm.invalid">
+          <mat-icon>add</mat-icon>
+          Agregar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tus habilidades -->
+  <h2 class="section-title" *ngIf="skills.length > 0">Tus habilidades ({{ skills.length }})</h2>
+
+  <ng-container *ngIf="skills.length > 0; else emptyState">
+    <div class="skills-grid">
+      <div
+        *ngFor="let s of skills; let i = index"
+        class="skill-card glass-card animate-fade-in-scale"
+        [ngClass]="'stagger-' + ((i % 6) + 1)"
+      >
+        <div class="skill-header">
+          <h3 class="skill-name">{{ s.name }}</h3>
+          <button mat-icon-button class="delete-btn" (click)="remove(s.id)" aria-label="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        @if (editingLevelId === s.id) {
+          <div class="level-edit-row">
+            <app-level-meter [level]="s.level" [interactive]="true" (levelChange)="updateLevel(s, $event)"></app-level-meter>
+            <button type="button" class="level-edit-cancel" (click)="cancelLevelEdit()" aria-label="Cancelar">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        } @else {
+          <button type="button" class="level-display-btn" (click)="startLevelEdit(s)" aria-label="Cambiar nivel">
+            <app-level-meter [level]="s.level" [showHint]="false"></app-level-meter>
+            <mat-icon>edit</mat-icon>
+          </button>
+        }
+
+        @if (s.endorsements?.length) {
+          <div class="endorsement-note">
+            <mat-icon>verified</mat-icon>
+            <span>Avalada por {{ s.endorsements!.join(', ') }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <div class="empty-state animate-fade-in-scale">
+      <div class="empty-icon">
+        <mat-icon>lightbulb</mat-icon>
+      </div>
+      <h2>Sin habilidades aún</h2>
+      <p>Elige del catálogo de arriba para agregar tus primeras habilidades</p>
+    </div>
+  </ng-template>
+</div>

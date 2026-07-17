@@ -9,7 +9,7 @@
         <p>Publica vacantes y gestiona postulaciones</p>
       </div>
     </div>
-    <button class="btn-create" (click)="openCreateForm()">
+    <button appButton="primary" (click)="openCreateForm()">
       <mat-icon>add</mat-icon>Nueva oferta
     </button>
   </header>
@@ -34,29 +34,35 @@
   @if (jobOffers.length > 0) {
     <div class="jobs-table animate-fade-in-up">
       <div class="table-header">
-        <span class="col-title">Título</span>
-        <span class="col-city">Ciudad</span>
+        <span class="col-offer">Oferta</span>
+        <span class="col-city">Ubicación</span>
         <span class="col-modality">Modalidad</span>
+        <span class="col-contract">Contrato</span>
+        <span class="col-workload">Jornada</span>
         <span class="col-status">Estado</span>
         <span class="col-count">Post.</span>
-        <span class="col-date">Fecha</span>
+        <span class="col-date">Publicación</span>
         <span class="col-actions">Acciones</span>
       </div>
       @for (job of jobOffers; track job.id) {
         <div class="table-row">
-          <span class="col-title">{{ job.title }}</span>
-          <span class="col-city">{{ job.city || '—' }}</span>
-          <span class="col-modality">{{ job.modality || '—' }}</span>
-          <span class="col-status">
-            <span class="status-badge" [class]="'status-' + job.status">
-              {{ statusLabel(job.status) }}
-            </span>
-            @if (job.status === 'ARCHIVED') {
-              <span class="status-hint">Puedes restaurarla</span>
+          <span class="col-offer">
+            <span class="offer-title">{{ job.title }}</span>
+            @if (job.salaryMin || job.salaryMax) {
+              <span class="offer-salary">{{ formatSalary(job) }}</span>
             }
           </span>
+          <span class="col-city">{{ job.city || '—' }}</span>
+          <span class="col-modality">{{ job.modality || '—' }}</span>
+          <span class="col-contract" [title]="contractTypeLabel(job)">{{ contractTypeLabel(job) || '—' }}</span>
+          <span class="col-workload" [title]="workloadLabel(job)">{{ workloadLabel(job) || '—' }}</span>
+          <span class="col-status">
+            <app-badge [tone]="statusTone(job.status)">
+              {{ statusLabel(job.status) }}
+            </app-badge>
+          </span>
           <span class="col-count">{{ job._count?.applications ?? 0 }}</span>
-          <span class="col-date">{{ job.createdAt | date:'shortDate' }}</span>
+          <span class="col-date">{{ formatJobDate(job) }}</span>
           <span class="col-actions">
             <button class="action-btn" (click)="editJob(job)" title="Editar oferta" aria-label="Editar oferta">
               <mat-icon>edit</mat-icon>
@@ -83,18 +89,16 @@
               </button>
             }
             @if (job.status === 'ARCHIVED') {
-              <button class="action-btn publish" (click)="restoreJob(job)" title="Restaurar oferta como borrador" aria-label="Restaurar oferta">
+              <button class="action-btn restore" (click)="restoreJob(job)" title="Restaurar oferta" aria-label="Restaurar oferta">
                 <mat-icon>undo</mat-icon>
               </button>
-            }
-            @if (job.status !== 'PUBLISHED' && job.status !== 'CLOSED') {
-              <button class="action-btn archive" (click)="archiveJob(job)" title="Archivar oferta" aria-label="Archivar oferta">
-                <mat-icon>archive</mat-icon>
-              </button>
-            }
-            @if (job.status === 'ARCHIVED') {
               <button class="action-btn delete" (click)="deleteJob(job)" title="Eliminar oferta" aria-label="Eliminar oferta">
                 <mat-icon>delete</mat-icon>
+              </button>
+            }
+            @if (job.status !== 'PUBLISHED' && job.status !== 'CLOSED' && job.status !== 'ARCHIVED') {
+              <button class="action-btn archive" (click)="archiveJob(job)" title="Archivar oferta" aria-label="Archivar oferta">
+                <mat-icon>archive</mat-icon>
               </button>
             }
           </span>
@@ -129,9 +133,9 @@
             <label>Modalidad</label>
             <select [(ngModel)]="formData.modality">
               <option value="">Seleccionar</option>
-              <option value="Remoto">Remoto</option>
-              <option value="Presencial">Presencial</option>
-              <option value="Híbrido">Híbrido</option>
+              @for (m of modalities; track m.value) {
+                <option [value]="m.value">{{ m.label }}</option>
+              }
             </select>
           </div>
         </div>
@@ -141,13 +145,37 @@
             <label>Tipo de contrato</label>
             <select [(ngModel)]="formData.contractType">
               <option value="">Seleccionar</option>
-              <option value="Tiempo completo">Tiempo completo</option>
-              <option value="Medio tiempo">Medio tiempo</option>
-              <option value="Freelance">Freelance</option>
-              <option value="Por proyecto">Por proyecto</option>
-              <option value="Prácticas">Prácticas</option>
+              @for (c of contractTypes; track c.value) {
+                <option [value]="c.value">{{ c.label }}</option>
+              }
             </select>
           </div>
+          <div class="form-group">
+            <label>Carga horaria</label>
+            <select [(ngModel)]="formData.workload">
+              <option value="">Seleccionar</option>
+              @for (w of workloads; track w.value) {
+                <option [value]="w.value">{{ w.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (formData.contractType === 'Otro') {
+          <div class="form-group">
+            <label>Especifica el tipo de contrato</label>
+            <input type="text" [(ngModel)]="formData.customContractType" placeholder="Ej. Contrato por proyecto académico" maxlength="100" />
+          </div>
+        }
+
+        @if (formData.workload === 'Otra') {
+          <div class="form-group">
+            <label>Especifica la carga horaria</label>
+            <input type="text" [(ngModel)]="formData.customWorkload" placeholder="Ej. Fines de semana" maxlength="100" />
+          </div>
+        }
+
+        <div class="form-row">
           <div class="form-group">
             <label>Moneda</label>
             <select [(ngModel)]="formData.currency">
@@ -181,14 +209,52 @@
 
         <div class="form-group">
           <label>Habilidades requeridas</label>
-          <input type="text" [(ngModel)]="formData.skillsRequired" placeholder="Ej. Angular, PostgreSQL, Docker, Git" />
-          <span class="field-help">Escribe las habilidades separadas por coma. Ejemplo: Angular, PostgreSQL, Docker, Git</span>
+          <span class="field-help">Opcionalmente, exige un nivel mínimo por habilidad — ayuda a mostrarle al candidato una coincidencia más precisa, sin bloquear a nadie de postularse.</span>
+
+          <div class="skill-rows">
+            @for (row of skillRows; track $index) {
+              <div class="skill-row">
+                <input
+                  type="text"
+                  class="skill-row-name"
+                  [(ngModel)]="row.name"
+                  [ngModelOptions]="{ standalone: true }"
+                  list="skill-catalog-datalist"
+                  placeholder="Ej. Angular"
+                />
+                <label class="skill-row-level-toggle">
+                  <input type="checkbox" [checked]="row.requireLevel" (change)="toggleRequireLevel(row)" />
+                  Exigir nivel mínimo
+                </label>
+                @if (row.requireLevel) {
+                  <app-level-meter
+                    [level]="row.level"
+                    [interactive]="true"
+                    [showHint]="false"
+                    (levelChange)="setRowLevel(row, $event)"
+                  ></app-level-meter>
+                }
+                <button type="button" class="skill-row-remove" (click)="removeSkillRow($index)" aria-label="Quitar habilidad">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+          <button type="button" class="add-skill-row-btn" (click)="addSkillRow()">
+            <mat-icon>add</mat-icon>
+            Agregar habilidad
+          </button>
+          <datalist id="skill-catalog-datalist">
+            @for (name of skillCatalogNames; track name) {
+              <option [value]="name"></option>
+            }
+          </datalist>
         </div>
       </div>
 
       <div class="form-actions">
-        <button class="btn-detail" (click)="closeForm()">Cancelar</button>
-        <button class="btn-save" (click)="saveJob()" [disabled]="saving()">
+        <button appButton="secondary" (click)="closeForm()">Cancelar</button>
+        <button appButton="primary" (click)="saveJob()" [disabled]="saving()">
           {{ saving() ? 'Guardando...' : editingId() ? 'Actualizar' : 'Crear oferta' }}
         </button>
       </div>
@@ -237,14 +303,14 @@
                     @if (app.candidate?.profile?.city) {
                       <span><mat-icon>location_on</mat-icon>{{ app.candidate?.profile?.city }}</span>
                     }
-                    <span><mat-icon>event</mat-icon>{{ app.createdAt | date:'mediumDate' }}</span>
+                    <span><mat-icon>event</mat-icon>{{ app.createdAt | appDate:'short' }}</span>
                   </div>
                   @if (app.coverMessage) {
                     <p class="app-cover">"{{ app.coverMessage }}"</p>
                   }
                 </div>
                 <div class="app-status-area">
-                  <span class="status-badge" [class]="'status-' + app.status">{{ statusLabel(app.status) }}</span>
+                  <app-badge [tone]="statusTone(app.status)">{{ statusLabel(app.status) }}</app-badge>
                   <select class="status-select" [ngModel]="app.status"
                     (ngModelChange)="updateStatus(app.id, $event)">
                     <option value="PENDING">Pendiente</option>
@@ -257,7 +323,7 @@
               </div>
               <div class="app-card-actions">
                 @if (app.candidate?.profile?.slug) {
-                  <a class="btn-detail" [routerLink]="'/portfolio/' + app.candidate?.profile?.slug">
+                  <a appButton="secondary" [routerLink]="'/portfolio/' + app.candidate?.profile?.slug">
                     <mat-icon>visibility</mat-icon>Ver portafolio
                   </a>
                 }

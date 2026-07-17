@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsInt } from 'class-validator';
 
 export class CreateJobOfferDto {
   @IsString()
@@ -26,6 +26,18 @@ export class CreateJobOfferDto {
   @IsOptional()
   @IsString()
   contractType?: string;
+
+  @IsOptional()
+  @IsString()
+  customContractType?: string;
+
+  @IsOptional()
+  @IsString()
+  workload?: string;
+
+  @IsOptional()
+  @IsString()
+  customWorkload?: string;
 
   @IsOptional()
   @IsInt()

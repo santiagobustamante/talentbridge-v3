@@ -15,14 +15,14 @@ import {
     <mat-dialog-content>{{ data.message }}</mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">Cancelar</button>
-      <button mat-raised-button color="warn" (click)="onConfirm()">Eliminar</button>
+      <button mat-raised-button [color]="data.confirmColor || 'warn'" (click)="onConfirm()">{{ data.confirmLabel || 'Eliminar' }}</button>
     </mat-dialog-actions>
   `,
 })
 export class ConfirmDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string },
+    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string; confirmLabel?: string; confirmColor?: 'warn' | 'primary' },
   ) {}
 
   onConfirm() {

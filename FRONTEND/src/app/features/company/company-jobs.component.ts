@@ -5,9 +5,52 @@ import { RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { JobsService } from '../../core/services/jobs.service';
 import { ChatService } from '../../core/services/chat.service';
 import { JobOffer, JobApplication } from '../../core/models/jobs.models';
+import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
+import { statusToTone } from '../../shared/components/badge/status-tone.util';
+import { statusToLabel } from '../../shared/components/badge/status-label.util';
+import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
+import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { formatAppDate } from '../../shared/utils/format-date.util';
+import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
+import { SKILL_CATALOG } from '../../core/services/skill-catalog';
+
+interface SkillRow {
+  name: string;
+  requireLevel: boolean;
+  level: SkillLevel;
+}
+
+/** Espejo minimalista de BACKEND/libs/contracts/src/skill-match.util.ts — Angular no puede
+ *  importar código de un lib NestJS, así que el formato "Nombre:NIVEL" se parsea/serializa
+ *  igual en ambos lados sin migrar el schema de JobOffer. */
+function parseSkillsRequired(raw: string): SkillRow[] {
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [name, levelPart] = entry.split(':');
+      const level = (levelPart || '').trim().toUpperCase();
+      const valid = ['BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'].includes(level);
+      return {
+        name: (name || '').trim(),
+        requireLevel: valid,
+        level: (valid ? level : 'BASIC') as SkillLevel,
+      };
+    });
+}
+
+function stringifySkillRows(rows: SkillRow[]): string {
+  return rows
+    .filter((r) => r.name.trim())
+    .map((r) => (r.requireLevel ? `${r.name.trim()}:${r.level}` : r.name.trim()))
+    .join(',');
+}
 
 @Component({
   selector: 'app-company-jobs',
@@ -15,6 +58,7 @@ import { JobOffer, JobApplication } from '../../core/models/jobs.models';
   imports: [
     CommonModule, FormsModule, RouterModule,
     MatIconModule, MatProgressBarModule, MatSnackBarModule,
+    BadgeComponent, ButtonDirective, AppDatePipe, LevelMeterComponent,
   ],
   styleUrl: './company-jobs.component.scss',
   templateUrl: './company-jobs.component.html',
@@ -24,6 +68,7 @@ export class CompanyJobsComponent implements OnInit {
   private chatService = inject(ChatService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = signal(false);
   saving = signal(false);
@@ -40,9 +85,39 @@ export class CompanyJobsComponent implements OnInit {
 
   formData: any = {
     title: '', description: '', requirements: '', responsibilities: '',
-    city: '', modality: '', contractType: '', salaryMin: '', salaryMax: '',
-    currency: 'COP', skillsRequired: '',
+    city: '', modality: '', contractType: '', customContractType: '',
+    workload: '', customWorkload: '', salaryMin: '', salaryMax: '',
+    currency: 'COP',
   };
+
+  skillRows: SkillRow[] = [];
+  skillCatalogNames = SKILL_CATALOG.map((e) => e.name);
+
+  contractTypes = [
+    { value: 'Término indefinido', label: 'Término indefinido' },
+    { value: 'Término fijo', label: 'Término fijo' },
+    { value: 'Obra o labor', label: 'Obra o labor' },
+    { value: 'Aprendizaje', label: 'Aprendizaje' },
+    { value: 'Prestación de servicios', label: 'Prestación de servicios' },
+    { value: 'Temporal / ocasional / accidental', label: 'Temporal / ocasional / accidental' },
+    { value: 'Prácticas', label: 'Prácticas' },
+    { value: 'Otro', label: 'Otro' },
+  ];
+
+  workloads = [
+    { value: 'Tiempo completo', label: 'Tiempo completo' },
+    { value: 'Medio tiempo', label: 'Medio tiempo' },
+    { value: 'Por horas', label: 'Por horas' },
+    { value: 'Turnos', label: 'Turnos' },
+    { value: 'Flexible', label: 'Flexible' },
+    { value: 'Otra', label: 'Otra' },
+  ];
+
+  modalities = [
+    { value: 'Remoto', label: 'Remoto' },
+    { value: 'Híbrido', label: 'Híbrido' },
+    { value: 'Presencial', label: 'Presencial' },
+  ];
 
   ngOnInit(): void {
     this.loadJobs();
@@ -72,9 +147,11 @@ export class CompanyJobsComponent implements OnInit {
     this.editingId.set(null);
     this.formData = {
       title: '', description: '', requirements: '', responsibilities: '',
-      city: '', modality: '', contractType: '', salaryMin: '', salaryMax: '',
-      currency: 'COP', skillsRequired: '',
+      city: '', modality: '', contractType: '', customContractType: '',
+      workload: '', customWorkload: '', salaryMin: '', salaryMax: '',
+      currency: 'COP',
     };
+    this.skillRows = [];
     this.showForm.set(true);
   }
 
@@ -83,11 +160,30 @@ export class CompanyJobsComponent implements OnInit {
     this.formData = {
       title: job.title, description: job.description,
       requirements: job.requirements || '', responsibilities: job.responsibilities || '',
-      city: job.city || '', modality: job.modality || '', contractType: job.contractType || '',
+      city: job.city || '', modality: job.modality || '',
+      contractType: job.contractType || '', customContractType: job.customContractType || '',
+      workload: job.workload || '', customWorkload: job.customWorkload || '',
       salaryMin: job.salaryMin ?? '', salaryMax: job.salaryMax ?? '',
-      currency: job.currency || 'COP', skillsRequired: job.skillsRequired || '',
+      currency: job.currency || 'COP',
     };
+    this.skillRows = parseSkillsRequired(job.skillsRequired || '');
     this.showForm.set(true);
+  }
+
+  addSkillRow(): void {
+    this.skillRows.push({ name: '', requireLevel: false, level: 'BASIC' });
+  }
+
+  removeSkillRow(index: number): void {
+    this.skillRows.splice(index, 1);
+  }
+
+  toggleRequireLevel(row: SkillRow): void {
+    row.requireLevel = !row.requireLevel;
+  }
+
+  setRowLevel(row: SkillRow, level: SkillLevel): void {
+    row.level = level;
   }
 
   closeForm(): void {
@@ -114,6 +210,7 @@ export class CompanyJobsComponent implements OnInit {
       ...this.formData,
       salaryMin,
       salaryMax,
+      skillsRequired: stringifySkillRows(this.skillRows),
     };
 
     const request = this.editingId()
@@ -153,32 +250,50 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   closeJob(job: JobOffer): void {
-    if (!confirm('¿Seguro que quieres cerrar esta oferta? Los candidatos ya no podrán postularse.')) return;
-
-    this.jobsService.closeJob(job.id).subscribe({
-      next: () => {
-        this.loadJobs();
-        this.snackBar.open('Oferta cerrada', 'Cerrar', { duration: 2000 });
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cerrar oferta',
+        message: '¿Seguro que quieres cerrar esta oferta? Los candidatos ya no podrán postularse.',
+        confirmLabel: 'Cerrar oferta',
+        confirmColor: 'primary',
       },
-      error: (err) => {
-        const msg = err?.error?.message || 'Error al cerrar';
-        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
-      },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.jobsService.closeJob(job.id).subscribe({
+        next: () => {
+          this.loadJobs();
+          this.snackBar.open('Oferta cerrada', 'Cerrar', { duration: 2000 });
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Error al cerrar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 
   archiveJob(job: JobOffer): void {
-    if (!confirm('¿Seguro que quieres archivar esta oferta? No se mostrará a los candidatos, pero podrás restaurarla después.')) return;
-
-    this.jobsService.archiveJob(job.id).subscribe({
-      next: () => {
-        this.loadJobs();
-        this.snackBar.open('Oferta archivada', 'Cerrar', { duration: 2000 });
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Archivar oferta',
+        message: '¿Seguro que quieres archivar esta oferta? No se mostrará a los candidatos, pero podrás restaurarla después.',
+        confirmLabel: 'Archivar',
+        confirmColor: 'primary',
       },
-      error: (err) => {
-        const msg = err?.error?.message || 'Error al archivar';
-        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
-      },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.jobsService.archiveJob(job.id).subscribe({
+        next: () => {
+          this.loadJobs();
+          this.snackBar.open('Oferta archivada', 'Cerrar', { duration: 2000 });
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Error al archivar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 
@@ -196,16 +311,24 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   deleteJob(job: JobOffer): void {
-    if (!confirm('¿Estás seguro de eliminar esta oferta? Esta acción no se puede deshacer.')) return;
-    this.jobsService.deleteJob(job.id).subscribe({
-      next: () => {
-        this.loadJobs();
-        this.snackBar.open('Oferta eliminada', 'Cerrar', { duration: 2000 });
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Eliminar oferta',
+        message: '¿Estás seguro de eliminar esta oferta? Esta acción no se puede deshacer.',
       },
-      error: (err) => {
-        const msg = err?.error?.message || 'Error al eliminar';
-        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
-      },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.jobsService.deleteJob(job.id).subscribe({
+        next: () => {
+          this.loadJobs();
+          this.snackBar.open('Oferta eliminada', 'Cerrar', { duration: 2000 });
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Error al eliminar';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 
@@ -270,17 +393,34 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    const map: Record<string, string> = {
-      DRAFT: 'Borrador',
-      PUBLISHED: 'Publicada',
-      CLOSED: 'Cerrada',
-      ARCHIVED: 'Archivada',
-      PENDING: 'Pendiente',
-      REVIEWED: 'Revisado',
-      PRESELECTED: 'Preseleccionado',
-      REJECTED: 'Rechazado',
-      HIRED: 'Contratado',
-    };
-    return map[status] || status;
+    return statusToLabel(status);
+  }
+
+  statusTone(status: string): BadgeTone {
+    return statusToTone(status);
+  }
+
+  contractTypeLabel(job: JobOffer): string {
+    if (job.contractType === 'Otro' && job.customContractType) return job.customContractType;
+    return job.contractType || '';
+  }
+
+  workloadLabel(job: JobOffer): string {
+    if (job.workload === 'Otra' && job.customWorkload) return job.customWorkload;
+    return job.workload || '';
+  }
+
+  formatSalary(job: JobOffer): string | null {
+    if (!job.salaryMin && !job.salaryMax) return null;
+    const c = job.currency || 'COP';
+    const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
+    const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+    if (min && max) return `${min} – ${max} ${c}`;
+    return `${min || max} ${c}`;
+  }
+
+  formatJobDate(job: JobOffer): string {
+    const date = job.publishedAt || job.createdAt;
+    return date ? formatAppDate(date, 'short') : '—';
   }
 }

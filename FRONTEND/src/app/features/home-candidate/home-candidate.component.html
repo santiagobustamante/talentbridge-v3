@@ -29,24 +29,25 @@
         <p>Gestiona tu perfil profesional, revisa oportunidades y mantén tu portafolio actualizado.</p>
       </div>
       <div class="hero-actions">
-        <a class="btn-primary" routerLink="/app/profile">
+        <a appButton="primary" routerLink="/app/profile">
           <mat-icon>person</mat-icon>Editar perfil
         </a>
-        <a class="btn-secondary" routerLink="/app/public-view">
+        <a appButton="secondary" routerLink="/app/public-view">
           <mat-icon>visibility</mat-icon>Vista pública
         </a>
-        <a class="btn-secondary" routerLink="/app/jobs">
+        <a appButton="secondary" routerLink="/app/jobs">
           <mat-icon>work</mat-icon>Buscar trabajos
         </a>
       </div>
     </div>
 
+    <!-- Profile checklist -->
+    @if (data.profilePercent < 100) {
+      <app-profile-checklist class="animate-fade-in-up" [percent]="data.profilePercent" [items]="checklistItems" />
+    }
+
     <!-- Stats grid -->
     <div class="stats-grid animate-fade-in-up">
-      <div class="stat-card">
-        <span class="stat-label">Perfil completado</span>
-        <strong class="stat-value">{{ data.profilePercent }}%</strong>
-      </div>
       <div class="stat-card">
         <span class="stat-label">Habilidades</span>
         <strong class="stat-value">{{ data.skillsCount }}</strong>
@@ -84,48 +85,6 @@
       </div>
     </div>
 
-    <!-- Quick links -->
-    <div class="section-block">
-      <h3 class="section-title">Accesos rápidos</h3>
-      <div class="quick-grid">
-        <a class="quick-card" routerLink="/app/profile">
-          <div class="quick-icon"><mat-icon>person</mat-icon></div>
-          <div class="quick-info"><strong>Perfil</strong><span>Tu información profesional</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/skills">
-          <div class="quick-icon"><mat-icon>psychology</mat-icon></div>
-          <div class="quick-info"><strong>Habilidades</strong><span>Organiza tus competencias</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/experience">
-          <div class="quick-icon"><mat-icon>work_history</mat-icon></div>
-          <div class="quick-info"><strong>Experiencia</strong><span>Tu trayectoria laboral</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/education">
-          <div class="quick-icon"><mat-icon>school</mat-icon></div>
-          <div class="quick-info"><strong>Educación</strong><span>Tu formación académica</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/projects">
-          <div class="quick-icon"><mat-icon>code</mat-icon></div>
-          <div class="quick-info"><strong>Proyectos</strong><span>Muestra tu trabajo</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/cv-analysis">
-          <div class="quick-icon"><mat-icon>document_scanner</mat-icon></div>
-          <div class="quick-info"><strong>CV</strong><span>Analiza tu hoja de vida</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/jobs">
-          <div class="quick-icon"><mat-icon>work</mat-icon></div>
-          <div class="quick-info"><strong>Trabajos</strong><span>Ofertas laborales</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/messages">
-          <div class="quick-icon"><mat-icon>chat</mat-icon></div>
-          <div class="quick-info"><strong>Mensajes</strong><span>Tus conversaciones</span></div>
-        </a>
-        <a class="quick-card" routerLink="/app/public-view">
-          <div class="quick-icon"><mat-icon>visibility</mat-icon></div>
-          <div class="quick-info"><strong>Vista pública</strong><span>Cómo te ven las empresas</span></div>
-        </a>
-      </div>
-    </div>
 
     <!-- Recent jobs -->
     <div class="section-block">
@@ -134,18 +93,26 @@
         <a class="section-link" routerLink="/app/jobs">Ver trabajos <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (data.recentJobs.length === 0) {
-        <p class="empty-text">Todavía no hay ofertas disponibles.</p>
+        <app-empty-state compact icon="work_outline" message="Todavía no hay ofertas disponibles." />
       } @else {
         <div class="job-list">
           @for (job of data.recentJobs; track job.id) {
             <a class="job-item" [routerLink]="'/app/jobs'">
-              <div class="job-item-avatar">{{ (job.company?.companyName || 'E').charAt(0) }}</div>
+              <div class="job-item-avatar">
+                @if (job.company?.logoUrl; as logo) {
+                  <img [src]="logo" [alt]="job.company?.companyName || ''" style="width:100%;height:100%;object-fit:cover" />
+                } @else {
+                  {{ (job.company?.companyName || 'E').charAt(0) }}
+                }
+              </div>
               <div class="job-item-info">
                 <strong>{{ job.title }}</strong>
-                <span>{{ job.company?.companyName || 'Empresa' }} @if (job.city) { · {{ job.city }} }</span>
+                <span>{{ job.company?.companyName || 'Empresa no especificada' }} @if (job.city) { · {{ job.city }} }</span>
                 <span class="job-meta-row">
                   @if (job.modality) { <em>{{ job.modality }}</em> }
-                  @if (job.skillsRequired) { <em>{{ job.skillsRequired.split(',').slice(0, 3).join(', ') }}</em> }
+                  @if (contractTypeLabel(job); as ct) { <em>{{ ct }}</em> }
+                  @if (workloadLabel(job); as wl) { <em>{{ wl }}</em> }
+                  @if (formatDate(job); as d) { <em>Publicado {{ d }}</em> }
                 </span>
               </div>
               @if (formatSalary(job.salaryMin, job.salaryMax, job.currency); as sal) {
@@ -164,16 +131,16 @@
         <a class="section-link" routerLink="/app/jobs">Ver todas <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (data.recentApplications.length === 0) {
-        <p class="empty-text">Aún no has aplicado a ofertas.</p>
+        <app-empty-state compact icon="assignment" message="Aún no has aplicado a ofertas." />
       } @else {
         <div class="app-list">
           @for (app of data.recentApplications; track app.id) {
             <div class="app-item">
               <div class="app-item-info">
                 <strong>{{ app.jobTitle }}</strong>
-                <span>{{ app.createdAt | date:'mediumDate' }}</span>
+                <span>{{ app.createdAt | appDate:'short' }}</span>
               </div>
-              <span class="app-status" [class]="'st-' + app.status">{{ statusLabel(app.status) }}</span>
+              <app-badge [tone]="statusTone(app.status)">{{ statusLabel(app.status) }}</app-badge>
             </div>
           }
         </div>
@@ -187,14 +154,14 @@
         <a class="section-link" routerLink="/app/messages">Ir a mensajes <mat-icon>arrow_forward</mat-icon></a>
       </div>
       @if (data.recentConversations.length === 0) {
-        <p class="empty-text">Aún no tienes mensajes.</p>
+        <app-empty-state compact icon="chat_bubble_outline" message="Aún no tienes mensajes." />
       } @else {
         <div class="msg-list">
           @for (conv of data.recentConversations; track conv.id) {
             <a class="msg-item" routerLink="/app/messages">
               <div class="msg-avatar">{{ (conv.companyName || 'E').charAt(0) }}</div>
               <div class="msg-info">
-                <strong>{{ conv.companyName || 'Empresa' }}</strong>
+                <strong>{{ conv.companyName || 'Empresa no especificada' }}</strong>
                 <span>{{ conv.lastMessage || 'Sin mensajes' }}</span>
               </div>
             </a>
