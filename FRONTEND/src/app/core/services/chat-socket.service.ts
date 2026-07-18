@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Subject, Observable } from 'rxjs';
 import type { MessageDto, UnreadCountDto } from '../models/chat.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService implements OnDestroy {
@@ -20,7 +21,7 @@ export class ChatSocketService implements OnDestroy {
   connect(): void {
     if (this.socket?.connected) return;
 
-    this.socket = io('http://localhost:3008/chat', {
+    this.socket = io(`${environment.wsUrl}/chat`, {
       withCredentials: true,
       transports: ['websocket'],
       autoConnect: true,

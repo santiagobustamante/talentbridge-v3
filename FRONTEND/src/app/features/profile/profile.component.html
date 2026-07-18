@@ -56,7 +56,7 @@
         <div class="summary-contact-item summary-item--with-switch">
           <div class="summary-item-main">
             <span>Teléfono</span>
-            <strong>{{ displayValue(summaryProfile.phone) }}</strong>
+            <strong>{{ displayPhone(summaryProfile.phone) }}</strong>
           </div>
           <div class="summary-visibility-control">
             <span>{{ profile?.showPhone ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
@@ -125,19 +125,19 @@
         <div class="form-grid">
           <div class="form-field">
             <label>Nombre completo</label>
-            <input class="app-input" formControlName="fullName" autocomplete="name" placeholder="Ej. María García López" />
+            <input class="app-input" formControlName="fullName" autocomplete="name" (blur)="onNameLikeBlur('fullName')" placeholder="Ej. María García López" />
           </div>
           <div class="form-field">
             <label>Título profesional</label>
-            <input class="app-input" formControlName="professionalTitle" placeholder="Ej. Full Stack Developer" />
+            <input class="app-input" formControlName="professionalTitle" (blur)="onNameLikeBlur('professionalTitle')" placeholder="Ej. Full Stack Developer" />
           </div>
           <div class="form-field full-width">
             <label>Resumen profesional</label>
-            <textarea class="app-textarea" formControlName="summary" rows="4" placeholder="Breve descripción de tu perfil profesional..."></textarea>
+            <textarea class="app-textarea" formControlName="summary" rows="4" (blur)="onSummaryBlur()" placeholder="Breve descripción de tu perfil profesional..."></textarea>
           </div>
           <div class="form-field full-width">
             <label>Ciudad</label>
-            <input class="app-input" formControlName="city" autocomplete="address-level2" placeholder="Ej. Madrid, España" />
+            <input class="app-input" formControlName="city" autocomplete="address-level2" (blur)="onNameLikeBlur('city')" placeholder="Ej. Madrid, España" />
             <div class="inline-visibility-control">
               <span>Mostrar ciudad en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showCity')?.value" [attr.aria-pressed]="form.get('showCity')?.value" (click)="toggleLocalVisibility('showCity')">
@@ -157,7 +157,7 @@
         <div class="form-grid">
           <div class="form-field full-width">
             <label>Teléfono</label>
-            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" placeholder="+57 300 000 0000" />
+            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" (blur)="onPhoneBlur()" placeholder="+57 300 000 0000" />
             <div class="inline-visibility-control">
               <span>Mostrar teléfono en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showPhone')?.value" [attr.aria-pressed]="form.get('showPhone')?.value" (click)="toggleLocalVisibility('showPhone')">
@@ -177,7 +177,7 @@
         <div class="form-grid">
           <div class="form-field full-width">
             <label>LinkedIn</label>
-            <input class="app-input" type="url" formControlName="linkedinUrl" autocomplete="url" placeholder="https://linkedin.com/in/usuario" />
+            <input class="app-input" type="url" formControlName="linkedinUrl" autocomplete="url" (blur)="onUrlBlur('linkedinUrl')" placeholder="https://linkedin.com/in/usuario" />
             <div class="inline-visibility-control">
               <span>Mostrar LinkedIn en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showLinkedin')?.value" [attr.aria-pressed]="form.get('showLinkedin')?.value" (click)="toggleLocalVisibility('showLinkedin')">
@@ -187,7 +187,7 @@
           </div>
           <div class="form-field full-width">
             <label>GitHub</label>
-            <input class="app-input" type="url" formControlName="githubUrl" autocomplete="url" placeholder="https://github.com/usuario" />
+            <input class="app-input" type="url" formControlName="githubUrl" autocomplete="url" (blur)="onUrlBlur('githubUrl')" placeholder="https://github.com/usuario" />
             <div class="inline-visibility-control">
               <span>Mostrar GitHub en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showGithub')?.value" [attr.aria-pressed]="form.get('showGithub')?.value" (click)="toggleLocalVisibility('showGithub')">
@@ -198,7 +198,7 @@
           </div>
           <div class="form-field full-width">
             <label>Sitio web</label>
-            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" placeholder="https://tusitio.com" />
+            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" (blur)="onUrlBlur('websiteUrl')" placeholder="https://tusitio.com" />
             <div class="inline-visibility-control">
               <span>Mostrar sitio web en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showWebsite')?.value" [attr.aria-pressed]="form.get('showWebsite')?.value" (click)="toggleLocalVisibility('showWebsite')">

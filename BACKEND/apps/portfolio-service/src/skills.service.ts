@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '@app/database';
+import { normalizeSkillDisplay, normalizeSkillKey } from '@app/common';
 import { SkillDto } from './dto/skill.dto';
 
 @Injectable()
@@ -31,7 +32,8 @@ export class SkillsService {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
     if (!profile) throw new NotFoundException('Perfil no encontrado');
 
-    const normalized = dto.name.trim().toLowerCase();
+    const displayName = normalizeSkillDisplay(dto.name);
+    const normalized = normalizeSkillKey(dto.name);
     const existing = await this.prisma.skill.findUnique({
       where: { profileId_normalizedName: { profileId: profile.id, normalizedName: normalized } },
     });
@@ -40,7 +42,7 @@ export class SkillsService {
     return this.prisma.skill.create({
       data: {
         profileId: profile.id,
-        name: dto.name,
+        name: displayName,
         normalizedName: normalized,
         level: dto.level || 'BASIC',
       },
@@ -56,11 +58,11 @@ export class SkillsService {
     });
     if (!skill) throw new NotFoundException('Habilidad no encontrada');
 
-    const normalized = dto.name ? dto.name.trim().toLowerCase() : skill.normalizedName;
+    const normalized = dto.name ? normalizeSkillKey(dto.name) : skill.normalizedName;
     return this.prisma.skill.update({
       where: { id: skillId },
       data: {
-        name: dto.name || skill.name,
+        name: dto.name ? normalizeSkillDisplay(dto.name) : skill.name,
         normalizedName: normalized,
         level: dto.level || skill.level,
       },

@@ -154,6 +154,18 @@ Basado en una auditoría de código + navegación en vivo del 2026-07-11, más 1
 
 ---
 
+## Fase 15 — Unificación de tamaño/alineación de campos en todos los formularios (2026-07-17)
+
+**Objetivo:** Corregir el bloque "Periodo" desproporcionado de `experiences` (reportado por el usuario) y, a partir de ahí, unificar altura/radio/espaciado/estados de campo en todos los formularios del frontend — no era una tarea del plan original de `plan-mejoras-frontend-ux.md` (ese plan resolvió colores y componentes compartidos Button/Badge/Card, nunca tamaño de campo), así que se documenta acá como fase nueva.
+**Tareas:** Nuevo `styles/_forms.scss` (mixins `control/textarea/grid/field-full/section/section-label/period-row/checkbox-inline`) + tokens `--field-height`/`--field-textarea-min-height` en `styles.scss`, consumidos tanto por el override global de Material como por los mixins custom · rediseño del bloque "Periodo" en `experiences` y `education` (checkbox desprendido → `.period-row` flex alineado) · fix de grilla de 3 campos en `projects` · convergencia de alturas/radios/gaps en `profile`, `company-profile`, `company-jobs`, `company-candidates`, `candidate-jobs`, `skills` sin tocar templates.
+**Módulos:** Frontend — `styles.scss` + `styles/_forms.scss` (nuevo) + `experiences`, `education`, `projects`, `profile`, `company-profile`, `company-jobs`, `company-candidates`, `jobs/candidate-jobs`, `skills`.
+**Estado:** Completa en código/build. Verificación visual en navegador real pendiente de confirmación del usuario (ver `NEXT_STEPS.md`).
+**Criterios de aceptación:** `npm run lint:css` + `ng build` limpios, sin warnings nuevos más allá de la categoría preexistente de presupuesto de bundle (ver `NEXT_STEPS.md`). El checkbox "Trabajo actual"/"Cursando actualmente" queda alineado a la altura del campo y no deja columnas huérfanas al ocultar Fecha Fin. Pendiente: confirmación visual del usuario en desktop/tablet/mobile.
+**Pruebas:** Ver `CHANGELOG.md` para el detalle completo. Ver `DECISIONS.md` ("Unificar tamaños de campo con un partial SCSS de mixins...") para por qué se descartó migrar todo a Angular Material/Reactive Forms.
+**Pendientes:** Confirmación visual del usuario — este entorno no tiene herramienta de captura de pantalla/navegador y ya había un `ng serve` corriendo en una sesión paralela del usuario, así que no se verificó en vivo desde acá.
+
+---
+
 ## Plan previo (ya completo, no vigente): Consistencia de CSS
 
 Ver [`plan-consistencia-css.md`](./plan-consistencia-css.md) — sistema de diseño base (tokens, componentes compartidos Button/Badge/Card). Completo, es la base sobre la que se construye el plan de arriba.

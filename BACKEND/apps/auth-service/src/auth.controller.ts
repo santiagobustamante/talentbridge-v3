@@ -53,7 +53,10 @@ export class AuthController {
     res.clearCookie('auth_token', {
       httpOnly: true,
       secure: process.env['NODE_ENV'] === 'production',
-      sameSite: 'lax',
+      // 'none' en producción: frontend (Vercel) y backend (Railway) viven en
+      // dominios distintos, y 'lax' no manda la cookie en llamadas cross-site
+      // por fetch/XHR. 'none' exige secure:true, que ya es el caso en producción.
+      sameSite: process.env['NODE_ENV'] === 'production' ? 'none' : 'lax',
       path: '/',
     });
     return { message: 'Sesión cerrada' };
@@ -70,7 +73,7 @@ export class AuthController {
     res.cookie('auth_token', token, {
       httpOnly: true,
       secure: process.env['NODE_ENV'] === 'production',
-      sameSite: 'lax',
+      sameSite: process.env['NODE_ENV'] === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000,
       path: '/',
     });

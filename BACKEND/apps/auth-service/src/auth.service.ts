@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService, UserRole } from '@app/database';
+import { normalizeEmail, titleCaseText } from '@app/common';
 import { RegisterDto, LoginDto, RegisterCompanyDto } from './dto/auth.dto';
 
 @Injectable()
@@ -21,8 +22,10 @@ export class AuthService {
       throw new ConflictException('Las contraseñas no coinciden');
     }
 
+    const email = normalizeEmail(dto.email);
+
     const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email },
     });
 
     if (existing) {
@@ -33,11 +36,11 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email,
+        email,
         passwordHash,
         profile: {
           create: {
-            slug: await this.generateUniqueSlug(dto.email),
+            slug: await this.generateUniqueSlug(email),
           },
         },
       },
@@ -53,8 +56,10 @@ export class AuthService {
       throw new ConflictException('Las contraseñas no coinciden');
     }
 
+    const email = normalizeEmail(dto.email);
+
     const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email },
     });
 
     if (existing) {
@@ -65,14 +70,14 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email,
+        email,
         passwordHash,
         role: UserRole.COMPANY,
         companyProfile: {
           create: {
-            companyName: dto.companyName,
-            sector: dto.sector,
-            city: dto.city,
+            companyName: titleCaseText(dto.companyName),
+            sector: dto.sector ? titleCaseText(dto.sector) : dto.sector,
+            city: dto.city ? titleCaseText(dto.city) : dto.city,
           },
         },
       },
@@ -85,7 +90,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email: normalizeEmail(dto.email) },
       include: { profile: true, companyProfile: true },
     });
 
@@ -110,7 +115,7 @@ export class AuthService {
 
   async loginCompany(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email: normalizeEmail(dto.email) },
       include: { profile: true, companyProfile: true },
     });
 

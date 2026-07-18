@@ -1,0 +1,165 @@
+// Mixins compartidos para campos de formulario. Nacen de unificar 4 sistemas
+// de formulario sin relación entre sí (mat-form-field, .app-input custom,
+// inputs nativos con ngModel, BEM aislado) que habían convergido cada uno en
+// su propia altura/radio/gap. Mismo patrón que _button.scss/_breakpoints.scss:
+// SCSS plano, sin componente Angular — se consume con @include dentro de la
+// clase que ya existe en cada componente (`.app-input { @include forms.control; }`),
+// así no hace falta tocar ningún template para los componentes que sólo
+// necesitan converger tamaños.
+// Uso: `@use '../../../styles/forms';` (ajustar profundidad relativa)
+
+@use 'breakpoints' as bp;
+
+// Input/select nativo de una sola línea (no textarea).
+@mixin control {
+  height: var(--field-height);
+  padding: 0 var(--space-md);
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  color: var(--text-main);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &::placeholder { color: var(--text-placeholder); }
+
+  &:hover:not(:disabled) {
+    border-color: var(--border-strong);
+    background: var(--bg-surface-hover);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-surface-soft);
+  }
+
+  &.is-invalid,
+  &[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+}
+
+// Textarea — mismo look que control() pero alto flexible en vez de fijo.
+@mixin textarea {
+  min-height: var(--field-textarea-min-height);
+  padding: var(--space-sm) var(--space-md);
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  color: var(--text-main);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &::placeholder { color: var(--text-placeholder); }
+
+  &:hover:not(:disabled) {
+    border-color: var(--border-strong);
+    background: var(--bg-surface-hover);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-surface-soft);
+  }
+
+  &.is-invalid,
+  &[aria-invalid="true"] {
+    border-color: var(--danger);
+  }
+}
+
+// Grilla estándar de 2 columnas para agrupar campos relacionados. Colapsa a
+// 1 columna en tablet. Gap único (--space-md) reemplaza los 14/22/10/20px
+// distintos que había por componente.
+@mixin grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+
+  @include bp.tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Campo que ocupa el ancho completo dentro de grid().
+@mixin field-full {
+  grid-column: 1 / -1;
+}
+
+// Bloque agrupador con fondo suave + label chico en mayúsculas — el patrón
+// ya usado como .form-section/.section-label en experiences/projects.
+@mixin section {
+  background: var(--bg-surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@mixin section-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Fila de período: Fecha inicio, Fecha fin (condicional) y un checkbox
+// "actual"/"en curso" alineados a la misma altura, sin columnas huérfanas.
+// Con flex-wrap, si Fecha fin se oculta el checkbox se recoloca junto a
+// Fecha inicio en vez de dejar un hueco (el bug original era con css grid
+// de 2 columnas fijas, donde la columna del checkbox se desinflaba sola).
+@mixin period-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+
+  > mat-form-field {
+    flex: 1 1 200px;
+    min-width: 180px;
+  }
+
+  @include bp.tablet {
+    align-items: stretch;
+  }
+}
+
+// Checkbox/toggle alineado a la altura de un campo de --field-height, para
+// usar dentro de period-row() u otra fila junto a inputs.
+@mixin checkbox-inline {
+  display: flex;
+  align-items: center;
+  height: var(--field-height);
+  padding-bottom: 1.25em; // compensa el subscript-wrapper de mat-form-field (hint/error) para alinear con el borde del input, no con el label flotante
+  flex: 0 0 auto;
+
+  @include bp.tablet {
+    height: auto;
+    padding-bottom: 0;
+  }
+}

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@app/database';
+import { trimText, titleCaseText, normalizePhoneStorage, normalizeUrl } from '@app/common';
 
 @Injectable()
 export class ProfileService {
@@ -53,8 +54,25 @@ export class ProfileService {
 
     return this.prisma.profile.update({
       where: { userId },
-      data: dto,
+      data: this.normalizeProfileDto(dto),
     });
+  }
+
+  /** El frontend ya manda los campos formateados, pero no se confía solo en eso —
+   *  se vuelve a normalizar acá antes de persistir. */
+  private normalizeProfileDto(dto: Partial<ProfileDto>): Partial<ProfileDto> {
+    const normalized: Partial<ProfileDto> = { ...dto };
+
+    if (dto.fullName !== undefined) normalized.fullName = titleCaseText(dto.fullName);
+    if (dto.professionalTitle !== undefined) normalized.professionalTitle = titleCaseText(dto.professionalTitle);
+    if (dto.city !== undefined) normalized.city = titleCaseText(dto.city);
+    if (dto.summary !== undefined) normalized.summary = trimText(dto.summary);
+    if (dto.phone !== undefined) normalized.phone = dto.phone ? normalizePhoneStorage(dto.phone) : dto.phone;
+    if (dto.linkedinUrl !== undefined) normalized.linkedinUrl = dto.linkedinUrl ? normalizeUrl(dto.linkedinUrl) : dto.linkedinUrl;
+    if (dto.githubUrl !== undefined) normalized.githubUrl = dto.githubUrl ? normalizeUrl(dto.githubUrl) : dto.githubUrl;
+    if (dto.websiteUrl !== undefined) normalized.websiteUrl = dto.websiteUrl ? normalizeUrl(dto.websiteUrl) : dto.websiteUrl;
+
+    return normalized;
   }
 
   async generateSlug(userId: number) {

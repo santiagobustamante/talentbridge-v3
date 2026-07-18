@@ -20,6 +20,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { Education } from '../../core/auth/auth.models';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { titleCaseText, trimText } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-education',
@@ -79,7 +80,7 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
                   <mat-option value="NON_FORMAL">No formal</mat-option>
                 </mat-select>
               </mat-form-field>
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" class="span-full">
                 <mat-label>Nivel de formación</mat-label>
                 <mat-select formControlName="formationLevel">
                   <ng-container *ngIf="form.get('educationType')?.value === 'NON_FORMAL'">
@@ -98,6 +99,8 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
                   </ng-container>
                 </mat-select>
               </mat-form-field>
+            </div>
+            <div class="period-row">
               <mat-form-field appearance="outline">
                 <mat-label>Fecha Inicio</mat-label>
                 <input matInput [matDatepicker]="sPicker" formControlName="startDate" />
@@ -110,12 +113,12 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
                 <mat-datepicker-toggle matSuffix [for]="ePicker"/>
                 <mat-datepicker #ePicker/>
               </mat-form-field>
+              <mat-checkbox class="period-checkbox" formControlName="isCurrent" color="primary">Cursando actualmente</mat-checkbox>
             </div>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Descripción</mat-label>
               <textarea matInput rows="3" formControlName="description" placeholder="Describe tu formación, materias relevantes, etc."></textarea>
             </mat-form-field>
-            <mat-checkbox formControlName="isCurrent" color="primary">Cursando actualmente</mat-checkbox>
             <div class="form-actions">
               <button mat-raised-button class="save-btn" type="submit" [disabled]="form.invalid">
                 <mat-icon>{{ editing ? 'check' : 'add' }}</mat-icon>
@@ -214,13 +217,13 @@ export class EducationComponent implements OnInit {
   save() {
     const v = this.form.value;
     const data = {
-      institution: v.institution!, degree: v.degree!, fieldOfStudy: v.fieldOfStudy || undefined,
+      institution: titleCaseText(v.institution!), degree: titleCaseText(v.degree!), fieldOfStudy: v.fieldOfStudy ? titleCaseText(v.fieldOfStudy) : undefined,
       startDate: v.startDate?.toISOString().split('T')[0] || '',
       endDate: v.endDate?.toISOString().split('T')[0] || undefined,
       isCurrent: v.isCurrent || false,
       educationType: v.educationType || undefined,
       formationLevel: v.formationLevel || undefined,
-      description: v.description || undefined,
+      description: v.description ? trimText(v.description) : undefined,
     };
     const req = this.editing ? this.service.update(this.editing, data) : this.service.create(data);
     req.subscribe({

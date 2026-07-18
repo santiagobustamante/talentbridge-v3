@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, shareReplay, tap } from 'rxjs';
 import { Profile, ProfileViewsResponse } from '../auth/auth.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = environment.apiUrl;
   private profileCache$: Observable<Profile> | null = null;
 
   constructor(private http: HttpClient) {}

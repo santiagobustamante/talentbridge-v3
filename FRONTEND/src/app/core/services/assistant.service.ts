@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface AssistantAction {
   label: string;
@@ -24,16 +25,21 @@ export interface AssistantResponse {
   results: AssistantResult[];
 }
 
+export interface AssistantHistoryItem {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AssistantService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
-  sendMessage(message: string): Observable<AssistantResponse> {
+  sendMessage(message: string, history?: AssistantHistoryItem[]): Observable<AssistantResponse> {
     return this.http.post<AssistantResponse>(
       `${this.api}/assistant/message`,
-      { message },
+      { message, history },
       { withCredentials: true },
     );
   }

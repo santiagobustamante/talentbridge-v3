@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import type { ConversationDto, MessageDto, MessagesResponse, UnreadCountDto } from '../models/chat.models';
 import { ChatSocketService } from './chat-socket.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = environment.apiUrl;
 
   private unreadCountSubject = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadCountSubject.asObservable();

@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 .page-content {
   max-width: 850px;
@@ -90,43 +91,24 @@
 
 /* ─── Form sections ──────────────────────── */
 
-.form-section {
-  background: var(--bg-surface-soft);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+.form-section { @include forms.section; }
 
 .section-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  @include forms.section-label;
   margin-bottom: 2px;
 
   .req { color: var(--danger); }
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
+.form-grid { @include forms.grid; }
 
 .full-width { width: 100%; }
 
-.span-full { grid-column: 1 / -1; }
+.span-full { @include forms.field-full; }
 
-.date-right {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  justify-content: flex-start;
-}
+.period-row { @include forms.period-row; }
+
+.period-checkbox { @include forms.checkbox-inline; }
 
 /* ─── Skills chips ───────────────────────── */
 
@@ -305,7 +287,6 @@
   .timeline { padding-left: 36px; }
   .timeline-item:not(:last-child)::before { left: -16px; top: 42px; bottom: calc(-42px - var(--space-xl)); }
   .timeline-dot { left: -33px; width: 36px; height: 36px; mat-icon { font-size: 16px; width: 16px; height: 16px; } }
-  .form-grid { grid-template-columns: 1fr; }
   .form-body { padding: var(--space-md); }
   .form-footer { flex-direction: column; .save-btn, .cancel-btn { width: 100%; justify-content: center; } }
 }

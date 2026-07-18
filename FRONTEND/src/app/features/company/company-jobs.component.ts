@@ -16,6 +16,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
+import { formatNumberDisplay, parseNumericInput, titleCaseText, trimText } from '../../shared/utils/normalize';
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
 
@@ -139,8 +140,8 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   private parseMoney(value: unknown): number | null {
-    const text = String(value ?? '').replace(/[^\d]/g, '').trim();
-    return text ? Number(text) : null;
+    const parsed = parseNumericInput(String(value ?? ''));
+    return parsed != null ? Math.round(parsed) : null;
   }
 
   openCreateForm(): void {
@@ -208,6 +209,11 @@ export class CompanyJobsComponent implements OnInit {
     this.saving.set(true);
     const payload = {
       ...this.formData,
+      title: titleCaseText(this.formData.title),
+      description: trimText(this.formData.description),
+      requirements: this.formData.requirements ? trimText(this.formData.requirements) : this.formData.requirements,
+      responsibilities: this.formData.responsibilities ? trimText(this.formData.responsibilities) : this.formData.responsibilities,
+      city: this.formData.city ? titleCaseText(this.formData.city) : this.formData.city,
       salaryMin,
       salaryMax,
       skillsRequired: stringifySkillRows(this.skillRows),
@@ -413,8 +419,8 @@ export class CompanyJobsComponent implements OnInit {
   formatSalary(job: JobOffer): string | null {
     if (!job.salaryMin && !job.salaryMax) return null;
     const c = job.currency || 'COP';
-    const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
-    const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+    const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
+    const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
     if (min && max) return `${min} – ${max} ${c}`;
     return `${min || max} ${c}`;
   }

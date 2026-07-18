@@ -10,7 +10,7 @@
       </p>
       <p class="hero-contact" *ngIf="profile.showPhone !== false && profile.phone">
         <mat-icon>phone</mat-icon>
-        {{ profile.phone }}
+        {{ displayPhone(profile.phone) }}
       </p>
       <p class="hero-summary" *ngIf="profile.summary">{{ profile.summary }}</p>
 

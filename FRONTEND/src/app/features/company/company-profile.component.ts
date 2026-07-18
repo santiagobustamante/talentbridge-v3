@@ -7,7 +7,15 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CompanyService } from '../../core/services/company.service';
 import { CompanyProfile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
-import { formatColombianPhone, formatColombianNit } from '../../shared/utils/phone-format.util';
+import {
+  normalizePhoneStorage,
+  formatPhoneDisplay,
+  normalizeNitStorage,
+  formatNitDisplay,
+  titleCaseText,
+  trimText,
+  normalizeUrl,
+} from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-company-profile',
@@ -45,18 +53,68 @@ export class CompanyProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
-    this.form.get('phone')?.valueChanges.subscribe((val) => {
-      const formatted = formatColombianPhone(val || '');
-      if (formatted !== val) {
-        this.form.get('phone')?.setValue(formatted, { emitEvent: false });
-      }
-    });
-    this.form.get('nit')?.valueChanges.subscribe((val) => {
-      const formatted = formatColombianNit(val || '');
-      if (formatted !== val) {
-        this.form.get('nit')?.setValue(formatted, { emitEvent: false });
-      }
-    });
+  }
+
+  /**
+   * Formatea al salir del campo, no en cada tecla — reformatear en vivo movía
+   * el cursor al final del texto en cada pulsación (vía setValue), impidiendo
+   * editar un número/NIT ya escrito porque el cursor "saltaba" apenas se
+   * tocaba una tecla en el medio del texto.
+   */
+  onPhoneBlur(): void {
+    const control = this.form.get('phone');
+    const value = control?.value || '';
+    const formatted = value ? formatPhoneDisplay(normalizePhoneStorage(value)) : '';
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  onNitBlur(): void {
+    const control = this.form.get('nit');
+    const value = control?.value || '';
+    const formatted = value ? formatNitDisplay(normalizeNitStorage(value)) : '';
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  onNameLikeBlur(controlName: 'companyName' | 'sector' | 'city'): void {
+    const control = this.form.get(controlName);
+    const value = control?.value || '';
+    const formatted = titleCaseText(value);
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  onDescriptionBlur(): void {
+    const control = this.form.get('description');
+    const value = control?.value || '';
+    const trimmed = trimText(value);
+    if (trimmed !== value) {
+      control?.setValue(trimmed);
+    }
+  }
+
+  onWebsiteBlur(): void {
+    const control = this.form.get('websiteUrl');
+    const value = control?.value || '';
+    if (!value.trim()) return;
+    const formatted = normalizeUrl(value);
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  displayPhone(value: unknown): string {
+    const text = String(value ?? '').trim();
+    return text ? formatPhoneDisplay(text) : 'No agregado todavía';
+  }
+
+  displayNit(value: unknown): string {
+    const text = String(value ?? '').trim();
+    return text ? formatNitDisplay(text) : 'No agregado todavía';
   }
 
   loadProfile(): void {
@@ -80,10 +138,10 @@ export class CompanyProfileComponent implements OnInit {
   private patchForm(profile: any): void {
     this.form.patchValue({
       companyName: profile?.companyName ?? '',
-      nit: profile?.nit ?? '',
+      nit: profile?.nit ? formatNitDisplay(profile.nit) : '',
       sector: profile?.sector ?? '',
       city: profile?.city ?? '',
-      phone: profile?.phone ?? '',
+      phone: profile?.phone ? formatPhoneDisplay(profile.phone) : '',
       websiteUrl: profile?.websiteUrl ?? '',
       description: profile?.description ?? '',
       logoUrl: profile?.logoUrl ?? '',
@@ -119,11 +177,11 @@ export class CompanyProfileComponent implements OnInit {
 
     const raw = this.form.getRawValue();
     const payload: any = {
-      companyName: this.cleanString(raw.companyName),
-      nit: this.cleanString(raw.nit),
-      sector: this.cleanString(raw.sector),
-      city: this.cleanString(raw.city),
-      phone: this.cleanString(raw.phone),
+      companyName: this.cleanTitleCase(raw.companyName),
+      nit: this.cleanNit(raw.nit),
+      sector: this.cleanTitleCase(raw.sector),
+      city: this.cleanTitleCase(raw.city),
+      phone: this.cleanPhone(raw.phone),
       websiteUrl: this.cleanUrl(raw.websiteUrl),
       description: this.cleanString(raw.description),
       logoUrl: this.cleanUrl(raw.logoUrl),
@@ -147,12 +205,27 @@ export class CompanyProfileComponent implements OnInit {
   }
 
   private cleanString(value: unknown): string | null {
-    const text = String(value ?? '').trim();
+    const text = trimText(String(value ?? ''));
     return text.length ? text : null;
+  }
+
+  private cleanTitleCase(value: unknown): string | null {
+    const text = titleCaseText(String(value ?? ''));
+    return text.length ? text : null;
+  }
+
+  private cleanPhone(value: unknown): string | null {
+    const text = String(value ?? '').trim();
+    return text.length ? normalizePhoneStorage(text) : null;
+  }
+
+  private cleanNit(value: unknown): string | null {
+    const text = String(value ?? '').trim();
+    return text.length ? normalizeNitStorage(text) : null;
   }
 
   private cleanUrl(value: unknown): string | null {
     const text = String(value ?? '').trim();
-    return text.length ? text : null;
+    return text.length ? normalizeUrl(text) : null;
   }
 }

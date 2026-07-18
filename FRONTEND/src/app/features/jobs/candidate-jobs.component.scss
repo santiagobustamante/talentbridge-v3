@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 :host {
   display: block;
@@ -116,43 +117,17 @@
   }
 
   input {
-    width: 100%;
-    padding: 0.65rem 1rem 0.65rem 2.5rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
-    background: var(--bg-surface);
-    color: var(--text-main);
-    transition: border-color var(--transition-base);
+    @include forms.control;
+    padding-left: 2.5rem;
     box-sizing: border-box;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
   }
 }
 
 .filter-select {
-  padding: 0.65rem 1rem;
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 0.85rem;
-  background: var(--bg-surface);
-  color: var(--text-main);
-  cursor: pointer;
+  @include forms.control;
+  width: auto;
   min-width: 140px;
-
-  &:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
+  cursor: pointer;
 }
 
 .jobs-priority-note {
@@ -704,21 +679,8 @@
 
 .apply-form-full {
   textarea {
-    width: 100%;
-    padding: 0.85rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
-    resize: vertical;
-    min-height: 80px;
-    background: var(--bg-surface);
-    color: var(--text-main);
+    @include forms.textarea;
     box-sizing: border-box;
-
-    &:focus { outline: none; border-color: var(--primary); }
-
-    &::placeholder { color: var(--text-muted); }
   }
 }
 

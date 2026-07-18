@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Skill } from '../auth/auth.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
-  private readonly api = 'http://localhost:3000/api/skills';
+  private readonly api = `${environment.apiUrl}/skills`;
 
   constructor(private http: HttpClient) {}
 

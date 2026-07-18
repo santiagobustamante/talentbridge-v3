@@ -142,16 +142,16 @@ const URL_PATTERN = /^https?:\/\/.+/i;
             <!-- Bloque 4: Estado -->
             <div class="form-section">
               <div class="section-label">Estado</div>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="">—</mat-option>
+                  <mat-option value="PLANNED">Planificado</mat-option>
+                  <mat-option value="IN_PROGRESS">En progreso</mat-option>
+                  <mat-option value="COMPLETED">Completado</mat-option>
+                </mat-select>
+              </mat-form-field>
               <div class="form-grid">
-                <mat-form-field appearance="outline">
-                  <mat-label>Estado</mat-label>
-                  <mat-select formControlName="status">
-                    <mat-option value="">—</mat-option>
-                    <mat-option value="PLANNED">Planificado</mat-option>
-                    <mat-option value="IN_PROGRESS">En progreso</mat-option>
-                    <mat-option value="COMPLETED">Completado</mat-option>
-                  </mat-select>
-                </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha inicio</mat-label>
                   <input matInput [matDatepicker]="psPicker" formControlName="startDate" />

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CompanyProfile, CandidateSearchResult, PaginatedResponse } from '../auth/auth.models';
+import { environment } from '../../../environments/environment';
 
 export interface FilterOptions {
   skills: string[];
@@ -39,7 +40,7 @@ export interface PublicCompany {
 
 @Injectable({ providedIn: 'root' })
 export class CompanyService {
-  private readonly api = 'http://localhost:3000/api';
+  private readonly api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

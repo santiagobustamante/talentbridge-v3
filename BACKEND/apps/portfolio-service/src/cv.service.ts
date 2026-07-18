@@ -1,11 +1,28 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '@app/database';
+import { DeepSeekService } from '@app/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
+/** Tope de caracteres del CV enviados al modelo — un CV real nunca se acerca a
+ *  esto; existe para no pagar tokens de más si la extracción de PDF produce
+ *  basura (ej. un PDF escaneado con OCR ruidoso). */
+const MAX_CV_TEXT_CHARS = 8000;
+
+interface CvLlmAnalysis {
+  score: number;
+  strengths: string[];
+  recommendations: string[];
+}
+
 @Injectable()
 export class CvService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(CvService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly deepSeek: DeepSeekService,
+  ) {}
 
   async getCvs(userId: number) {
     return this.prisma.cvDocument.findMany({
@@ -81,7 +98,7 @@ export class CvService {
       );
     }
 
-    return this.performAnalysis(cvId, text.toLowerCase());
+    return this.performAnalysis(cvId, text);
   }
 
   async getAnalyses(userId: number, cvId: number) {
@@ -128,42 +145,34 @@ export class CvService {
   }
 
   private async performAnalysis(cvId: number, text: string) {
-    const strengths: string[] = [];
-    const recommendations: string[] = [];
+    const truncated = text.slice(0, MAX_CV_TEXT_CHARS);
 
-    const keywords = ['javascript', 'typescript', 'python', 'java', 'react', 'angular', 'node', 'sql', 'docker', 'git', 'aws', 'azure', 'nestjs', 'postgresql', 'html', 'css'];
-    let keywordMatches = 0;
-    for (const kw of keywords) {
-      if (text.includes(kw)) keywordMatches++;
+    const system = `Eres un reclutador experto de tecnología que evalúa hojas de vida (CV) de candidatos en Colombia. Analiza el texto del CV que te pasa el usuario y da una evaluación honesta y específica — evita frases genéricas que aplicarían a cualquier CV. Basate solo en lo que el texto realmente dice, no inventes datos que no estén.
+
+Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después:
+{
+  "score": number entre 0 y 100 (qué tan completo y bien presentado está el CV para procesos de selección técnica),
+  "strengths": array de 3 a 5 strings cortos, cada uno una fortaleza CONCRETA encontrada en este CV puntual,
+  "recommendations": array de 3 a 5 strings cortos, cada uno una recomendación ACCIONABLE y específica para mejorar este CV puntual
+}`;
+
+    let result: CvLlmAnalysis;
+    try {
+      result = await this.deepSeek.chatJson<CvLlmAnalysis>({
+        system,
+        messages: [{ role: 'user', content: truncated }],
+        maxTokens: 800,
+      });
+    } catch (err) {
+      this.logger.error(`Fallo el análisis de CV con DeepSeek: ${(err as Error).message}`);
+      throw new BadRequestException('No se pudo analizar el CV en este momento. Intenta de nuevo en unos minutos.');
     }
 
-    const experienceMatch = text.match(/(\d+)\s*(años|years)/);
-    if (experienceMatch) {
-      strengths.push(`Experiencia de ${experienceMatch[1]} años detectada`);
-    } else {
-      recommendations.push('Añade años de experiencia claramente en tu CV');
-    }
-
-    if (text.includes('educación') || text.includes('education') || text.includes('universidad') || text.includes('university')) {
-      strengths.push('Formación académica identificada');
-    }
-
-    if (keywordMatches >= 5) {
-      strengths.push(`Se detectaron ${keywordMatches} palabras clave relevantes`);
-    } else {
-      recommendations.push('Incluye más palabras clave técnicas relevantes a tu profesión');
-    }
-
-    if (text.length < 500) {
-      recommendations.push('Tu CV parece muy corto. Considera añadir más detalle sobre tu experiencia');
-    }
-
-    const score = Math.min(100, Math.round(
-      (keywordMatches / keywords.length) * 40 +
-      (experienceMatch ? 30 : 0) +
-      (text.length > 1000 ? 20 : text.length > 500 ? 10 : 0) +
-      (text.includes('educación') || text.includes('education') ? 10 : 0)
-    ));
+    const score = Math.max(0, Math.min(100, Math.round(Number(result.score) || 0)));
+    const strengths = Array.isArray(result.strengths) ? result.strengths.filter((s) => typeof s === 'string') : [];
+    const recommendations = Array.isArray(result.recommendations)
+      ? result.recommendations.filter((s) => typeof s === 'string')
+      : [];
 
     return this.prisma.cvAnalysis.create({
       data: { cvDocumentId: cvId, score, strengths, recommendations },

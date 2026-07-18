@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
+import { normalizeEmail } from '../../shared/utils/normalize';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 
 @Component({
@@ -135,12 +136,21 @@ export class CompanyRegisterComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const { email, password, confirmPassword, companyName, sector, city } = this.form.value;
-    this.auth.registerCompany(email!, password!, confirmPassword!, companyName!, sector || undefined, city || undefined).subscribe({
-      next: () => this.router.navigate(['/company/dashboard']),
-      error: (err) => {
-        this.loading = false;
-        this.snackBar.open(err.error?.message || 'Error al registrar empresa', 'Cerrar', { duration: 5000 });
-      },
-    });
+    this.auth
+      .registerCompany(
+        normalizeEmail(email!),
+        password!,
+        confirmPassword!,
+        companyName!,
+        sector || undefined,
+        city || undefined,
+      )
+      .subscribe({
+        next: () => this.router.navigate(['/company/dashboard']),
+        error: (err) => {
+          this.loading = false;
+          this.snackBar.open(err.error?.message || 'Error al registrar empresa', 'Cerrar', { duration: 5000 });
+        },
+      });
   }
 }

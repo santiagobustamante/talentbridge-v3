@@ -12,7 +12,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { Profile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
-import { formatColombianPhone } from '../../shared/utils/phone-format.util';
+import {
+  normalizePhoneStorage,
+  formatPhoneDisplay,
+  titleCaseText,
+  trimText,
+  normalizeUrl,
+} from '../../shared/utils/normalize';
 
 type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' | 'showWebsite';
 
@@ -66,12 +72,56 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProfile();
-    this.form.get('phone')?.valueChanges.subscribe((val) => {
-      const formatted = formatColombianPhone(val || '');
-      if (formatted !== val) {
-        this.form.get('phone')?.setValue(formatted, { emitEvent: false });
-      }
-    });
+  }
+
+  /**
+   * Formatea el teléfono al salir del campo, no en cada tecla — reformatear
+   * en vivo movía el cursor al final del texto en cada pulsación (vía
+   * setValue), lo que hacía imposible editar un número ya escrito porque
+   * el cursor "saltaba" apenas se tocaba una tecla en el medio del texto.
+   */
+  onPhoneBlur(): void {
+    const control = this.form.get('phone');
+    const value = control?.value || '';
+    const formatted = value ? formatPhoneDisplay(normalizePhoneStorage(value)) : '';
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  /** Mismo patrón que el teléfono: solo se reformatea al salir del campo, nunca
+   *  mientras se escribe, para no repetir el bug del cursor saltando al final. */
+  onNameLikeBlur(controlName: 'fullName' | 'professionalTitle' | 'city'): void {
+    const control = this.form.get(controlName);
+    const value = control?.value || '';
+    const formatted = titleCaseText(value);
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  onSummaryBlur(): void {
+    const control = this.form.get('summary');
+    const value = control?.value || '';
+    const trimmed = trimText(value);
+    if (trimmed !== value) {
+      control?.setValue(trimmed);
+    }
+  }
+
+  onUrlBlur(controlName: 'linkedinUrl' | 'githubUrl' | 'websiteUrl'): void {
+    const control = this.form.get(controlName);
+    const value = control?.value || '';
+    if (!value.trim()) return;
+    const formatted = normalizeUrl(value);
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  displayPhone(value: unknown): string {
+    const text = String(value ?? '').trim();
+    return text ? formatPhoneDisplay(text) : 'No agregado todavía';
   }
 
   loadProfile(): void {
@@ -97,7 +147,7 @@ export class ProfileComponent implements OnInit {
       fullName: data?.fullName ?? '',
       professionalTitle: data?.professionalTitle ?? '',
       summary: data?.summary ?? '',
-      phone: data?.phone ?? '',
+      phone: data?.phone ? formatPhoneDisplay(data.phone) : '',
       city: data?.city ?? '',
       linkedinUrl: data?.linkedinUrl ?? '',
       githubUrl: data?.githubUrl ?? '',
@@ -189,11 +239,11 @@ export class ProfileComponent implements OnInit {
     const raw = this.form.getRawValue();
 
     const payload: any = {
-      fullName: this.cleanString(raw.fullName),
-      professionalTitle: this.cleanString(raw.professionalTitle),
+      fullName: this.cleanTitleCase(raw.fullName),
+      professionalTitle: this.cleanTitleCase(raw.professionalTitle),
       summary: this.cleanString(raw.summary),
-      phone: this.cleanString(raw.phone),
-      city: this.cleanString(raw.city),
+      phone: this.cleanPhone(raw.phone),
+      city: this.cleanTitleCase(raw.city),
       linkedinUrl: this.cleanUrl(raw.linkedinUrl),
       githubUrl: this.cleanUrl(raw.githubUrl),
       websiteUrl: this.cleanUrl(raw.websiteUrl),
@@ -267,12 +317,22 @@ export class ProfileComponent implements OnInit {
   }
 
   private cleanString(value: unknown): string | null {
-    const text = String(value ?? '').trim();
+    const text = trimText(String(value ?? ''));
     return text.length ? text : null;
+  }
+
+  private cleanTitleCase(value: unknown): string | null {
+    const text = titleCaseText(String(value ?? ''));
+    return text.length ? text : null;
+  }
+
+  private cleanPhone(value: unknown): string | null {
+    const text = String(value ?? '').trim();
+    return text.length ? normalizePhoneStorage(text) : null;
   }
 
   private cleanUrl(value: unknown): string | null {
     const text = String(value ?? '').trim();
-    return text.length ? text : null;
+    return text.length ? normalizeUrl(text) : null;
   }
 }

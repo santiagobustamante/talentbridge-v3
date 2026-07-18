@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 :host {
   display: block;
@@ -263,21 +264,16 @@
     .req { color: var(--danger); }
   }
 
-  input, textarea, select {
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
-    background: var(--bg-surface);
-    color: var(--text-main);
+  input, select {
+    @include forms.control;
     box-sizing: border-box;
-
-    &:focus { outline: none; border-color: var(--primary); }
-    &::placeholder { color: var(--text-muted); }
   }
 
-  textarea { resize: vertical; min-height: 60px; }
+  textarea {
+    @include forms.textarea;
+    box-sizing: border-box;
+  }
+
   select { cursor: pointer; }
 }
 
@@ -436,17 +432,10 @@
   background: var(--bg-surface-soft);
 
   .skill-row-name {
+    @include forms.control;
     flex: 1;
     min-width: 140px;
-    padding: 0.5rem 0.65rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.85rem;
-    background: var(--bg-surface);
-    color: var(--text-main);
-
-    &:focus { outline: none; border-color: var(--primary); }
+    box-sizing: border-box;
   }
 
   .skill-row-level-toggle {

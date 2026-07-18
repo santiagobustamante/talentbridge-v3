@@ -13,6 +13,7 @@ import { statusToLabel } from '../../shared/components/badge/status-label.util';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
+import { formatNumberDisplay } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-candidate-jobs',
@@ -307,8 +308,8 @@ export class CandidateJobsComponent implements OnInit {
   formatSalaryCompact(job: JobOffer): string | null {
     if (job.salaryMin || job.salaryMax) {
       const currency = job.currency || 'COP';
-      const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
-      const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+      const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
+      const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
       if (min && max) return `${min} – ${max} ${currency}`;
       if (min) return `Desde ${min} ${currency}`;
       return `Hasta ${max} ${currency}`;
@@ -327,8 +328,8 @@ export class CandidateJobsComponent implements OnInit {
   formatSalary(job: JobOffer): string | null {
     if (!job.salaryMin && !job.salaryMax) return null;
     const currency = job.currency || 'COP';
-    const min = job.salaryMin ? job.salaryMin.toLocaleString() : '';
-    const max = job.salaryMax ? job.salaryMax.toLocaleString() : '';
+    const min = job.salaryMin ? formatNumberDisplay(job.salaryMin) : '';
+    const max = job.salaryMax ? formatNumberDisplay(job.salaryMax) : '';
     if (min && max) return `$${min} - $${max} ${currency}`;
     if (min) return `Desde $${min} ${currency}`;
     return `Hasta $${max} ${currency}`;
@@ -423,8 +424,8 @@ export class CandidateJobsComponent implements OnInit {
     const job = app.jobOffer;
     if (!job?.salaryMin && !job?.salaryMax) return null;
     const c = job.currency || 'COP';
-    const min = job.salaryMin ? '$' + job.salaryMin.toLocaleString() : '';
-    const max = job.salaryMax ? '$' + job.salaryMax.toLocaleString() : '';
+    const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
+    const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
     if (min && max) return `${min} – ${max} ${c}`;
     return `${min || max} ${c}`;
   }

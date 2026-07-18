@@ -23,6 +23,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
 import { Experience } from '../../core/auth/auth.models';
 import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/services/skill-catalog';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
+import { titleCaseText, trimText } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-experiences',
@@ -105,22 +106,20 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
             <!-- Bloque 2: Fechas -->
             <div class="form-section">
               <div class="section-label">Periodo</div>
-              <div class="form-grid">
+              <div class="period-row">
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha Inicio <span class="req">*</span></mat-label>
                   <input matInput [matDatepicker]="sPicker" formControlName="startDate" />
                   <mat-datepicker-toggle matSuffix [for]="sPicker"/>
                   <mat-datepicker #sPicker/>
                 </mat-form-field>
-                <div class="date-right">
-                  <mat-checkbox formControlName="isCurrent" color="primary">Trabajo actual</mat-checkbox>
-                  <mat-form-field appearance="outline" *ngIf="!form.get('isCurrent')?.value">
-                    <mat-label>Fecha Fin</mat-label>
-                    <input matInput [matDatepicker]="ePicker" formControlName="endDate" />
-                    <mat-datepicker-toggle matSuffix [for]="ePicker"/>
-                    <mat-datepicker #ePicker/>
-                  </mat-form-field>
-                </div>
+                <mat-form-field appearance="outline" *ngIf="!form.get('isCurrent')?.value">
+                  <mat-label>Fecha Fin</mat-label>
+                  <input matInput [matDatepicker]="ePicker" formControlName="endDate" />
+                  <mat-datepicker-toggle matSuffix [for]="ePicker"/>
+                  <mat-datepicker #ePicker/>
+                </mat-form-field>
+                <mat-checkbox class="period-checkbox" formControlName="isCurrent" color="primary">Trabajo actual</mat-checkbox>
               </div>
             </div>
 
@@ -291,17 +290,17 @@ export class ExperiencesComponent implements OnInit {
   save() {
     const v = this.form.value;
     const data = {
-      company: v.company!,
-      position: v.position!,
+      company: titleCaseText(v.company!),
+      position: titleCaseText(v.position!),
       startDate: v.startDate?.toISOString().split('T')[0] || '',
       endDate: v.isCurrent ? undefined : (v.endDate?.toISOString().split('T')[0] || undefined),
       isCurrent: v.isCurrent || false,
-      city: v.city || undefined,
+      city: v.city ? titleCaseText(v.city) : undefined,
       workMode: v.workMode || undefined,
       contractType: v.contractType || undefined,
-      functions: v.functions || undefined,
-      achievements: v.achievements || undefined,
-      tools: v.tools || undefined,
+      functions: v.functions ? trimText(v.functions) : undefined,
+      achievements: v.achievements ? trimText(v.achievements) : undefined,
+      tools: v.tools ? trimText(v.tools) : undefined,
       learnedSkills: this.selectedSkills.length ? this.selectedSkills : undefined,
     };
 

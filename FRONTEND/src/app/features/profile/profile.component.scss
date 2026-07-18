@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 .profile-page {
   max-width: 900px;
@@ -165,27 +166,16 @@
   h2 { font-size: 1.08rem; font-weight: 700; color: var(--text-main); margin: 0; }
 }
 
-.form-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px;
-}
+.form-grid { @include forms.grid; }
 
 .form-field {
   display: flex; flex-direction: column; gap: 6px;
   label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
 }
-.full-width { grid-column: 1 / -1; }
+.full-width { @include forms.field-full; }
 
-.app-input, .app-textarea {
-  width: 100%; box-sizing: border-box;
-  border: 1.5px solid var(--border-medium); border-radius: 12px;
-  background: var(--bg-surface); color: var(--text-main); font-size: 0.95rem;
-  font-family: var(--font-sans, sans-serif); outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-  &::placeholder { color: var(--text-placeholder); }
-  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent); }
-}
-.app-input { height: 48px; padding: 0 14px; }
-.app-textarea { min-height: 120px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+.app-input { @include forms.control; box-sizing: border-box; }
+.app-textarea { @include forms.textarea; box-sizing: border-box; }
 
 /* ─── Toggles / Inline visibility ─────────── */
 .inline-visibility-control {
@@ -301,7 +291,7 @@
 
 /* ─── Responsive ─────────────────────────── */
 @include bp.tablet {
-  .form-grid, .summary-contact-grid { grid-template-columns: 1fr; }
+  .summary-contact-grid { grid-template-columns: 1fr; }
   .page-header { flex-direction: column; align-items: flex-start; }
   .form-card { padding: 18px; }
   .form-actions { flex-direction: column; align-items: stretch; }

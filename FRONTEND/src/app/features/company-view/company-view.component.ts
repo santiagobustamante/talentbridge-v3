@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CompanyService, PublicCompany } from '../../core/services/company.service';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { formatPhoneDisplay } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-company-view',
@@ -21,6 +22,11 @@ export class CompanyViewComponent implements OnInit {
   company = signal<PublicCompany | null>(null);
   loading = signal(true);
   error = signal(false);
+
+  displayPhone(value: unknown): string {
+    const text = String(value ?? '').trim();
+    return text ? formatPhoneDisplay(text) : '';
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

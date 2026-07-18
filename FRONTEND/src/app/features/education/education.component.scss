@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 .page-content {
   max-width: 1000px;
@@ -108,15 +109,20 @@
   padding: var(--space-xl);
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-sm) var(--space-lg);
+.form-grid { @include forms.grid; }
+
+.span-full { @include forms.field-full; }
+
+.period-row {
+  margin-top: var(--space-md);
+  @include forms.period-row;
 }
+
+.period-checkbox { @include forms.checkbox-inline; }
 
 .full-width {
   width: 100%;
-  margin-top: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .form-actions {
@@ -363,10 +369,6 @@
 @include bp.tablet {
   .page-content {
     padding: 0;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
   }
 
   .education-grid {

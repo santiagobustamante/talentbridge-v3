@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '@app/database';
+import { DeepSeekService, DeepSeekChatMessage } from '@app/common';
+import { computeSkillMatch } from '@app/contracts';
+import { ChatHistoryItemDto } from './dto/assistant-message.dto';
 
 interface AssistantResponse {
   reply: string;
@@ -9,199 +12,254 @@ interface AssistantResponse {
   results: any[];
 }
 
+interface AssistantLlmOutput {
+  reply: string;
+  actions?: { label: string; route: string }[];
+  showProfileCard?: boolean;
+  showCandidateMatches?: boolean;
+}
+
+interface CandidateCardData {
+  fullName: string | null;
+  professionalTitle: string | null;
+  city: string | null;
+  slug: string;
+  skills?: string[];
+}
+
+const CANDIDATE_ROUTES: Record<string, string> = {
+  '/app/inicio': 'Panel principal / dashboard del candidato',
+  '/app/profile': 'Editar perfil profesional (nombre, título, resumen, contacto, redes)',
+  '/app/skills': 'Agregar o editar habilidades',
+  '/app/experience': 'Agregar o editar experiencia laboral',
+  '/app/education': 'Agregar o editar educación/formación',
+  '/app/projects': 'Agregar o editar proyectos del portafolio',
+  '/app/jobs': 'Explorar ofertas de trabajo y ver postulaciones propias',
+  '/app/messages': 'Mensajes/chat con empresas',
+  '/app/cv-analysis': 'Subir y analizar la hoja de vida (CV)',
+  '/app/public-view': 'Ver cómo se ve el portafolio público propio',
+};
+
+const COMPANY_ROUTES: Record<string, string> = {
+  '/company/dashboard': 'Panel principal de la empresa',
+  '/company/profile': 'Editar perfil de la empresa',
+  '/company/candidates': 'Buscar candidatos por ciudad, profesión o habilidades',
+  '/company/jobs': 'Crear y gestionar ofertas laborales, ver postulaciones',
+  '/company/messages': 'Mensajes/chat con candidatos',
+};
+
+const FALLBACK_REPLY =
+  'Ahora mismo no puedo responder — puede que el servicio de IA esté temporalmente no disponible. Intenta de nuevo en un momento.';
+
 @Injectable()
 export class AssistantService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(AssistantService.name);
 
-  async processMessage(userId: number, role: string, message: string): Promise<AssistantResponse> {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly deepSeek: DeepSeekService,
+  ) {}
+
+  async processMessage(
+    userId: number,
+    role: string,
+    message: string,
+    history?: ChatHistoryItemDto[],
+  ): Promise<AssistantResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { profile: { include: { skills: true } }, companyProfile: true },
     });
 
+    const isCandidate = role === 'CANDIDATE';
     const userName = user?.profile?.fullName || user?.companyProfile?.companyName || 'Usuario';
-    const msg = message.toLowerCase().trim();
-
-    if (role === 'CANDIDATE') {
-      return this.candidateResponses(userId, userName, msg, user);
-    } else {
-      return this.companyResponses(userId, userName, msg, user);
-    }
-  }
-
-  private async candidateResponses(userId: number, userName: string, msg: string, user: any): Promise<AssistantResponse> {
-    const stats = await this.getCandidateStats(userId);
     const profile = user?.profile;
-    const slug = profile?.slug;
 
-    if (msg.includes('hola') || msg.includes('ayuda') || msg.includes('qué puedes') || msg === '') {
-      return {
-        reply: `¡Hola ${userName}! 👋 Soy Joaquín, tu asistente en TalentBridge. Puedo ayudarte con tu perfil, buscar ofertas de trabajo, ver tus postulaciones, revisar mensajes y más. ¿En qué te ayudo hoy?`,
-        role: 'CANDIDATE',
-        intent: 'greeting',
-        actions: [
-          { label: 'Editar perfil', route: '/app/profile' },
-          { label: 'Ver ofertas', route: '/app/jobs' },
-          { label: 'Dashboard', route: '/app/inicio' },
-        ],
-        results: profile ? [{ fullName: profile.fullName, professionalTitle: profile.professionalTitle, city: profile.city, slug: profile.slug }] : [],
-      };
+    const stats = isCandidate ? await this.getCandidateStats(userId) : await this.getCompanyStats(userId);
+    const routes = isCandidate ? CANDIDATE_ROUTES : COMPANY_ROUTES;
+
+    // Contexto real de compatibilidad — sin esto, Joaquín solo veía conteos
+    // agregados y no podía responder preguntas concretas de matching ("¿qué
+    // oferta me conviene más?", "¿qué candidato le sirve a esta vacante?").
+    const companyMatches = isCandidate ? null : await this.getCompanyCandidateMatches(userId);
+    const matchContext = isCandidate
+      ? await this.getCandidateJobMatchesText(profile?.skills || [])
+      : companyMatches!.text;
+
+    const system = this.buildSystemPrompt(isCandidate, userName, stats, routes, matchContext);
+
+    const messages: DeepSeekChatMessage[] = [
+      ...(history || []).map((h) => ({ role: h.role, content: h.content }) as DeepSeekChatMessage),
+      { role: 'user', content: message },
+    ];
+
+    let llmOutput: AssistantLlmOutput;
+    try {
+      llmOutput = await this.deepSeek.chatJson<AssistantLlmOutput>({ system, messages, maxTokens: 600 });
+    } catch (err) {
+      this.logger.error(`Fallo la llamada a DeepSeek para Joaquín: ${(err as Error).message}`);
+      return { reply: FALLBACK_REPLY, role, intent: 'error', actions: [], results: [] };
     }
 
-    if (msg.includes('perfil') || msg.includes('completado')) {
-      const hasBasicInfo = !!(profile?.fullName && profile?.professionalTitle);
-      let completion = 0;
-      if (hasBasicInfo) completion += 25;
-      if (stats.skillsCount > 0) completion += 25;
-      if (stats.experiencesCount > 0 || stats.educationsCount > 0) completion += 25;
-      if (stats.projectsCount > 0) completion += 25;
+    const actions = (llmOutput.actions || [])
+      .filter((a) => a && typeof a.route === 'string' && routes[a.route])
+      .slice(0, 3)
+      .map((a) => ({ label: a.label || routes[a.route], route: a.route }));
 
-      const tips: string[] = [];
-      if (!profile?.fullName) tips.push('Agrega tu nombre completo');
-      if (stats.skillsCount === 0) tips.push('Agrega al menos 3 habilidades');
-      if (!profile?.professionalTitle) tips.push('Define tu título profesional');
-
-      return {
-        reply: `📊 Tu perfil está al ${completion}% completado.\n\n${tips.length > 0 ? '📝 Recomendaciones:\n- ' + tips.join('\n- ') : '✅ ¡Tu perfil está completo!'}`,
-        role: 'CANDIDATE',
-        intent: 'profile_check',
-        actions: [
-          { label: 'Editar perfil', route: '/app/profile' },
-          { label: 'Ver perfil público', route: slug ? `/portfolio/${slug}` : '/app/profile' },
-        ],
-        results: profile ? [{ fullName: profile.fullName, professionalTitle: profile.professionalTitle, city: profile.city, slug: profile.slug, skills: profile.skills?.map((s: any) => s.name) }] : [],
-      };
-    }
-
-    if (msg.includes('oferta') || msg.includes('trabajo') || msg.includes('vacante')) {
-      const availableJobs = await this.prisma.jobOffer.count({ where: { status: 'PUBLISHED' } });
-      return {
-        reply: `💼 Actualmente hay ${availableJobs} ofertas de trabajo publicadas. Has aplicado a ${stats.applicationsCount} ofertas. Puedes explorar todas las ofertas desde /app/jobs`,
-        role: 'CANDIDATE',
-        intent: 'jobs_info',
-        actions: [{ label: 'Ver ofertas', route: '/app/jobs' }],
-        results: [],
-      };
-    }
-
-    if (msg.includes('postulacion') || msg.includes('aplicacion')) {
-      return {
-        reply: `📋 Tienes ${stats.applicationsCount} postulaciones activas. Para aplicar a una oferta, asegúrate de tener al menos una habilidad que coincida con los requisitos.`,
-        role: 'CANDIDATE',
-        intent: 'applications_info',
-        actions: [{ label: 'Ver postulaciones', route: '/app/jobs' }],
-        results: [],
-      };
-    }
-
-    if (msg.includes('mensaje') || msg.includes('chat')) {
-      return {
-        reply: `💬 Tienes ${stats.unreadMessages} mensajes sin leer. Puedes revisar tus conversaciones desde la sección de mensajes.`,
-        role: 'CANDIDATE',
-        intent: 'messages_info',
-        actions: [{ label: 'Ver mensajes', route: '/app/messages' }],
-        results: [],
-      };
-    }
-
-    if (msg.includes('dashboard') || msg.includes('inicio')) {
-      return {
-        reply: `📊 Dashboard de ${userName}:\n- Perfil: ${profile?.fullName ? 'Completándose' : 'Incompleto'}\n- Habilidades: ${stats.skillsCount}\n- Postulaciones: ${stats.applicationsCount}\n- Mensajes sin leer: ${stats.unreadMessages}`,
-        role: 'CANDIDATE',
-        intent: 'dashboard',
-        actions: [{ label: 'Ir al dashboard', route: '/app/inicio' }],
-        results: profile ? [{ fullName: profile.fullName, professionalTitle: profile.professionalTitle, city: profile.city, slug: profile.slug, skills: profile.skills?.map((s: any) => s.name) }] : [],
-      };
+    let results: any[] = [];
+    if (isCandidate && llmOutput.showProfileCard && profile) {
+      results = [
+        {
+          fullName: profile.fullName,
+          professionalTitle: profile.professionalTitle,
+          city: profile.city,
+          slug: profile.slug,
+          skills: profile.skills?.map((s) => s.name),
+        },
+      ];
+    } else if (!isCandidate && llmOutput.showCandidateMatches && companyMatches) {
+      results = companyMatches.topCandidates;
     }
 
     return {
-      reply: `Entiendo tu pregunta sobre "${msg}". Puedo ayudarte con tu perfil, ofertas de trabajo, postulaciones, mensajes y dashboard. ¿En qué te ayudo?`,
-      role: 'CANDIDATE',
-      intent: 'unknown',
-      actions: [
-        { label: 'Dashboard', route: '/app/inicio' },
-        { label: 'Ver ofertas', route: '/app/jobs' },
-      ],
-      results: [],
+      reply: llmOutput.reply || FALLBACK_REPLY,
+      role,
+      intent: 'ai',
+      actions,
+      results,
     };
   }
 
-  private async companyResponses(userId: number, userName: string, msg: string, user: any): Promise<AssistantResponse> {
-    const stats = await this.getCompanyStats(userId);
+  private buildSystemPrompt(
+    isCandidate: boolean,
+    userName: string,
+    stats: Record<string, number>,
+    routes: Record<string, string>,
+    matchContext: string,
+  ): string {
+    const routeList = Object.entries(routes)
+      .map(([route, desc]) => `- ${route}: ${desc}`)
+      .join('\n');
 
-    if (msg.includes('hola') || msg.includes('ayuda') || msg.includes('qué puedes') || msg === '') {
-      return {
-        reply: `¡Hola ${userName}! 👋 Soy Joaquín, tu asistente en TalentBridge. Puedo ayudarte a buscar candidatos, gestionar ofertas, revisar postulaciones y más. ¿En qué te ayudo?`,
-        role: 'COMPANY',
-        intent: 'greeting',
-        actions: [
-          { label: 'Buscar candidatos', route: '/company/candidates' },
-          { label: 'Ver ofertas', route: '/company/jobs' },
-          { label: 'Dashboard', route: '/company/dashboard' },
-        ],
-        results: [],
-      };
+    const statsList = Object.entries(stats)
+      .map(([k, v]) => `- ${k}: ${v}`)
+      .join('\n');
+
+    const audience = isCandidate
+      ? 'un candidato que busca empleo y arma su portafolio profesional'
+      : 'una empresa que busca talento y publica ofertas laborales';
+
+    const matchLabel = isCandidate
+      ? 'Compatibilidad real de este candidato con las ofertas publicadas (de mayor a menor match, ya calculado — úsalo para responder cuál oferta/empresa conviene más, nunca inventes un porcentaje distinto)'
+      : 'Candidatos con mejor compatibilidad para cada oferta activa de esta empresa (ya calculado)';
+
+    return `Eres Joaquín, el asistente virtual de TalentBridge, una plataforma colombiana que conecta candidatos con empresas.
+
+Hablas en español neutro de Colombia, con tuteo (tú, puedes, tienes) — NUNCA voseo (vos, podés, tenés). Tono cercano, profesional y breve (2-4 frases salvo que el usuario pida más detalle). No inventes datos: usa solo la información real que se te da abajo.
+
+Estás hablando con ${audience}, llamado/a ${userName}.
+
+Datos reales de este usuario en la plataforma ahora mismo:
+${statsList}
+
+${matchLabel}:
+${matchContext}
+
+Rutas válidas de la aplicación a las que podés sugerir navegar (usa el path EXACTO, nunca inventes una ruta que no esté en esta lista):
+${routeList}
+
+Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después:
+{
+  "reply": "tu respuesta en lenguaje natural",
+  "actions": [{"label": "texto corto del botón", "route": "una de las rutas válidas de arriba"}],
+  "showProfileCard": boolean,
+  "showCandidateMatches": boolean
+}
+
+"actions" es opcional, máximo 2, solo si de verdad ayuda a la conversación (no lo agregues en cada respuesta). "showProfileCard" (solo para candidatos) solo debe ser true si tiene sentido mostrarle un resumen de su propio perfil. "showCandidateMatches" (solo para empresas) solo debe ser true si el usuario pregunta por candidatos compatibles/recomendados y tiene sentido mostrarle tarjetas de esos candidatos.`;
+  }
+
+  /** Compatibilidad real candidato→ofertas, reusando la misma lógica de matching
+   *  que ya usa la pantalla de ofertas (`computeSkillMatch`) — nunca un número inventado. */
+  private async getCandidateJobMatchesText(
+    candidateSkills: { normalizedName: string; level: string }[],
+  ): Promise<string> {
+    const jobs = await this.prisma.jobOffer.findMany({
+      where: { status: 'PUBLISHED' },
+      include: { company: { select: { companyProfile: { select: { companyName: true } } } } },
+      orderBy: { createdAt: 'desc' },
+      take: 40,
+    });
+
+    if (jobs.length === 0) return 'No hay ofertas publicadas en este momento.';
+
+    const scored = jobs
+      .map((job) => ({ job, match: computeSkillMatch(job.skillsRequired, candidateSkills) }))
+      .sort((a, b) => b.match.matchPercent - a.match.matchPercent)
+      .slice(0, 8);
+
+    return scored
+      .map(
+        ({ job, match }) =>
+          `- "${job.title}" en ${job.company.companyProfile?.companyName || 'una empresa'} (${job.city || 'ciudad no especificada'}): ${match.matchPercent}% de match (${match.matchedCount}/${match.totalCount} habilidades requeridas que ya tiene)`,
+      )
+      .join('\n');
+  }
+
+  /** Compatibilidad real empresa→candidatos por cada oferta activa propia. Solo
+   *  mira perfiles publicados (misma visibilidad que ya respeta la búsqueda de
+   *  candidatos existente) — no expone perfiles que el candidato mantiene privados. */
+  private async getCompanyCandidateMatches(
+    companyUserId: number,
+  ): Promise<{ text: string; topCandidates: CandidateCardData[] }> {
+    const jobs = await this.prisma.jobOffer.findMany({
+      where: { companyId: companyUserId, status: 'PUBLISHED' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    if (jobs.length === 0) {
+      return { text: 'Esta empresa no tiene ofertas publicadas actualmente.', topCandidates: [] };
     }
 
-    if (msg.includes('candidato') || msg.includes('buscar') || msg.includes('talento')) {
-      return {
-        reply: `🔍 Puedes buscar candidatos por ciudad, profesión o habilidades desde la sección de búsqueda. Usa filtros como ciudad, profesión o habilidades específicas.`,
-        role: 'COMPANY',
-        intent: 'search_candidates',
-        actions: [{ label: 'Buscar candidatos', route: '/company/candidates' }],
-        results: [],
-      };
-    }
+    const candidates = await this.prisma.profile.findMany({
+      where: { isPublished: true },
+      include: { skills: true },
+      take: 200,
+    });
 
-    if (msg.includes('oferta') || msg.includes('vacante') || msg.includes('publicar')) {
-      return {
-        reply: `📋 Tienes ${stats.activeJobs} ofertas activas (${stats.totalJobs} en total). Para crear una nueva oferta ve a /company/jobs, completa los campos y publícala.`,
-        role: 'COMPANY',
-        intent: 'jobs_info',
-        actions: [{ label: 'Gestionar ofertas', route: '/company/jobs' }],
-        results: [],
-      };
-    }
+    const lines: string[] = [];
+    const topCandidatesByKey = new Map<string, CandidateCardData>();
 
-    if (msg.includes('postulacion') || msg.includes('aplicante')) {
-      return {
-        reply: `📊 Tienes ${stats.pendingApplications} postulaciones pendientes de revisar (${stats.totalApplications} en total). Puedes cambiar el estado de cada una desde tus ofertas.`,
-        role: 'COMPANY',
-        intent: 'applications_info',
-        actions: [{ label: 'Ver ofertas', route: '/company/jobs' }],
-        results: [],
-      };
-    }
+    for (const job of jobs) {
+      const scored = candidates
+        .map((c) => ({
+          profile: c,
+          match: computeSkillMatch(
+            job.skillsRequired,
+            c.skills.map((s) => ({ normalizedName: s.normalizedName, level: s.level })),
+          ),
+        }))
+        .sort((a, b) => b.match.matchPercent - a.match.matchPercent)
+        .slice(0, 3);
 
-    if (msg.includes('mensaje') || msg.includes('chat')) {
-      return {
-        reply: `💬 Tienes ${stats.unreadMessages} mensajes sin leer. Puedes chatear con candidatos desde la sección de mensajes.`,
-        role: 'COMPANY',
-        intent: 'messages_info',
-        actions: [{ label: 'Ver mensajes', route: '/company/messages' }],
-        results: [],
-      };
-    }
-
-    if (msg.includes('dashboard') || msg.includes('inicio') || msg.includes('resumen')) {
-      return {
-        reply: `📊 Dashboard de ${userName}:\n- Ofertas activas: ${stats.activeJobs}\n- Total postulaciones: ${stats.totalApplications}\n- Pendientes: ${stats.pendingApplications}\n- Mensajes sin leer: ${stats.unreadMessages}`,
-        role: 'COMPANY',
-        intent: 'dashboard',
-        actions: [{ label: 'Ir al dashboard', route: '/company/dashboard' }],
-        results: [],
-      };
+      lines.push(`Oferta "${job.title}":`);
+      for (const { profile, match } of scored) {
+        lines.push(
+          `  - ${profile.fullName || 'Candidato'} (${profile.city || 'ciudad no especificada'}): ${match.matchPercent}% de match`,
+        );
+        topCandidatesByKey.set(profile.slug, {
+          fullName: profile.fullName,
+          professionalTitle: profile.professionalTitle,
+          city: profile.city,
+          slug: profile.slug,
+        });
+      }
     }
 
     return {
-      reply: `Entiendo tu pregunta sobre "${msg}". Puedo ayudarte con búsqueda de candidatos, ofertas de trabajo, postulaciones, mensajes y dashboard. ¿En qué te ayudo?`,
-      role: 'COMPANY',
-      intent: 'unknown',
-      actions: [
-        { label: 'Dashboard', route: '/company/dashboard' },
-        { label: 'Buscar candidatos', route: '/company/candidates' },
-      ],
-      results: [],
+      text: lines.join('\n'),
+      topCandidates: Array.from(topCandidatesByKey.values()).slice(0, 6),
     };
   }
 
@@ -224,13 +282,24 @@ export class AssistantService {
         })
       : 0;
 
+    const availableJobs = await this.prisma.jobOffer.count({ where: { status: 'PUBLISHED' } });
+
+    const hasBasicInfo = !!(profile?.fullName && profile?.professionalTitle);
+    let profileCompletion = 0;
+    if (hasBasicInfo) profileCompletion += 25;
+    if ((profile?.skills.length || 0) > 0) profileCompletion += 25;
+    if ((profile?.experiences.length || 0) > 0 || (profile?.educations.length || 0) > 0) profileCompletion += 25;
+    if ((profile?.projects.length || 0) > 0) profileCompletion += 25;
+
     return {
-      skillsCount: profile?.skills.length || 0,
-      experiencesCount: profile?.experiences.length || 0,
-      educationsCount: profile?.educations.length || 0,
-      projectsCount: profile?.projects.length || 0,
-      applicationsCount,
-      unreadMessages,
+      perfilCompletadoPorcentaje: profileCompletion,
+      habilidadesRegistradas: profile?.skills.length || 0,
+      experienciasRegistradas: profile?.experiences.length || 0,
+      educacionesRegistradas: profile?.educations.length || 0,
+      proyectosRegistrados: profile?.projects.length || 0,
+      postulacionesRealizadas: applicationsCount,
+      mensajesSinLeer: unreadMessages,
+      ofertasPublicadasEnLaPlataforma: availableJobs,
     };
   }
 
@@ -253,6 +322,12 @@ export class AssistantService {
         })
       : 0;
 
-    return { totalJobs, activeJobs, totalApplications, pendingApplications, unreadMessages };
+    return {
+      ofertasTotales: totalJobs,
+      ofertasActivas: activeJobs,
+      postulacionesTotales: totalApplications,
+      postulacionesPendientes: pendingApplications,
+      mensajesSinLeer: unreadMessages,
+    };
   }
 }

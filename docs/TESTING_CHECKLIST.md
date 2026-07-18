@@ -31,6 +31,7 @@ Manual, en navegador real (esta sesión no tiene forma de verificarlo por sí mi
 
 ## Perfil candidato (`/app/profile`)
 - [ ] Guardar cambios de datos básicos persiste y refresca el resumen.
+- [ ] Campos e íconos alineados, misma altura entre sí y contra los formularios con `mat-form-field` (Experiencia/Educación/Proyectos) — Fase 15, 2026-07-17.
 - [ ] Generar slug produce una URL válida y sin caracteres raros.
 - [x] URL pública mostrada usa el dominio real (`window.location.origin`), no `localhost:4200` hardcodeado — BUG-005. *(verificado en sesión anterior, no reprobado esta vez)*
 - [x] Aviso de GitHub (`<app-github-warning>`) aparece junto al campo GitHub. *(2026-07-17, verificado en vivo)*
@@ -42,6 +43,7 @@ Manual, en navegador real (esta sesión no tiene forma de verificarlo por sí mi
 - [ ] Ofertas sin `skillsRequired` permiten aplicar sin restricción.
 - [x] Ofertas donde el candidato no matchea ninguna skill requerida: botón "Aplicar" deshabilitado + mensaje "No coincides con los requisitos principales". *(2026-07-17, verificado en vivo)*
 - [ ] Aplicar dos veces a la misma oferta → error 409 claro, no un fallo genérico.
+- [ ] Filtros (búsqueda, ciudad, rango de fechas) con la misma altura de campo; textarea del mensaje de postulación con tamaño razonable, no gigante — Fase 15, 2026-07-17.
 
 ## Mis postulaciones
 - [x] Estado de cada postulación (`Pendiente/Revisado/Preseleccionado/Rechazado/Contratado`) se muestra en español con el color correcto (`statusToLabel`/`statusToTone`). *(2026-07-17, verificado en vivo)*
@@ -56,15 +58,18 @@ Manual, en navegador real (esta sesión no tiene forma de verificarlo por sí mi
 ## Experiencia (`/app/experience`)
 - [ ] CRUD completo funciona; fechas de rango en formato `mes año` en español (`monthYear`).
 - [ ] Eliminar pide confirmación; error de red muestra snackbar (BUG-007).
+- [ ] Bloque "Periodo": al tildar "Trabajo actual", "Fecha Fin" se oculta de forma limpia y el checkbox queda alineado junto a "Fecha Inicio" (sin columna vacía ni salto de layout) — Fase 15, 2026-07-17.
 
 ## Educación (`/app/education`)
 - [ ] CRUD completo funciona (incluido **guardar**, que no tenía manejo de error — BUG-007, verificar que ahora sí).
 - [ ] Eliminar pide confirmación con `ConfirmDialogComponent`.
+- [ ] Al tildar "Cursando actualmente", "Fecha Fin" se oculta y el checkbox queda en la misma fila que las fechas (ya no aparece suelto después de la descripción) — Fase 15, 2026-07-17.
 
 ## Proyectos (`/app/projects`)
 - [ ] CRUD completo funciona.
 - [ ] Aviso legal de repositorio (`<app-github-warning>`) visible en el formulario.
 - [ ] Eliminar pide confirmación; error de red muestra snackbar.
+- [ ] Fecha inicio/Fecha fin forman una fila de 2 columnas propia, sin celda huérfana junto a "Estado" — Fase 15, 2026-07-17.
 
 ## CV (`/app/cv-analysis`)
 - [x] Subida de PDF (≤5MB) funciona; archivo >5MB rechazado con mensaje claro. *(2026-07-17: verificado que la pantalla y el documento ya subido se ven correctamente; no se reprobó una subida nueva ni el rechazo por tamaño)*
@@ -86,6 +91,7 @@ Manual, en navegador real (esta sesión no tiene forma de verificarlo por sí mi
 ## Perfil empresa (`/company/profile`)
 - [ ] Guardar cambios persiste.
 - [x] Logo se muestra correctamente (SVG real). *(2026-07-17, verificado en vivo)*
+- [ ] Campos con altura/radio consistentes con el resto de la app, foco en violeta (identidad "empresa", no el teal de candidato) — Fase 15, 2026-07-17.
 
 ## Vacantes publicadas (`/company/jobs`)
 - [x] Tabla de ofertas alineada correctamente en desktop (columna Contrato ya no se corta — BUG-010, corregido y verificado 2026-07-17). Tablet/mobile no re-verificados esta pasada.
@@ -93,10 +99,12 @@ Manual, en navegador real (esta sesión no tiene forma de verificarlo por sí mi
 - [ ] Publicar oferta cambia su estado y la hace visible en `/app/jobs` del lado candidato.
 - [x] Ver postulaciones de una oferta y cambiar su estado funciona (modal con candidato, mensaje, dropdown de estado, "Ver portafolio"/"Contactar"). *(2026-07-17, verificado en vivo)*
 - [x] "Nueva oferta": formulario abre con todos los campos (título, descripción, ciudad, modalidad, tipo de contrato, carga horaria, moneda, salario, requisitos, responsabilidades). *(2026-07-17, verificado en vivo; guardado y opción "Otro" no reprobados esta vez)*
+- [ ] Campos del formulario (título, salario mín/máx, textareas) con altura/radio consistentes, fila de habilidades requeridas alineada — Fase 15, 2026-07-17.
 
 ## Candidatos (`/company/candidates`)
 - [x] Búsqueda por texto devuelve resultados reales con cards completas (avatar, título, ciudad, experiencia, resumen, skills). *(2026-07-17, verificado en vivo — el primer intento pareció "sin resultados" por un selector de prueba incorrecto, no un bug de la app, ver `DECISIONS.md`)*
 - [x] Chips de habilidades con mayúsculas consistentes — BUG-011, corregido y verificado 2026-07-17.
+- [ ] Panel de filtros avanzados (ciudad, experiencia mínima, etc.): campos con la misma altura entre sí, grilla de 2 columnas colapsa a 1 en tablet/mobile — Fase 15, 2026-07-17.
 
 ## Chat (`/app/messages` y `/company/messages`)
 - [x] Lista de conversaciones carga; muestra logo/avatar, nombre y último mensaje. *(2026-07-17, verificado en vivo, ambos lados)*

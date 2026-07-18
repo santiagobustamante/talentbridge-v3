@@ -1,6 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { AssistantService } from './assistant.service';
+import { AssistantMessageDto } from './dto/assistant-message.dto';
 
 @Controller('assistant')
 export class AssistantController {
@@ -8,7 +9,7 @@ export class AssistantController {
 
   @UseGuards(JwtAuthGuard)
   @Post('message')
-  async sendMessage(@CurrentUser() user: { sub: number; role?: string }, @Body() body: { message: string }) {
-    return this.assistantService.processMessage(user.sub, user.role || 'CANDIDATE', body.message);
+  async sendMessage(@CurrentUser() user: { sub: number; role?: string }, @Body() body: AssistantMessageDto) {
+    return this.assistantService.processMessage(user.sub, user.role || 'CANDIDATE', body.message, body.history);
   }
 }

@@ -15,6 +15,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
 import { Skill } from '../../core/auth/auth.models';
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG, SkillCatalogEntry } from '../../core/services/skill-catalog';
+import { normalizeSkillDisplay } from '../../shared/utils/normalize';
 
 const MAX_SEARCH_RESULTS = 60;
 
@@ -136,7 +137,8 @@ export class SkillsComponent implements OnInit {
 
   addCustom(): void {
     if (this.customForm.invalid) return;
-    const data = this.customForm.value as { name: string; level: SkillLevel };
+    const raw = this.customForm.value as { name: string; level: SkillLevel };
+    const data = { ...raw, name: normalizeSkillDisplay(raw.name) };
     this.service.create(data).subscribe({
       next: () => {
         this.load();

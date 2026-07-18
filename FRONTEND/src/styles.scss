@@ -125,6 +125,12 @@
 
   --sidebar-width: 264px;
   --topbar-height: 60px;
+
+  /* Altura/tamaño estándar de campo, compartida entre los overrides de
+     Material de más abajo y los inputs custom (ver styles/_forms.scss) —
+     antes cada sistema tenía su propio número (46/48/44px). */
+  --field-height: 46px;
+  --field-textarea-min-height: 96px;
 }
 
 $theme: mat.define-theme((
@@ -193,7 +199,7 @@ html {
 }
 
 .mat-mdc-form-field-flex {
-  min-height: 46px !important;
+  min-height: var(--field-height) !important;
 }
 
 .mat-mdc-form-field-subscript-wrapper {

@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AssistantService, AssistantResponse } from '../../core/services/assistant.service';
+import { AssistantService, AssistantResponse, AssistantHistoryItem } from '../../core/services/assistant.service';
 import { AuthService } from '../../core/auth/auth.service';
 
 interface ChatMessage {
@@ -94,12 +94,13 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
       const msg = (text || this.inputMessage).trim();
       if (!msg || this.loading()) return;
 
+      const history = this.buildHistory();
       this.messages = [...this.messages, { from: 'user' as const, text: msg }];
       this.inputMessage = '';
       this.loading.set(true);
       this.cdr.detectChanges();
 
-      this.assistantService.sendMessage(msg).subscribe({
+      this.assistantService.sendMessage(msg, history).subscribe({
         next: (res: AssistantResponse) => {
           this.zone.run(() => {
             this.messages = [
@@ -146,6 +147,15 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
       event.stopPropagation();
       this.sendMessage();
     }
+  }
+
+  /** Últimos turnos de la conversación en memoria, para que el backend le dé
+   *  contexto al modelo — no se persiste nada, es solo lo que ya está en pantalla. */
+  private buildHistory(): AssistantHistoryItem[] {
+    return this.messages
+      .filter((m) => m.text?.trim())
+      .slice(-8)
+      .map((m) => ({ role: m.from === 'user' ? ('user' as const) : ('assistant' as const), content: m.text }));
   }
 
   private showGreeting() {

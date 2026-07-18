@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'forms';
 
 .page-content { max-width: 1100px; margin: 0 auto; padding: 0 var(--space-md); }
 
@@ -49,19 +50,14 @@
 
 /* ─── Sections ──────────────────────────── */
 
-.form-section {
-  background: var(--bg-surface-soft); border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md); padding: 18px;
-  display: flex; flex-direction: column; gap: 14px;
-}
+.form-section { @include forms.section; }
 
 .section-label {
-  font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
-  text-transform: uppercase; letter-spacing: 0.05em;
+  @include forms.section-label;
   .req { color: var(--danger); }
 }
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid { @include forms.grid; }
 
 .full-width { width: 100%; }
 
@@ -164,7 +160,6 @@
 
 @include bp.tablet {
   .page-content { padding: 0; }
-  .form-grid { grid-template-columns: 1fr; }
   .projects-grid { grid-template-columns: 1fr; }
   .form-body { padding: var(--space-md); }
   .form-footer { flex-direction: column; .save-btn, .cancel-btn { width: 100%; justify-content: center; } }

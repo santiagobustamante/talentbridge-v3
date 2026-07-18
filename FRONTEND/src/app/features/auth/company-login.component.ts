@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
+import { normalizeEmail } from '../../shared/utils/normalize';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 
 @Component({
@@ -99,7 +100,7 @@ export class CompanyLoginComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const { email, password } = this.form.value;
-    this.auth.loginCompany(email!, password!).subscribe({
+    this.auth.loginCompany(normalizeEmail(email!), password!).subscribe({
       next: () => {
         const q = this.route.snapshot.queryParamMap.get('q');
         if (q) {

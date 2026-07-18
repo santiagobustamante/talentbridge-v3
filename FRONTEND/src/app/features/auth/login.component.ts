@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { normalizeEmail } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-login',
@@ -98,7 +99,7 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const { email, password } = this.form.value;
-    this.auth.login(email!, password!).subscribe({
+    this.auth.login(normalizeEmail(email!), password!).subscribe({
       next: () => this.router.navigate(['/app/inicio']),
       error: (err) => {
         this.loading = false;

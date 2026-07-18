@@ -14,6 +14,7 @@ import { statusToLabel } from '../../shared/components/badge/status-label.util';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
+import { formatNumberDisplay } from '../../shared/utils/normalize';
 import { ProfileChecklistComponent, ProfileChecklistItem } from '../../shared/components/profile-checklist/profile-checklist.component';
 
 @Component({
@@ -84,8 +85,8 @@ export class HomeCandidateComponent implements OnInit, OnDestroy {
   formatSalary(min?: number, max?: number, currency?: string): string | null {
     if (!min && !max) return null;
     const c = currency || 'COP';
-    const minStr = min ? '$' + min.toLocaleString() : '';
-    const maxStr = max ? '$' + max.toLocaleString() : '';
+    const minStr = min ? '$' + formatNumberDisplay(min) : '';
+    const maxStr = max ? '$' + formatNumberDisplay(max) : '';
     if (min && max) return `${minStr} – ${maxStr} ${c}`;
     return `${minStr || maxStr} ${c}`;
   }

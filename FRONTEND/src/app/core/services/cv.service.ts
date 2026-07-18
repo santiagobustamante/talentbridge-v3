@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CvDocument, CvAnalysis } from '../auth/auth.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CvService {
-  private readonly api = 'http://localhost:3000/api/cv';
-  private readonly uploadApi = 'http://localhost:3003/api/cv';
+  private readonly api = `${environment.apiUrl}/cv`;
+  // Va directo a portfolio-service (no por el gateway) -- necesita su propio
+  // dominio público en producción, ver environment.prod.ts.
+  private readonly uploadApi = `${environment.cvUploadUrl}/api/cv`;
 
   constructor(private http: HttpClient) {}
 

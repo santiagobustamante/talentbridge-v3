@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { normalizeEmail } from '../../shared/utils/normalize';
 
 @Component({
   selector: 'app-register',
@@ -116,7 +117,7 @@ export class RegisterComponent {
     if (this.form.invalid) return;
     this.loading = true;
     const { email, password, confirmPassword } = this.form.value;
-    this.auth.register(email!, password!, confirmPassword!).subscribe({
+    this.auth.register(normalizeEmail(email!), password!, confirmPassword!).subscribe({
       next: () => this.router.navigate(['/app/inicio']),
       error: (err) => {
         this.loading = false;

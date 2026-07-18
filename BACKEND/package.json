@@ -13,7 +13,6 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-
     "start:gateway": "nest start api-gateway --watch",
     "start:auth": "nest start auth-service --watch",
     "start:candidate": "nest start candidate-service --watch",
@@ -24,7 +23,6 @@
     "start:chat": "nest start chat-service --watch",
     "start:assistant": "nest start assistant-service --watch",
     "start:dashboard": "nest start dashboard-service --watch",
-
     "build:gateway": "nest build api-gateway",
     "build:auth": "nest build auth-service",
     "build:candidate": "nest build candidate-service",
@@ -36,7 +34,6 @@
     "build:assistant": "nest build assistant-service",
     "build:dashboard": "nest build dashboard-service",
     "build:libs": "nest build database-lib && nest build auth-lib && nest build common-lib && nest build contracts-lib && nest build events-lib",
-
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -51,6 +48,7 @@
     "update:company-logos": "ts-node prisma/update-company-logos.ts",
     "generate:company-logos": "ts-node prisma/generate-company-logos.ts",
     "backfill:job-workload": "ts-node prisma/backfill-job-workload.ts",
+    "backfill:normalize-data": "ts-node prisma/normalize-existing-data.ts",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "prisma": {
@@ -76,6 +74,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
+    "openai": "^6.48.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pdf-parse": "^2.4.5",

@@ -166,3 +166,38 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 
 - **"Landing con huecos enormes de espacio en blanco"**: una captura `fullPage: true` con Playwright mostró la sección "¿A quién está dirigido?" con dos cards vacías seguidas de miles de píxeles en blanco. Inspección del DOM confirmó que el contenido real está completo y correctamente renderizado (texto, íconos, botones) — el problema fue un artefacto de captura de pantalla de página completa combinado con las animaciones de scroll (`animate-fade-in-up`) del home, no un bug de la app. Verificado con una captura de viewport normal tras hacer scroll real a la sección: se ve perfecta.
 - **"Joaquín tapa la última card de la lista de trabajos en mobile"**: la misma clase de artefacto — una captura `fullPage: true` en 390px de ancho mostraba el botón flotante superpuesto a una card. Al scrollear el contenedor real hasta el final y capturar solo el viewport, la paginación y el botón "Ver detalle" tienen espacio de sobra por encima de Joaquín. **No era un bug real**, pero de todos modos se agregó `padding-bottom` a `.page-content` en ambos shells (candidato y empresa) como margen de seguridad — no cambia nada visualmente hoy, pero cubre el caso si una pantalla futura tiene contenido que llegue justo al borde inferior.
+
+---
+
+### BUG-015 — El campo de teléfono/NIT no dejaba editar un valor ya cargado (el cursor saltaba al final en cada tecla)
+
+**Módulo:** Frontend — `profile.component`, `company-profile.component`
+**Descripción:** Al agregar formateo en vivo del teléfono ("+57 300 123 4567") y el NIT ("900.123.456-7") en la misma sesión, cada pulsación disparaba `valueChanges` → `setValue(formatted)`. `setValue` reescribe el `<input>` del DOM (vía `writeValue` del `ControlValueAccessor`) sin preservar la posición del cursor, sin importar que se pasara `emitEvent: false` (ese flag solo evita que el propio listener se dispare de nuevo — no tiene ningún efecto sobre si Angular reescribe el valor visible del campo). Resultado: escribir o borrar un carácter en cualquier posición que no fuera la última hacía que el cursor saltara al final del texto inmediatamente después de esa tecla, haciendo prácticamente imposible editar un número ya cargado (cada tecla adicional terminaba insertándose al final, no donde el usuario apuntaba).
+**Archivos afectados:** `FRONTEND/src/app/features/profile/profile.component.ts`, `FRONTEND/src/app/features/company/company-profile.component.ts`
+**Solución:** Se reemplazó el listener de `valueChanges` (formateo en cada tecla) por un handler en el evento `(blur)` de cada campo — el valor se reformatea recién al salir del campo, no mientras se escribe. Mientras el campo tiene foco no hay ninguna interferencia con la posición del cursor.
+**Prueba realizada:** Reproducido el bug exacto contra el código anterior (insertar un carácter en la posición 5 de "+57 312 439 2090" → el cursor terminaba en la posición 16, el final) y confirmado que con el fix el cursor se queda en la posición correcta (6) durante la edición, reformateando recién al disparar `blur`.
+**Estado:** Corregido.
+
+---
+
+### BUG-016 — `parseNumericInput` interpretaba mal un monto con puntos de miles cuando no había ninguna coma ("$2.500.000" → 3)
+
+**Módulo:** Frontend/Backend — `shared/utils/normalize/currency.util.ts` (frontend) y su espejo `libs/common/src/normalize/currency.util.ts` (backend)
+**Descripción:** Al crear una oferta laboral con salario mínimo `$2.500.000` y máximo `$4.000.000`, la tabla de ofertas mostraba "$3 – $4 COP" en vez de "$2.500.000 – $4.000.000 COP" — descubierto durante la verificación en vivo del sistema de normalización (no en el diseño original).
+**Causa:** La lógica original de `parseNumericInput` solo distinguía coma-decimal vs. punto-miles cuando **ambos** separadores estaban presentes en el valor ("2.500,75" vs "2,500.75"). Si solo había puntos (caso real: formato es-CO sin coma, "$2.500.000"), el código no los eliminaba — pasaba directo a `parseFloat("2.500.000")`, que en JavaScript se detiene en el segundo punto (no es un número válido más allá de ahí) y devuelve `2.5`. `Math.round(2.5)` en el componente que llama a esta función redondea a `3`. Mismo problema con "4.000.000" → `4.0` → `4`.
+**Archivos afectados:** `FRONTEND/src/app/shared/utils/normalize/currency.util.ts`, `BACKEND/libs/common/src/normalize/currency.util.ts`
+**Solución:** Reescrita la lógica para manejar los 3 casos por separado: (a) coma y punto presentes → el que aparece último es el separador decimal (comportamiento anterior, sin cambios); (b) un solo tipo de separador con el último grupo de exactamente 3 dígitos, o más de un grupo → se trata como separador de miles y se elimina por completo ("2.500.000" → 2500000, "2.500" → 2500); (c) un solo separador con 1-2 dígitos en el último grupo → se trata como decimal ("2.50" → 2.5).
+**Prueba realizada:** Reproducido el bug exacto en vivo (oferta creada con `$2.500.000`/`$4.000.000` mostrando "$3 – $4 COP" en la tabla), corregida la utilidad, editada la misma oferta reingresando los mismos valores, y confirmado que la tabla ahora muestra "$2.500.000 – $4.000.000 COP". `ng build` y `nest build` (`common-lib`) limpios tras el fix.
+**Estado:** Corregido.
+
+---
+
+### BUG-017 — `normalizeUrl` rompía rutas relativas de logo ("/assets/logo.svg" → "https:///assets/logo.svg"), reportado por el usuario con captura de pantalla
+
+**Módulo:** Frontend/Backend — `shared/utils/normalize/url.util.ts` (frontend) y su espejo `libs/common/src/normalize/url.util.ts` (backend) · Dato afectado: `company_profiles.logo_url` de `empresa001@demo.com` (Talento Llanero S.A.S.)
+**Descripción:** El usuario compartió una captura del dashboard de empresa mostrando el logo roto (ícono de imagen no cargada + texto alternativo "Taler..." desbordado) tanto en el header como en el hero del dashboard.
+**Causa:** `company-profile.component.ts` pasa el campo `logoUrl` del formulario por el mismo `cleanUrl()` que `websiteUrl` antes de guardar. `normalizeUrl` anteponía `https://` a cualquier valor sin protocolo — pero el valor real de `logoUrl` para los datos demo es una ruta relativa (`/assets/company-logos/logo-1.svg`), no una URL externa. Al guardar el perfil de esta empresa durante la verificación en vivo de esta misma tarea, el valor quedó corrompido a `https:///assets/company-logos/logo-1.svg` (con triple slash), una URL inválida que el navegador no puede resolver — de ahí el ícono roto y el `alt` desbordado.
+**Archivos afectados:** `FRONTEND/src/app/shared/utils/normalize/url.util.ts`, `BACKEND/libs/common/src/normalize/url.util.ts`
+**Solución:** `normalizeUrl` ahora deja intacto cualquier valor que ya empiece con `/` (ruta relativa válida tal cual), sin anteponerle protocolo. Se corrigió además el dato ya corrompido de `empresa001@demo.com` (único registro afectado — el único guardado de perfil de empresa hecho durante esta sesión) de vuelta a `/assets/company-logos/logo-1.svg`.
+**Prueba realizada:** Confirmado por consulta directa al endpoint (`GET /api/company/profile`) que el valor corrupto tenía el triple slash antes del fix. Tras corregir la utilidad y el dato, verificado en vivo que el logo (ícono de circuito azul) vuelve a renderizar correctamente en el header y en el hero del dashboard. `nest build` (`common-lib` + `company-service`) limpio.
+**Estado:** Corregido.

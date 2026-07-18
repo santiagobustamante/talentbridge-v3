@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Profile } from '../../../core/auth/auth.models';
 import { GithubWarningComponent } from '../github-warning/github-warning.component';
 import { AppDatePipe } from '../../pipes/app-date.pipe';
+import { formatPhoneDisplay } from '../../utils/normalize';
 
 @Component({
   selector: 'app-portfolio-content',
@@ -17,6 +18,11 @@ export class PortfolioContentComponent {
   @Input({ required: true }) profile!: Profile;
   /** Modo vista previa autenticada: muestra links "Editar" por sección. */
   @Input() editable = false;
+
+  displayPhone(value: unknown): string {
+    const text = String(value ?? '').trim();
+    return text ? formatPhoneDisplay(text) : '';
+  }
 
   levelLabel(level: string): string {
     const map: Record<string, string> = { BASIC: 'Básico', INTERMEDIATE: 'Intermedio', ADVANCED: 'Avanzado', EXPERT: 'Experto' };

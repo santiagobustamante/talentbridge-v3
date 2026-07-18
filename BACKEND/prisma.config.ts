@@ -9,6 +9,10 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Migraciones/CLI siempre contra la conexión directa (DIRECT_URL) cuando existe
+    // -- necesaria en Supabase porque el pooler (DATABASE_URL en modo pgbouncer)
+    // no soporta el protocolo que usan migrate/db push. En dev local (un solo
+    // Postgres, sin pooler) no hay DIRECT_URL y cae a DATABASE_URL, sin cambios.
+    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
   },
 });

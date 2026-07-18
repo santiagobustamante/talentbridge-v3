@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService, UserRole } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
+import { titleCaseText, trimText } from '@app/common';
 
 const PUBLISHED = 'PUBLISHED' as any;
 const DRAFT = 'DRAFT' as any;
@@ -49,11 +50,11 @@ export class JobsService {
     return this.prisma.jobOffer.create({
       data: {
         companyId: companyUserId,
-        title: dto.title,
-        description: dto.description,
-        requirements: dto.requirements,
-        responsibilities: dto.responsibilities,
-        city: dto.city,
+        title: titleCaseText(dto.title),
+        description: trimText(dto.description),
+        requirements: dto.requirements ? trimText(dto.requirements) : dto.requirements,
+        responsibilities: dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities,
+        city: dto.city ? titleCaseText(dto.city) : dto.city,
         modality: dto.modality,
         contractType: dto.contractType,
         customContractType: dto.customContractType,
@@ -76,11 +77,11 @@ export class JobsService {
     if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
 
     const updateData: any = {};
-    if (dto.title !== undefined) updateData.title = dto.title;
-    if (dto.description !== undefined) updateData.description = dto.description;
-    if (dto.requirements !== undefined) updateData.requirements = dto.requirements;
-    if (dto.responsibilities !== undefined) updateData.responsibilities = dto.responsibilities;
-    if (dto.city !== undefined) updateData.city = dto.city;
+    if (dto.title !== undefined) updateData.title = titleCaseText(dto.title);
+    if (dto.description !== undefined) updateData.description = trimText(dto.description);
+    if (dto.requirements !== undefined) updateData.requirements = dto.requirements ? trimText(dto.requirements) : dto.requirements;
+    if (dto.responsibilities !== undefined) updateData.responsibilities = dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities;
+    if (dto.city !== undefined) updateData.city = dto.city ? titleCaseText(dto.city) : dto.city;
     if (dto.modality !== undefined) updateData.modality = dto.modality;
     if (dto.contractType !== undefined) updateData.contractType = dto.contractType;
     if (dto.customContractType !== undefined) updateData.customContractType = dto.customContractType;

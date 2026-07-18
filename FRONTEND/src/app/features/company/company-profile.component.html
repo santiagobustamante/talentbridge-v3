@@ -55,7 +55,7 @@
       <div class="summary-grid">
         <div class="summary-item">
           <span>Teléfono</span>
-          <strong>{{ displayValue(summaryProfile.phone) }}</strong>
+          <strong>{{ displayPhone(summaryProfile.phone) }}</strong>
         </div>
         <div class="summary-item">
           <span>Sitio web</span>
@@ -63,7 +63,7 @@
         </div>
         <div class="summary-item">
           <span>NIT</span>
-          <strong>{{ displayValue(summaryProfile.nit) }}</strong>
+          <strong>{{ displayNit(summaryProfile.nit) }}</strong>
         </div>
         <div class="summary-item">
           <span>Logo</span>
@@ -85,23 +85,23 @@
         <div class="form-grid">
           <div class="form-field">
             <label>Nombre de la empresa</label>
-            <input class="app-input" formControlName="companyName" autocomplete="organization" placeholder="Ej. Tech Solutions S.A." />
+            <input class="app-input" formControlName="companyName" autocomplete="organization" (blur)="onNameLikeBlur('companyName')" placeholder="Ej. Tech Solutions S.A." />
           </div>
           <div class="form-field">
             <label>NIT</label>
-            <input class="app-input" inputmode="numeric" formControlName="nit" placeholder="Ej. 900.123.456-7" />
+            <input class="app-input" inputmode="numeric" formControlName="nit" (blur)="onNitBlur()" placeholder="Ej. 900.123.456-7" />
           </div>
           <div class="form-field">
             <label>Sector</label>
-            <input class="app-input" formControlName="sector" placeholder="Ej. Tecnología, Salud, Educación" />
+            <input class="app-input" formControlName="sector" (blur)="onNameLikeBlur('sector')" placeholder="Ej. Tecnología, Salud, Educación" />
           </div>
           <div class="form-field">
             <label>Ciudad</label>
-            <input class="app-input" formControlName="city" autocomplete="address-level2" placeholder="Ej. Bogotá, Colombia" />
+            <input class="app-input" formControlName="city" autocomplete="address-level2" (blur)="onNameLikeBlur('city')" placeholder="Ej. Bogotá, Colombia" />
           </div>
           <div class="form-field form-field--full">
             <label>Descripción</label>
-            <textarea class="app-textarea" formControlName="description" rows="4" placeholder="Describe tu empresa, misión, y el tipo de talento que buscas..."></textarea>
+            <textarea class="app-textarea" formControlName="description" rows="4" (blur)="onDescriptionBlur()" placeholder="Describe tu empresa, misión, y el tipo de talento que buscas..."></textarea>
           </div>
         </div>
       </div>
@@ -114,11 +114,11 @@
         <div class="form-grid">
           <div class="form-field form-field--full">
             <label>Teléfono</label>
-            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" placeholder="+57 300 000 0000" />
+            <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" (blur)="onPhoneBlur()" placeholder="+57 300 000 0000" />
           </div>
           <div class="form-field form-field--full">
             <label>Sitio web</label>
-            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" placeholder="https://miempresa.com" />
+            <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" (blur)="onWebsiteBlur()" placeholder="https://miempresa.com" />
           </div>
         </div>
       </div>
