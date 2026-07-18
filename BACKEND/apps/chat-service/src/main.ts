@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   const port = process.env['CHAT_SERVICE_PORT'] || 3008;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Chat Service corriendo en http://localhost:${port}`);
 }
 

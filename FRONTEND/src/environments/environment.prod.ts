@@ -8,9 +8,9 @@ export const environment = {
   // por WebSocket directo desde el navegador (chat-socket.service.ts), no pasa
   // por el proxy fetch() del gateway, así que no puede quedar solo en red interna
   // como los demás.
-  apiUrl: 'https://REEMPLAZAR-CON-URL-DE-API-GATEWAY.up.railway.app/api',
-  wsUrl: 'https://REEMPLAZAR-CON-URL-DE-CHAT-SERVICE.up.railway.app',
+  apiUrl: 'https://api-gateway-production-85c5.up.railway.app/api',
+  wsUrl: 'https://chat-service-production-fc44.up.railway.app',
   // portfolio-service también necesita dominio público propio: la subida de CV
   // (cv.service.ts) le pega directo, bypasea el gateway.
-  cvUploadUrl: 'https://REEMPLAZAR-CON-URL-DE-PORTFOLIO-SERVICE.up.railway.app',
+  cvUploadUrl: 'https://portfolio-service-production-58df.up.railway.app',
 };

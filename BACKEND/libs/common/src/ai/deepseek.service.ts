@@ -10,19 +10,28 @@ export interface DeepSeekChatMessage {
  * Cliente compartido para DeepSeek. La API de DeepSeek es compatible con el
  * formato de OpenAI, así que se reutiliza ese SDK apuntado a otro `baseURL`
  * en vez de escribir un cliente HTTP propio.
+ *
+ * `CommonModule` es `@Global()`, así que Nest instancia este provider en
+ * TODOS los microservicios al arrancar (no solo en los que llaman a
+ * `chatJson`/`chatText`) — pero `DEEPSEEK_API_KEY` solo está configurada en
+ * assistant-service/portfolio-service. Por eso el cliente de OpenAI se crea
+ * perezosamente en el primer uso real, no en el constructor: así los otros
+ * servicios pueden bootear sin la variable sin crashear.
  */
 @Injectable()
 export class DeepSeekService {
   private readonly logger = new Logger(DeepSeekService.name);
-  private readonly client: OpenAI;
-  private readonly model: string;
+  private client: OpenAI | null = null;
+  private readonly model = process.env['DEEPSEEK_MODEL'] || 'deepseek-chat';
 
-  constructor() {
-    this.client = new OpenAI({
-      apiKey: process.env['DEEPSEEK_API_KEY'],
-      baseURL: process.env['DEEPSEEK_BASE_URL'] || 'https://api.deepseek.com',
-    });
-    this.model = process.env['DEEPSEEK_MODEL'] || 'deepseek-chat';
+  private getClient(): OpenAI {
+    if (!this.client) {
+      this.client = new OpenAI({
+        apiKey: process.env['DEEPSEEK_API_KEY'],
+        baseURL: process.env['DEEPSEEK_BASE_URL'] || 'https://api.deepseek.com',
+      });
+    }
+    return this.client;
   }
 
   /**
@@ -36,7 +45,7 @@ export class DeepSeekService {
     maxTokens?: number;
     temperature?: number;
   }): Promise<T> {
-    const completion = await this.client.chat.completions.create({
+    const completion = await this.getClient().chat.completions.create({
       model: this.model,
       messages: [{ role: 'system', content: params.system }, ...params.messages],
       response_format: { type: 'json_object' },
@@ -64,7 +73,7 @@ export class DeepSeekService {
     maxTokens?: number;
     temperature?: number;
   }): Promise<string> {
-    const completion = await this.client.chat.completions.create({
+    const completion = await this.getClient().chat.completions.create({
       model: this.model,
       messages: [{ role: 'system', content: params.system }, ...params.messages],
       max_tokens: params.maxTokens ?? 700,

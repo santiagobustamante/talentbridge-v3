@@ -16,7 +16,7 @@ async function bootstrap() {
   });
 
   const port = process.env['AUTH_SERVICE_PORT'] || 3001;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Auth Service corriendo en http://localhost:${port}`);
 }
 

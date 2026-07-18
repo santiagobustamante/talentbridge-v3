@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   const port = process.env['DASHBOARD_SERVICE_PORT'] || 3010;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Dashboard Service corriendo en http://localhost:${port}`);
 }
 

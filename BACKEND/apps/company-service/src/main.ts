@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   const port = process.env['COMPANY_SERVICE_PORT'] || 3004;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Company Service corriendo en http://localhost:${port}`);
 }
 
