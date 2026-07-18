@@ -95,7 +95,7 @@ services:
       - key: DEEPSEEK_MODEL
         value: deepseek-chat
 
-  - type: pserv
+  - type: web
     name: auth-service
     runtime: docker
     plan: free
@@ -118,7 +118,7 @@ services:
       - key: FRONTEND_URL
         value: https://talentbridge-v3.vercel.app
 
-  - type: pserv
+  - type: web
     name: candidate-service
     runtime: docker
     plan: free
@@ -141,7 +141,7 @@ services:
       - key: FRONTEND_URL
         value: https://talentbridge-v3.vercel.app
 
-  - type: pserv
+  - type: web
     name: company-service
     runtime: docker
     plan: free
@@ -164,7 +164,7 @@ services:
       - key: FRONTEND_URL
         value: https://talentbridge-v3.vercel.app
 
-  - type: pserv
+  - type: web
     name: jobs-service
     runtime: docker
     plan: free
@@ -187,7 +187,7 @@ services:
       - key: FRONTEND_URL
         value: https://talentbridge-v3.vercel.app
 
-  - type: pserv
+  - type: web
     name: applications-service
     runtime: docker
     plan: free
@@ -210,7 +210,7 @@ services:
       - key: FRONTEND_URL
         value: https://talentbridge-v3.vercel.app
 
-  - type: pserv
+  - type: web
     name: assistant-service
     runtime: docker
     plan: free
@@ -239,7 +239,7 @@ services:
       - key: DEEPSEEK_MODEL
         value: deepseek-chat
 
-  - type: pserv
+  - type: web
     name: dashboard-service
     runtime: docker
     plan: free
