@@ -1,0 +1,263 @@
+services:
+  - type: web
+    name: api-gateway
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/api-gateway.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: API_GATEWAY_PORT
+        value: 3000
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:3001
+      - key: CANDIDATE_SERVICE_URL
+        value: http://candidate-service:3002
+      - key: PORTFOLIO_SERVICE_URL
+        value: http://portfolio-service:3003
+      - key: COMPANY_SERVICE_URL
+        value: http://company-service:3004
+      - key: JOBS_SERVICE_URL
+        value: http://jobs-service:3006
+      - key: APPLICATIONS_SERVICE_URL
+        value: http://applications-service:3007
+      - key: CHAT_SERVICE_URL
+        value: http://chat-service:3008
+      - key: ASSISTANT_SERVICE_URL
+        value: http://assistant-service:3009
+      - key: DASHBOARD_SERVICE_URL
+        value: http://dashboard-service:3010
+
+  - type: web
+    name: chat-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/chat-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3008
+      - key: CHAT_SERVICE_PORT
+        value: 3008
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: web
+    name: portfolio-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/portfolio-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3003
+      - key: PORTFOLIO_SERVICE_PORT
+        value: 3003
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: UPLOAD_DIR
+        value: uploads
+      - key: MAX_PDF_SIZE_MB
+        value: 5
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+
+  - type: pserv
+    name: auth-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/auth-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: AUTH_SERVICE_PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: pserv
+    name: candidate-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/candidate-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3002
+      - key: CANDIDATE_SERVICE_PORT
+        value: 3002
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: pserv
+    name: company-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/company-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3004
+      - key: COMPANY_SERVICE_PORT
+        value: 3004
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: pserv
+    name: jobs-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/jobs-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3006
+      - key: JOBS_SERVICE_PORT
+        value: 3006
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: pserv
+    name: applications-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/applications-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3007
+      - key: APPLICATIONS_SERVICE_PORT
+        value: 3007
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  - type: pserv
+    name: assistant-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/assistant-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3009
+      - key: ASSISTANT_SERVICE_PORT
+        value: 3009
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+
+  - type: pserv
+    name: dashboard-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/dashboard-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3010
+      - key: DASHBOARD_SERVICE_PORT
+        value: 3010
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
