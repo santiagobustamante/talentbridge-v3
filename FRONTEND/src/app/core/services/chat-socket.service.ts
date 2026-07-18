@@ -3,19 +3,23 @@ import { io, Socket } from 'socket.io-client';
 import { Subject, Observable } from 'rxjs';
 import type { MessageDto, UnreadCountDto } from '../models/chat.models';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 /**
  * Wrapper de socket.io-client para el namespace `/chat` del chat-service.
  * Traduce los eventos crudos del socket (mensajes, "escribiendo...",
  * lecturas, contador de no-leídos) a Observables de RxJS (`Subject`) para
  * que el resto de la app no dependa directamente de la librería de sockets.
- * Igual que el resto del proyecto, se conecta con `withCredentials: true`
- * para autenticar la conexión con la misma cookie de sesión HttpOnly (no
- * hay token separado para el socket).
+ * Se conecta con `withCredentials: true` (cookie de sesión) y también manda
+ * el token de `AuthService.getToken()` en `auth.token` del handshake, como
+ * respaldo para navegadores que bloquean la cookie cross-domain (mismo
+ * motivo que el header Authorization en las peticiones HTTP normales).
  */
 @Injectable({ providedIn: 'root' })
 export class ChatSocketService implements OnDestroy {
   private socket: Socket | null = null;
+
+  constructor(private auth: AuthService) {}
 
   private messageSubject = new Subject<MessageDto>();
   private typingSubject = new Subject<{ conversationId: number; userId: number; isTyping: boolean }>();
@@ -33,6 +37,7 @@ export class ChatSocketService implements OnDestroy {
 
     this.socket = io(`${environment.wsUrl}/chat`, {
       withCredentials: true,
+      auth: { token: this.auth.getToken() },
       transports: ['websocket'],
       autoConnect: true,
     });

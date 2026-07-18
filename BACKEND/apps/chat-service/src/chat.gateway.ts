@@ -41,16 +41,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   /**
    * Se ejecuta en cada nueva conexión de socket. Autentica leyendo el JWT
-   * de la cookie httpOnly (el mismo mecanismo que usa el resto de la
-   * plataforma vía HTTP, para no requerir un token aparte para WebSocket).
-   * Si el token falta o es inválido, desconecta el socket. Si es válido,
-   * une al socket a la sala personal `user:<id>` y a la sala de cada
-   * conversación en la que participa, para poder recibir eventos dirigidos
-   * sin tener que "suscribirse" manualmente desde el cliente.
+   * de la cookie httpOnly, con el token mandado en `handshake.auth.token`
+   * como respaldo (mismo motivo que el header Authorization en HTTP: en
+   * despliegues cross-domain algunos navegadores bloquean la cookie
+   * `SameSite=None`, y sin este respaldo el chat quedaría inutilizable en
+   * esos casos aunque el resto de la sesión funcione vía localStorage).
+   * Si no hay token válido por ninguna de las dos vías, desconecta el
+   * socket. Si es válido, une al socket a la sala personal `user:<id>` y a
+   * la sala de cada conversación en la que participa, para poder recibir
+   * eventos dirigidos sin tener que "suscribirse" manualmente desde el
+   * cliente.
    */
   async handleConnection(client: Socket) {
     const cookie = client.handshake.headers.cookie;
-    const token = JwtUtil.extractTokenFromCookie(cookie);
+    const token = JwtUtil.extractTokenFromCookie(cookie) || (client.handshake.auth?.['token'] as string | undefined);
 
     if (!token) {
       client.disconnect();

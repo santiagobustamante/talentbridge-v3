@@ -15,7 +15,7 @@ export class AuthController {
   ) {
     const result = await this.authService.register(dto);
     this.setAuthCookie(res, result.token);
-    return { user: result.user };
+    return { user: result.user, token: result.token };
   }
 
   @Post('register-company')
@@ -25,7 +25,7 @@ export class AuthController {
   ) {
     const result = await this.authService.registerCompany(dto);
     this.setAuthCookie(res, result.token);
-    return { user: result.user };
+    return { user: result.user, token: result.token };
   }
 
   @Post('login')
@@ -35,7 +35,7 @@ export class AuthController {
   ) {
     const result = await this.authService.login(dto);
     this.setAuthCookie(res, result.token);
-    return { user: result.user };
+    return { user: result.user, token: result.token };
   }
 
   @Post('login-company')
@@ -45,7 +45,7 @@ export class AuthController {
   ) {
     const result = await this.authService.loginCompany(dto);
     this.setAuthCookie(res, result.token);
-    return { user: result.user };
+    return { user: result.user, token: result.token };
   }
 
   @Post('logout')
