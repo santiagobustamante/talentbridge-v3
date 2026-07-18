@@ -1,16 +1,17 @@
 export const environment = {
   production: true,
-  // Placeholders hasta tener las URLs públicas reales de Railway (Fase 4 del plan
-  // de deploy) -- se actualizan antes del build de producción definitivo.
-  // apiUrl: api-gateway (los otros 8 servicios de negocio quedan solo en red
-  // privada de Railway, el frontend nunca les habla directo).
+  // Backend desplegado en Render (se migró desde Railway por 502s persistentes
+  // a nivel de cuenta, ver docs/DECISIONS.md). Los 10 servicios son públicos
+  // porque el plan free de Render no soporta servicios privados (pserv).
+  // apiUrl: api-gateway -- el resto de servicios de negocio le hablan a través
+  // suyo, salvo los dos de abajo que el frontend llama directo.
   // wsUrl: chat-service tiene que tener su PROPIO dominio público -- el chat va
   // por WebSocket directo desde el navegador (chat-socket.service.ts), no pasa
   // por el proxy fetch() del gateway, así que no puede quedar solo en red interna
   // como los demás.
-  apiUrl: 'https://api-gateway-production-85c5.up.railway.app/api',
-  wsUrl: 'https://chat-service-production-fc44.up.railway.app',
+  apiUrl: 'https://api-gateway-ey6d.onrender.com/api',
+  wsUrl: 'https://chat-service-olzl.onrender.com',
   // portfolio-service también necesita dominio público propio: la subida de CV
   // (cv.service.ts) le pega directo, bypasea el gateway.
-  cvUploadUrl: 'https://portfolio-service-production-58df.up.railway.app',
+  cvUploadUrl: 'https://portfolio-service-uqi0.onrender.com',
 };
