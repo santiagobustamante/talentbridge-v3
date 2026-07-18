@@ -276,3 +276,17 @@
   .card-top { flex-wrap: wrap; }
   .view-btn { margin-left: auto; }
 }
+
+@include bp.mobile {
+  .search-card { padding: 16px; }
+
+  /* Input + botón Buscar + botón Filtros en una fila no entran en 375px —
+     se apilan, cada uno a ancho completo. */
+  .search-row { flex-direction: column; align-items: stretch; }
+  .search-input-wrap { width: 100%; }
+  .btn-search, .btn-toggle-filters { width: 100%; justify-content: center; }
+
+  .candidate-card { padding: 16px; }
+  .card-top { gap: 10px; }
+  .view-btn, .card-top .app-btn { flex: 1 1 auto; justify-content: center; }
+}

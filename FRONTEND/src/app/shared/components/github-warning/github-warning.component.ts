@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { GITHUB_RESPONSIBILITY_WARNING } from '../../constants/legal-warnings';
 
+/**
+ * Aviso legal fijo que se muestra cerca de campos donde el candidato puede pegar
+ * enlaces a repositorios (ej. proyectos del portafolio), recordando que la
+ * responsabilidad sobre el contenido compartido es suya. Sin `@Input`/`@Output`:
+ * el texto viene de la constante `GITHUB_RESPONSIBILITY_WARNING`.
+ */
 @Component({
   selector: 'app-github-warning',
   standalone: true,

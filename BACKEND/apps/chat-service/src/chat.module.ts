@@ -8,6 +8,12 @@ import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 
+/**
+ * Módulo raíz del microservicio de Chat. Combina un controller HTTP
+ * (histórico de conversaciones/mensajes, marcar como leído, bloquear) con
+ * un gateway WebSocket (`ChatGateway`) que empuja los mensajes nuevos y
+ * notificaciones en tiempo real a los clientes conectados vía Socket.io.
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

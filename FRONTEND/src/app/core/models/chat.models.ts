@@ -1,3 +1,10 @@
+/**
+ * DTOs del sistema de mensajería candidato↔empresa (chat.service.ts y
+ * chat-socket.service.ts). Los campos `blockedByMe`/`blockedByOther`
+ * soportan el bloqueo unilateral de conversaciones, e `isMine` en
+ * MessageDto ya viene resuelto por el backend para que el frontend no tenga
+ * que comparar IDs de usuario para alinear las burbujas de chat.
+ */
 export interface ConversationDto {
   id: number;
   candidate: { id: number; fullName: string | null; professionalTitle: string | null; city: string | null; slug: string };

@@ -9,6 +9,13 @@ import { Profile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { PortfolioContentComponent } from '../../shared/components/portfolio-content/portfolio-content.component';
 
+/**
+ * Pantalla de previsualización del propio portafolio (dentro del shell
+ * de candidato autenticado, ruta "/app/public-view"). Le muestra al
+ * candidato cómo se ve su portafolio público antes de compartirlo, y le
+ * da accesos rápidos para copiar o abrir el link público (`/portfolio/:slug`).
+ * Reutiliza el mismo `PortfolioContentComponent` que usa la vista pública real.
+ */
 @Component({
   selector: 'app-public-preview',
   standalone: true,
@@ -27,6 +34,7 @@ export class PublicPreviewComponent implements OnInit {
   loadError: string | null = null;
   copied = false;
 
+  /** Carga el perfil del candidato autenticado para renderizar la previsualización. */
   ngOnInit(): void {
     this.profileService.getProfile().subscribe({
       next: (p) => {
@@ -40,10 +48,16 @@ export class PublicPreviewComponent implements OnInit {
     });
   }
 
+  /** Arma la URL pública absoluta del portafolio a partir del slug configurado en Perfil. */
   get publicUrl(): string {
     return this.profile?.slug ? `${window.location.origin}/portfolio/${this.profile.slug}` : '';
   }
 
+  /**
+   * Copia el link público al portapapeles. Si el candidato todavía no
+   * configuró su slug en la sección Perfil, en vez de copiar un link
+   * inválido lo guía hacia allá con una acción en el snackbar.
+   */
   copyPublicLink(): void {
     if (!this.publicUrl) {
       this.snackBar.open('Primero configura tu URL pública desde Perfil.', 'Ir a Perfil', { duration: 5000 })
@@ -56,6 +70,7 @@ export class PublicPreviewComponent implements OnInit {
     setTimeout(() => (this.copied = false), 2500);
   }
 
+  /** Abre el portafolio público real en la misma pestaña, si ya tiene slug configurado. */
   openPublicLink(): void {
     if (!this.profile?.slug) {
       this.snackBar.open('Primero configura tu URL pública desde Perfil.', 'Cerrar', { duration: 3000 });

@@ -8,6 +8,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AssistantService, AssistantResponse, AssistantHistoryItem } from '../../core/services/assistant.service';
 import { AuthService } from '../../core/auth/auth.service';
 
+/** Un turno de la conversación con el asistente: quién lo dijo, el texto, y opcionalmente
+ *  botones de acción (navegación sugerida) o resultados estructurados (ej. lista de candidatos/ofertas). */
 interface ChatMessage {
   from: 'user' | 'assistant';
   text: string;
@@ -15,6 +17,13 @@ interface ChatMessage {
   results?: any[];
 }
 
+/**
+ * Widget flotante del asistente conversacional "Joaquín" (impulsado por IA vía
+ * `AssistantService`, backend `assistant-service`), embebido en `AppShellComponent`
+ * y visible en toda el área autenticada. Se adapta al rol del usuario logueado:
+ * para candidatos ofrece ayuda con el perfil/CV, para empresas ayuda a buscar
+ * talento. No tiene `@Input`/`@Output` — toma el usuario actual de `AuthService`.
+ */
 @Component({
   selector: 'app-assistant-chat',
   standalone: true,
@@ -31,19 +40,24 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
 
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
+  /** Si el panel de chat está expandido (true) o solo se ve el botón flotante (false). */
   open = signal(false);
+  /** True mientras se espera la respuesta del backend, para deshabilitar el input y mostrar el indicador de "escribiendo". */
   loading = signal(false);
   inputMessage = '';
   messages: ChatMessage[] = [];
 
+  /** True si el usuario logueado es un candidato (determina el saludo y el tono de las respuestas). */
   get isCandidate(): boolean {
     return this.auth.isCandidate();
   }
 
+  /** True si el usuario logueado es una empresa. */
   get isCompany(): boolean {
     return this.auth.isCompany();
   }
 
+  /** Al iniciar el componente, muestra el mensaje de bienvenida según el rol del usuario. */
   ngOnInit() {
     this.zone.run(() => {
       this.showGreeting();
@@ -51,10 +65,12 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  /** Tras cada actualización de la vista, hace scroll al final del historial (así el último mensaje siempre queda visible). */
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
 
+  /** Cierra el panel de chat al presionar Escape, para no bloquear la navegación por teclado del resto de la app. */
   @HostListener('document:keydown.escape', ['$event'])
   onEscape() {
     if (this.open()) {
@@ -65,6 +81,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  /** Abre o cierra el panel del chat (botón flotante). */
   toggle(event?: MouseEvent) {
     if (event) {
       event.preventDefault();
@@ -77,6 +94,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  /** Cierra el panel del chat sin togglear (ej. desde un botón "X" dedicado). */
   closePanel() {
     this.zone.run(() => {
       this.open.set(false);
@@ -84,6 +102,12 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  /**
+   * Envía el mensaje del usuario (o uno pasado por parámetro, ej. una sugerencia
+   * clickeada) al backend del asistente junto con el historial reciente, y agrega
+   * tanto el mensaje del usuario como la respuesta a la conversación en pantalla.
+   * Ignora el envío si el input está vacío o ya hay una respuesta en curso.
+   */
   sendMessage(text?: string, event?: MouseEvent) {
     if (event) {
       event.preventDefault();
@@ -133,6 +157,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  /** Navega a la ruta sugerida por el asistente (botón de acción en la respuesta), ej. "Ir a Habilidades". */
   navigate(route: string, event?: MouseEvent) {
     if (event) {
       event.preventDefault();
@@ -141,6 +166,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     this.router.navigateByUrl(route);
   }
 
+  /** Envía el mensaje con Enter; Shift+Enter se deja pasar para permitir un salto de línea en el textarea. */
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -158,6 +184,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
       .map((m) => ({ role: m.from === 'user' ? ('user' as const) : ('assistant' as const), content: m.text }));
   }
 
+  /** Muestra el mensaje inicial de "Joaquín" adaptado al rol (candidato o empresa) al abrir el chat por primera vez. */
   private showGreeting() {
     if (this.isCandidate) {
       this.messages = [
@@ -178,6 +205,7 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  /** Fuerza el scroll del contenedor de mensajes hasta el final, si el ViewChild ya está disponible. */
   private scrollToBottom() {
     if (this.scrollContainer) {
       const el = this.scrollContainer.nativeElement;

@@ -4,6 +4,12 @@ import { DeepSeekService, DeepSeekChatMessage } from '@app/common';
 import { computeSkillMatch } from '@app/contracts';
 import { ChatHistoryItemDto } from './dto/assistant-message.dto';
 
+/**
+ * Forma final que recibe el frontend luego de procesar la respuesta del
+ * modelo: además del texto, incluye metadatos (`role`, `intent`) y datos
+ * ya validados/enriquecidos (`actions`, `results`) listos para renderizar
+ * botones de navegación o tarjetas de perfil/candidatos.
+ */
 interface AssistantResponse {
   reply: string;
   role: string;
@@ -12,6 +18,14 @@ interface AssistantResponse {
   results: any[];
 }
 
+/**
+ * Forma cruda que se le exige al modelo DeepSeek que devuelva (ver
+ * `buildSystemPrompt`). Se pide JSON estricto en vez de texto libre para
+ * poder validar y renderizar de forma segura las acciones sugeridas
+ * (rutas) y decidir si mostrar tarjetas, sin depender de parsear lenguaje
+ * natural ni confiar ciegamente en lo que el modelo "cree" que es una ruta
+ * válida.
+ */
 interface AssistantLlmOutput {
   reply: string;
   actions?: { label: string; route: string }[];
@@ -19,6 +33,7 @@ interface AssistantLlmOutput {
   showCandidateMatches?: boolean;
 }
 
+/** Datos mínimos de un candidato para renderizar una tarjeta en el chat. */
 interface CandidateCardData {
   fullName: string | null;
   professionalTitle: string | null;
@@ -27,6 +42,11 @@ interface CandidateCardData {
   skills?: string[];
 }
 
+/**
+ * Rutas del área de candidato que Joaquín puede sugerir como acción de
+ * navegación. Se le pasan al modelo como lista cerrada dentro del system
+ * prompt para que nunca invente una ruta que no exista en el frontend.
+ */
 const CANDIDATE_ROUTES: Record<string, string> = {
   '/app/inicio': 'Panel principal / dashboard del candidato',
   '/app/profile': 'Editar perfil profesional (nombre, título, resumen, contacto, redes)',
@@ -40,6 +60,7 @@ const CANDIDATE_ROUTES: Record<string, string> = {
   '/app/public-view': 'Ver cómo se ve el portafolio público propio',
 };
 
+/** Igual que CANDIDATE_ROUTES pero para el área de empresa. */
 const COMPANY_ROUTES: Record<string, string> = {
   '/company/dashboard': 'Panel principal de la empresa',
   '/company/profile': 'Editar perfil de la empresa',
@@ -48,9 +69,19 @@ const COMPANY_ROUTES: Record<string, string> = {
   '/company/messages': 'Mensajes/chat con candidatos',
 };
 
+/** Respuesta genérica que se muestra si la llamada a DeepSeek falla, para
+ *  no dejar al usuario sin respuesta ni exponer detalles del error interno. */
 const FALLBACK_REPLY =
   'Ahora mismo no puedo responder — puede que el servicio de IA esté temporalmente no disponible. Intenta de nuevo en un momento.';
 
+/**
+ * Service del asistente virtual "Joaquín". Orquesta todo el flujo de una
+ * pregunta del usuario: junta datos reales de la plataforma (perfil,
+ * estadísticas, matching candidato↔oferta ya calculado), arma un prompt de
+ * sistema con esa información y llama a DeepSeek pidiendo una respuesta en
+ * JSON estricto, para finalmente traducirla a un formato seguro de mostrar
+ * en el frontend (validando que las rutas sugeridas existan de verdad).
+ */
 @Injectable()
 export class AssistantService {
   private readonly logger = new Logger(AssistantService.name);
@@ -60,6 +91,22 @@ export class AssistantService {
     private readonly deepSeek: DeepSeekService,
   ) {}
 
+  /**
+   * Punto de entrada del asistente: procesa un mensaje del usuario y
+   * devuelve la respuesta lista para el frontend.
+   *
+   * El flujo es deliberado: primero se consultan en Prisma datos reales del
+   * usuario (perfil, estadísticas de uso, y compatibilidad candidato↔oferta
+   * u oferta↔candidatos ya calculada con `computeSkillMatch`), y recién con
+   * esos datos concretos como contexto se arma el prompt y se llama al
+   * modelo — así Joaquín nunca "inventa" un porcentaje de match o un dato
+   * de perfil, solo interpreta y redacta sobre información real. A
+   * diferencia del chat entre candidato y empresa (chat-service), esta
+   * conversación NO se persiste en base de datos: es un asistente de
+   * ayuda/navegación sin valor de "historial" que conservar, y el
+   * historial reciente se lo manda el propio frontend en cada request
+   * (ver `AssistantMessageDto.history`).
+   */
   async processMessage(
     userId: number,
     role: string,
@@ -130,6 +177,15 @@ export class AssistantService {
     };
   }
 
+  /**
+   * Arma el system prompt que define la personalidad de Joaquín, le inyecta
+   * los datos reales del usuario (estadísticas + matching ya calculado) y
+   * las rutas válidas de navegación, y le exige responder en un JSON con
+   * forma fija (`AssistantLlmOutput`) en vez de texto libre — esto es lo
+   * que permite parsear la respuesta de forma confiable y decidir
+   * programáticamente si mostrar botones de acción o tarjetas, sin
+   * depender de que el modelo redacte algo "parseable" por casualidad.
+   */
   private buildSystemPrompt(
     isCandidate: boolean,
     userName: string,
@@ -263,6 +319,12 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
     };
   }
 
+  /**
+   * Calcula estadísticas reales del candidato (porcentaje de perfil
+   * completo, cantidad de habilidades/experiencias/proyectos, postulaciones
+   * hechas, mensajes sin leer, ofertas disponibles) para dárselas a Joaquín
+   * como contexto verificable en vez de que el modelo las estime.
+   */
   private async getCandidateStats(userId: number) {
     const profile = await this.prisma.profile.findUnique({
       where: { userId },
@@ -303,6 +365,10 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
     };
   }
 
+  /**
+   * Equivalente a `getCandidateStats` pero para el lado empresa: ofertas
+   * totales/activas, postulaciones totales/pendientes y mensajes sin leer.
+   */
   private async getCompanyStats(userId: number) {
     const totalJobs = await this.prisma.jobOffer.count({ where: { companyId: userId } });
     const activeJobs = await this.prisma.jobOffer.count({ where: { companyId: userId, status: 'PUBLISHED' } });

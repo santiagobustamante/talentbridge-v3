@@ -17,6 +17,14 @@ import { formatAppDate } from '../../shared/utils/format-date.util';
 import { formatNumberDisplay } from '../../shared/utils/normalize';
 import { ProfileChecklistComponent, ProfileChecklistItem } from '../../shared/components/profile-checklist/profile-checklist.component';
 
+/**
+ * Home del candidato autenticado (ruta "/app/inicio"). Muestra un
+ * resumen de actividad (postulaciones recientes, ofertas sugeridas),
+ * el contador de mensajes no leidos actualizado en tiempo real, y un
+ * checklist de completitud de perfil que guia al candidato hacia las
+ * secciones que le faltan completar (datos basicos, habilidades,
+ * experiencia/educacion, proyectos).
+ */
 @Component({
   selector: 'app-home-candidate',
   standalone: true,
@@ -40,11 +48,21 @@ export class HomeCandidateComponent implements OnInit, OnDestroy {
   private unreadSub: Subscription | null = null;
   private routerSub: Subscription | null = null;
 
+  /** Nombre a saludar en el header: el nombre completo del perfil, o el usuario del email como respaldo. */
   get userName(): string {
     const profile = this.auth.currentUser()?.profile;
     return profile?.fullName || this.auth.currentUser()?.email?.split('@')[0] || 'Usuario';
   }
 
+  /**
+   * Carga el resumen del dashboard y, en paralelo, arma el checklist de
+   * completitud de perfil evaluando cuatro condiciones sobre los datos
+   * ya cargados (info basica, al menos una habilidad, al menos una
+   * experiencia o educacion, al menos un proyecto) para guiar al
+   * candidato hacia lo que le falta completar. Tambien conecta el
+   * contador de mensajes no leidos y lo refresca cada vez que se vuelve
+   * a esta pantalla.
+   */
   ngOnInit(): void {
     this.dashboardService.getCandidateDashboard().subscribe({
       next: (d) => { this.data = d; this.loading = false; },
@@ -82,6 +100,7 @@ export class HomeCandidateComponent implements OnInit, OnDestroy {
     this.routerSub?.unsubscribe();
   }
 
+  /** Rango salarial en formato compacto para mostrar en las tarjetas de ofertas sugeridas. */
   formatSalary(min?: number, max?: number, currency?: string): string | null {
     if (!min && !max) return null;
     const c = currency || 'COP';
@@ -91,24 +110,29 @@ export class HomeCandidateComponent implements OnInit, OnDestroy {
     return `${minStr || maxStr} ${c}`;
   }
 
+  /** Traduce el estado de una postulacion a una etiqueta legible en español. */
   statusLabel(s: string): string {
     return statusToLabel(s);
   }
 
+  /** Mapea el estado de una postulacion al tono de color del badge. */
   statusTone(s: string): BadgeTone {
     return statusToTone(s);
   }
 
+  /** Fecha de publicacion de una oferta sugerida, formateada para mostrar en pantalla. */
   formatDate(job: DashboardJob): string {
     const date = job.publishedAt || job.createdAt;
     return formatAppDate(date, 'short');
   }
 
+  /** Etiqueta de tipo de contrato de una oferta sugerida, usando el valor personalizado si aplica. */
   contractTypeLabel(job: DashboardJob): string | null {
     if (job.contractType === 'Otro' && job.customContractType) return job.customContractType;
     return job.contractType || null;
   }
 
+  /** Etiqueta de jornada laboral de una oferta sugerida, usando el valor personalizado si aplica. */
   workloadLabel(job: DashboardJob): string | null {
     if (job.workload === 'Otra' && job.customWorkload) return job.customWorkload;
     return job.workload || null;

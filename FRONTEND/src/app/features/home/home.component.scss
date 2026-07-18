@@ -351,7 +351,7 @@
   }
 
   .icon-candidate { background: var(--primary); }
-  .icon-company { background: var(--accent); }
+  .icon-company { background: var(--accent-purple); }
 
   h3 {
     font-size: 1.1rem;
@@ -645,7 +645,7 @@
   }
 
   &.company {
-    background: var(--accent);
+    background: var(--accent-purple);
     color: var(--text-on-color);
   }
 }
@@ -866,4 +866,23 @@
 
 @include bp.mobile {
   .professions-grid { grid-template-columns: 1fr; }
+
+  .navbar-inner { padding: 0 var(--space-md); }
+
+  .navbar-brand {
+    gap: 6px;
+
+    .brand-icon { width: 28px; height: 28px; }
+    .brand-name { font-size: 0.92rem; }
+  }
+
+  .navbar-actions {
+    gap: 6px;
+
+    a {
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+  }
 }

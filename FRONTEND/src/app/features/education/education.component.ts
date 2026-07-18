@@ -22,6 +22,13 @@ import { Education } from '../../core/auth/auth.models';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { titleCaseText, trimText } from '../../shared/utils/normalize';
 
+/**
+ * Gestion de formacion academica del candidato (ruta "/app/education").
+ * Permite crear/editar/eliminar entradas de educacion formal (colegio,
+ * tecnico, universidad, posgrado) o no formal (cursos, certificaciones,
+ * diplomados, bootcamps) segun `educationType`, y controlar si la
+ * seccion se muestra en el portafolio publico.
+ */
 @Component({
   selector: 'app-education',
   standalone: true,
@@ -197,6 +204,7 @@ export class EducationComponent implements OnInit {
     educationType: [''], formationLevel: [''], description: [''],
   });
 
+  /** Carga las entradas de formacion existentes y el flag de visibilidad guardado en el perfil. */
   ngOnInit() {
     this.load();
     this.profileService.getProfile().subscribe({
@@ -204,8 +212,10 @@ export class EducationComponent implements OnInit {
       error: () => { this.profileLoaded = true; },
     });
   }
+  /** Trae la lista de formacion academica del candidato desde el backend. */
   load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
 
+  /** Actualiza si la seccion de formacion se muestra en el portafolio publico; revierte el cambio si falla el guardado. */
   toggleVisibility(event: any) {
     this.showEducation = event.checked;
     this.profileService.updateProfile({ showEducation: this.showEducation } as any).subscribe({
@@ -214,6 +224,7 @@ export class EducationComponent implements OnInit {
     });
   }
 
+  /** Guarda el formulario: crea una entrada de formacion nueva o actualiza la que esta en edicion, segun `editing`. */
   save() {
     const v = this.form.value;
     const data = {
@@ -235,6 +246,7 @@ export class EducationComponent implements OnInit {
     });
   }
 
+  /** Carga los datos de una entrada de formacion existente en el formulario para editarla. */
   startEdit(e: Education) {
     this.editing = e.id;
     this.form.setValue({
@@ -246,8 +258,10 @@ export class EducationComponent implements OnInit {
     });
   }
 
+  /** Sale del modo edicion/creacion y limpia el formulario a su estado inicial. */
   cancel() { this.editing = null; this.showForm = false; this.form.reset({ institution: '', degree: '', fieldOfStudy: '', startDate: null, endDate: null, isCurrent: false, educationType: '', formationLevel: '', description: '' }); }
 
+  /** Pide confirmacion y, si se acepta, elimina la entrada de formacion del backend y recarga la lista. */
   remove(id: number) {
     const ref = this.dialog.open(ConfirmDialogComponent, { data: { title: 'Eliminar', message: '¿Eliminar esta educación?' } });
     ref.afterClosed().subscribe((ok) => {

@@ -12,6 +12,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { normalizeEmail } from '../../shared/utils/normalize';
 
+/**
+ * Formulario de registro para candidatos (ruta "/register"). Crea una
+ * cuenta nueva con email + contraseña (con confirmación de contraseña) y,
+ * si tiene éxito, redirige al home del candidato para empezar a armar el
+ * perfil. Ofrece enlace cruzado hacia el registro de empresa.
+ */
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -107,12 +113,14 @@ export class RegisterComponent {
     { validators: this.passwordMatch },
   );
 
+  /** Validador a nivel de formulario: exige que contraseña y confirmación coincidan exactamente. */
   private passwordMatch(group: ReturnType<typeof this.fb.group>) {
     const pass = group.get('password')?.value;
     const confirm = group.get('confirmPassword')?.value;
     return pass === confirm ? null : { mismatch: true };
   }
 
+  /** Envía el registro al backend (email normalizado) y redirige al home del candidato si tiene éxito. */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;

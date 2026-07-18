@@ -17,6 +17,13 @@ import {
   normalizeUrl,
 } from '../../shared/utils/normalize';
 
+/**
+ * Pantalla de edicion del perfil de empresa (ruta "/company/profile").
+ * Analoga a la de perfil de candidato pero con datos empresariales:
+ * nombre, NIT (identificador tributario colombiano), sector, ciudad,
+ * telefono, sitio web, descripcion y logo. Normaliza NIT/telefono al
+ * salir de cada campo y antes de guardar en el backend.
+ */
 @Component({
   selector: 'app-company-profile',
   standalone: true,
@@ -47,6 +54,7 @@ export class CompanyProfileComponent implements OnInit {
     logoUrl: [''],
   });
 
+  /** Perfil a mostrar en la vista de resumen (modo lectura): el actual, o el ultimo guardado como respaldo. */
   get summaryProfile(): any {
     return this.companyProfile ?? this.lastSavedProfile ?? {};
   }
@@ -70,6 +78,7 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
+  /** Formatea el NIT (identificador tributario) al salir del campo, mismo patron que el telefono para no romper el cursor mientras se escribe. */
   onNitBlur(): void {
     const control = this.form.get('nit');
     const value = control?.value || '';
@@ -79,6 +88,7 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
+  /** Capitaliza tipo "Titulo" (nombre de empresa, sector, ciudad) al salir del campo. */
   onNameLikeBlur(controlName: 'companyName' | 'sector' | 'city'): void {
     const control = this.form.get(controlName);
     const value = control?.value || '';
@@ -88,6 +98,7 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
+  /** Recorta espacios de la descripcion de la empresa al salir del campo. */
   onDescriptionBlur(): void {
     const control = this.form.get('description');
     const value = control?.value || '';
@@ -97,6 +108,7 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
+  /** Normaliza la URL del sitio web de la empresa al salir del campo. */
   onWebsiteBlur(): void {
     const control = this.form.get('websiteUrl');
     const value = control?.value || '';
@@ -107,16 +119,19 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
+  /** Formatea un telefono almacenado (formato crudo) a su forma legible para mostrar en pantalla. */
   displayPhone(value: unknown): string {
     const text = String(value ?? '').trim();
     return text ? formatPhoneDisplay(text) : 'No agregado todavía';
   }
 
+  /** Formatea un NIT almacenado (formato crudo) a su forma legible para mostrar en pantalla. */
   displayNit(value: unknown): string {
     const text = String(value ?? '').trim();
     return text ? formatNitDisplay(text) : 'No agregado todavía';
   }
 
+  /** Carga el perfil de la empresa autenticada desde el backend y precarga el formulario. */
   loadProfile(): void {
     this.loading = true;
     this.loadError = null;
@@ -135,6 +150,7 @@ export class CompanyProfileComponent implements OnInit {
     });
   }
 
+  /** Vuelca los datos de un perfil de empresa al formulario reactivo, formateando NIT/telefono para lectura. */
   private patchForm(profile: any): void {
     this.form.patchValue({
       companyName: profile?.companyName ?? '',
@@ -148,10 +164,12 @@ export class CompanyProfileComponent implements OnInit {
     });
   }
 
+  /** Entra en modo edicion del perfil de empresa. */
   editProfile(): void {
     this.isEditing = true;
   }
 
+  /** Descarta los cambios sin guardar y vuelve al formulario a los ultimos datos guardados. */
   cancelEdit(): void {
     const source = this.lastSavedProfile ?? this.companyProfile;
     if (source) {
@@ -160,17 +178,20 @@ export class CompanyProfileComponent implements OnInit {
     this.isEditing = false;
   }
 
+  /** Texto a mostrar para un campo del perfil, o un texto por defecto si esta vacio. */
   displayValue(value: unknown, fallback = 'No agregado todavía'): string {
     const text = String(value ?? '').trim();
     return text.length ? text : fallback;
   }
 
+  /** Iniciales (hasta 2) del nombre de la empresa, usadas en el avatar cuando no hay logo. */
   getInitials(name: unknown): string {
     const clean = String(name ?? '').trim();
     if (!clean) return 'E';
     return clean.split(/\s+/).slice(0, 2).map((p: string) => p.charAt(0).toUpperCase()).join('');
   }
 
+  /** Guarda el formulario: normaliza cada campo (capitalizacion, NIT, telefono, URLs) antes de enviarlo al backend. */
   save(): void {
     if (this.saving) return;
     this.saving = true;
@@ -204,26 +225,31 @@ export class CompanyProfileComponent implements OnInit {
     });
   }
 
+  /** Recorta espacios de un texto libre antes de guardar; null si queda vacio. */
   private cleanString(value: unknown): string | null {
     const text = trimText(String(value ?? ''));
     return text.length ? text : null;
   }
 
+  /** Aplica capitalizacion tipo "Titulo" antes de guardar; null si queda vacio. */
   private cleanTitleCase(value: unknown): string | null {
     const text = titleCaseText(String(value ?? ''));
     return text.length ? text : null;
   }
 
+  /** Convierte el telefono al formato de almacenamiento antes de guardar; null si esta vacio. */
   private cleanPhone(value: unknown): string | null {
     const text = String(value ?? '').trim();
     return text.length ? normalizePhoneStorage(text) : null;
   }
 
+  /** Convierte el NIT al formato de almacenamiento antes de guardar; null si esta vacio. */
   private cleanNit(value: unknown): string | null {
     const text = String(value ?? '').trim();
     return text.length ? normalizeNitStorage(text) : null;
   }
 
+  /** Normaliza una URL antes de guardar; null si esta vacia. */
   private cleanUrl(value: unknown): string | null {
     const text = String(value ?? '').trim();
     return text.length ? normalizeUrl(text) : null;

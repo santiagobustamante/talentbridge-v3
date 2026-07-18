@@ -11,6 +11,13 @@ import { ChatService } from '../../core/services/chat.service';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 
+/**
+ * Buscador de candidatos para empresas (ruta "/company/candidates").
+ * Permite filtrar por texto libre, ciudad, profesión y habilidades
+ * (con modo "cualquiera de las seleccionadas" o "todas"), paginar los
+ * resultados, avalar (endorse) habilidades de un candidato y arrancar
+ * una conversación de chat directamente desde la tarjeta de resultado.
+ */
 @Component({
   selector: 'app-company-candidates',
   standalone: true,
@@ -53,6 +60,7 @@ export class CompanyCandidatesComponent implements OnInit {
   totalPages = 1;
   hasSearched = false;
 
+  /** Sugerencias de autocompletado de habilidades: catálogo global filtrado por el texto tipeado, sin repetir las ya elegidas. */
   get filteredSkillSuggestions(): string[] {
     const input = this.skillInput.trim().toLowerCase();
     if (!input) return [];
@@ -61,6 +69,7 @@ export class CompanyCandidatesComponent implements OnInit {
       .slice(0, 8);
   }
 
+  /** Sugerencias de autocompletado de ciudades a partir del texto tipeado en el filtro. */
   get filteredCitySuggestions(): string[] {
     const input = this.cityInput.trim().toLowerCase();
     if (!input) return [];
@@ -69,6 +78,7 @@ export class CompanyCandidatesComponent implements OnInit {
       .slice(0, 6);
   }
 
+  /** Sugerencias de autocompletado de profesiones a partir del texto tipeado en el filtro. */
   get filteredProfessionSuggestions(): string[] {
     const input = this.professionInput.trim().toLowerCase();
     if (!input) return [];
@@ -77,6 +87,12 @@ export class CompanyCandidatesComponent implements OnInit {
       .slice(0, 6);
   }
 
+  /**
+   * Carga las opciones disponibles para los filtros (habilidades, ciudades,
+   * profesiones existentes en la base) y, si se llegó a esta pantalla con
+   * un query param "q" (ej. desde los chips de búsqueda del dashboard),
+   * precarga ese término y dispara la búsqueda automáticamente.
+   */
   ngOnInit(): void {
     this.companyService.getFilterOptions().subscribe({
       next: (opts) => this.filterOptions.set(opts),
@@ -90,10 +106,16 @@ export class CompanyCandidatesComponent implements OnInit {
     }
   }
 
+  /** Muestra/oculta el panel de filtros avanzados (ciudad, profesión, habilidades). */
   toggleFilters(): void {
     this.filtersOpen.update(v => !v);
   }
 
+  /**
+   * Crea (o recupera) una conversación de chat con el candidato y navega
+   * directo a Mensajes con esa conversación abierta, para que la empresa
+   * pueda contactarlo con un solo clic desde el resultado de búsqueda.
+   */
   contactCandidate(candidateId: number): void {
     if (this.contactingCandidateId === candidateId) return;
 
@@ -112,6 +134,12 @@ export class CompanyCandidatesComponent implements OnInit {
     });
   }
 
+  /**
+   * Avala o retira el aval (endorsement) de una habilidad puntual de un
+   * candidato desde el resultado de búsqueda. Actualiza el estado local
+   * de forma optimista (contador y flag `endorsedByMe`) apenas confirma
+   * el backend, sin necesidad de recargar toda la búsqueda.
+   */
   toggleEndorse(candidate: CandidateResult, skill: { id: number; endorsedByMe?: boolean; endorsementCount?: number }): void {
     if (this.endorsingSkillId === skill.id) return;
     this.endorsingSkillId = skill.id;
@@ -135,6 +163,7 @@ export class CompanyCandidatesComponent implements OnInit {
     });
   }
 
+  /** Agrega una habilidad al filtro de búsqueda (como chip), evitando duplicados. */
   addSkill(skill: string): void {
     const clean = skill.trim();
     if (!clean || this.selectedSkills.includes(clean)) return;
@@ -142,10 +171,16 @@ export class CompanyCandidatesComponent implements OnInit {
     this.skillInput = '';
   }
 
+  /** Quita una habilidad del filtro de búsqueda. */
   removeSkill(skill: string): void {
     this.selectedSkills = this.selectedSkills.filter((s) => s !== skill);
   }
 
+  /**
+   * Atajos de teclado del input de habilidades: Enter agrega la habilidad
+   * tipeada como chip; Backspace con el input vacío borra el último chip
+   * agregado (patrón común de inputs tipo "tags").
+   */
   onSkillKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -158,22 +193,26 @@ export class CompanyCandidatesComponent implements OnInit {
     }
   }
 
+  /** Aplica una sugerencia de ciudad al filtro y limpia el input de autocompletado. */
   selectCity(suggestion: string): void {
     this.cityCtrl.setValue(suggestion);
     this.cityInput = '';
   }
 
+  /** Aplica una sugerencia de profesión al filtro y limpia el input de autocompletado. */
   selectProfession(suggestion: string): void {
     this.professionCtrl.setValue(suggestion);
     this.professionInput = '';
   }
 
+  /** Dispara una búsqueda nueva desde la página 1 (usado al aplicar filtros). */
   doSearch(): void {
     this.page = 1;
     this.hasSearched = true;
     this.fetchResults();
   }
 
+  /** Resetea todos los filtros y el resultado de búsqueda al estado inicial. */
   clearFilters(): void {
     this.qCtrl.setValue('');
     this.cityCtrl.setValue('');
@@ -188,6 +227,7 @@ export class CompanyCandidatesComponent implements OnInit {
     this.hasSearched = false;
   }
 
+  /** Navega a una página de resultados válida y sube el scroll al inicio de la lista. */
   goToPage(p: number): void {
     if (p < 1 || p > this.totalPages) return;
     this.page = p;
@@ -195,6 +235,7 @@ export class CompanyCandidatesComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /** Arma los query params activos (texto, ciudad, profesión, habilidades) y consulta el backend paginado. */
   private fetchResults(): void {
     this.loading.set(true);
     this.candidates = [];
@@ -227,6 +268,11 @@ export class CompanyCandidatesComponent implements OnInit {
     });
   }
 
+  /**
+   * Genera la lista de números de página a mostrar en el paginador,
+   * comprimiendo con "..." cuando hay muchas páginas (siempre muestra
+   * la primera, la última, y una ventana alrededor de la página actual).
+   */
   get pagesArray(): (number | string)[] {
     const pages: (number | string)[] = [];
     const total = this.totalPages;

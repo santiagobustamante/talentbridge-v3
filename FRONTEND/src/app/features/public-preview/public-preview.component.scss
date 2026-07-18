@@ -77,3 +77,12 @@
   .pv-header { flex-direction: column; }
   .pv-header-actions { width: 100%; .app-btn { flex: 1; justify-content: center; } }
 }
+
+@include bp.mobile {
+  .preview-page { padding: 12px 12px 32px; gap: 16px; }
+  .pv-header-icon { width: 42px; height: 42px; mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+  .pv-header-text h1 { font-size: 1.2rem; }
+  .pv-header-actions { flex-direction: column; }
+  .pv-header-actions .app-btn { width: 100%; }
+  .pv-no-slug { padding: 16px; flex-direction: column; align-items: flex-start; }
+}

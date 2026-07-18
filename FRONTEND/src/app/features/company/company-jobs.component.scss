@@ -565,5 +565,28 @@
   .overlay { padding: 0.75rem; align-items: flex-start; }
   .form-modal, .applications-modal { padding: 1.25rem; }
   .app-card-main { flex-wrap: wrap; }
-  .app-status-area { flex-direction: row; align-items: center; width: 100%; }
+  .app-status-area { flex-direction: row; align-items: center; width: 100%; flex-wrap: wrap; }
+}
+
+@include bp.mobile {
+  .company-jobs-page { padding: 0.6rem; padding-bottom: 90px; }
+
+  .page-header {
+    .header-icon { width: 44px; height: 44px; mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+    h1 { font-size: 1.2rem; }
+  }
+
+  .overlay { padding: 0.5rem; }
+  .form-modal, .applications-modal { padding: 1rem; }
+
+  /* La fila de habilidad (input + toggle "exigir nivel" + medidor de 200px fijo
+     + botón quitar) no entra en 375px en línea — se apila. */
+  .skill-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    .skill-row-name { min-width: 0; }
+    app-level-meter { width: 100%; }
+    .skill-row-remove { align-self: flex-end; margin-left: 0; }
+  }
 }

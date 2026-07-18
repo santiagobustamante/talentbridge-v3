@@ -15,7 +15,9 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
   standalone: true,
 })
 export class ButtonDirective implements OnChanges {
+  /** Variante visual del botón (color/estilo). Se setea con la sintaxis `appButton="primary"`. */
   @Input('appButton') variant: ButtonVariant = 'primary';
+  /** Tamaño del botón (afecta padding/font-size vía las clases .app-btn--sm/md/lg). */
   @Input() size: ButtonSize = 'md';
 
   private appliedClasses: string[] = [];
@@ -25,6 +27,11 @@ export class ButtonDirective implements OnChanges {
     private readonly renderer: Renderer2,
   ) {}
 
+  /**
+   * Recalcula y reaplica las clases CSS cada vez que cambian `variant` o `size`.
+   * Primero remueve las clases aplicadas en el ciclo anterior para no acumular
+   * clases viejas (ej. si `variant` cambia de "primary" a "danger" en runtime).
+   */
   ngOnChanges(): void {
     for (const cls of this.appliedClasses) {
       this.renderer.removeClass(this.el.nativeElement, cls);

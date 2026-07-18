@@ -40,11 +40,13 @@ export function parseNumericInput(raw: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+/** Formatea un número plano con separador de miles según el locale, sin símbolo de moneda ("2.500.000"). */
 export function formatNumberDisplay(value: number | null | undefined, locale = 'es-CO'): string {
   if (value == null || !Number.isFinite(value)) return '';
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(value);
 }
 
+/** Formatea un número como moneda con símbolo y separador de miles según el locale ("$2.500.000"). */
 export function formatCurrencyDisplay(
   value: number | null | undefined,
   currency = 'COP',

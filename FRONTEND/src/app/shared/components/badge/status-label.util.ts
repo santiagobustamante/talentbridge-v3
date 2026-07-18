@@ -16,6 +16,11 @@ const STATUS_LABEL: Record<string, string> = {
   HIRED: 'Contratado',
 };
 
+/**
+ * Traduce un status del backend (en inglés/mayúsculas, ej. "PUBLISHED") a su
+ * etiqueta en español para mostrar en la UI. Si el status no está mapeado,
+ * devuelve el valor original tal cual en vez de esconder el dato.
+ */
 export function statusToLabel(status: string): string {
   return STATUS_LABEL[status] ?? status;
 }

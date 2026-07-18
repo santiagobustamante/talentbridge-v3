@@ -3,6 +3,13 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { ApplicationsModule } from './applications.module';
 
+/**
+ * Punto de entrada del microservicio de Postulaciones. Levanta una app
+ * NestJS HTTP independiente (arquitectura de microservicios: cada dominio
+ * corre en su propio proceso/puerto detrás del API Gateway), con prefijo
+ * global `/api`, soporte de cookies (para el JWT httpOnly) y CORS habilitado
+ * solo para el origen del frontend.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(ApplicationsModule);
   app.setGlobalPrefix('api');

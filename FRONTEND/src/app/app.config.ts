@@ -11,8 +11,32 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 
+// Angular no trae registrada la configuración regional 'es-CO' por
+// default (solo viene con 'en-US' en el core); hay que importar el paquete
+// de datos de la locale y registrarlo explícitamente antes de poder usarlo
+// como LOCALE_ID. Sin esto, los pipes de fecha/moneda/número fallarían o
+// caerían al formato en inglés.
 registerLocaleData(localeEsCO);
 
+/**
+ * Configuración raíz de la aplicación standalone (reemplaza a AppModule).
+ * Puntos no obvios:
+ *
+ * - `LOCALE_ID: 'es-CO'`: fuerza formato colombiano (fechas, moneda, números)
+ *   en toda la app vía los pipes de Angular, en vez del inglés por default.
+ *
+ * - `HTTP_INTERCEPTORS` con `AuthInterceptor` (multi: true): intercepta
+ *   TODAS las llamadas HTTP salientes para adjuntar la cookie de sesión y
+ *   manejar 401 (ver auth.interceptor.ts).
+ *
+ * - `APP_INITIALIZER`: antes de que Angular termine de arrancar, ejecuta
+ *   `auth.initAuth()` y espera su resultado (`firstValueFrom`). Esto
+ *   garantiza que cuando los guards de rutas corren por primera vez ya se
+ *   sabe si hay una sesión activa o no (evita el parpadeo de "no
+ *   autenticado" seguido de un redirect cuando en realidad sí había
+ *   sesión). `initAuth()` nunca rechaza (atrapa errores internamente), así
+ *   que el bootstrap no se cuelga si el backend no responde.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),

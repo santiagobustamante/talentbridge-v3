@@ -20,15 +20,21 @@ import { formatNumberDisplay, parseNumericInput, titleCaseText, trimText } from 
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
 
+/** Fila del formulario de habilidades requeridas: nombre, si exige un nivel minimo, y cual. */
 interface SkillRow {
   name: string;
   requireLevel: boolean;
   level: SkillLevel;
 }
 
-/** Espejo minimalista de BACKEND/libs/contracts/src/skill-match.util.ts — Angular no puede
- *  importar código de un lib NestJS, así que el formato "Nombre:NIVEL" se parsea/serializa
- *  igual en ambos lados sin migrar el schema de JobOffer. */
+/**
+ * Parsea el string crudo `skillsRequired` de una oferta (formato interno
+ * "Nombre" o "Nombre:NIVEL", separado por comas) a filas editables en el
+ * formulario. Espejo minimalista de BACKEND/libs/contracts/src/skill-match.util.ts
+ * — Angular no puede importar código de un lib NestJS, así que el formato
+ * "Nombre:NIVEL" se parsea/serializa igual en ambos lados sin migrar el
+ * schema de JobOffer.
+ */
 function parseSkillsRequired(raw: string): SkillRow[] {
   return raw
     .split(',')
@@ -46,6 +52,7 @@ function parseSkillsRequired(raw: string): SkillRow[] {
     });
 }
 
+/** Serializa las filas del formulario de vuelta al formato interno "Nombre:NIVEL" (o solo "Nombre" si no exige nivel) que espera el backend. */
 function stringifySkillRows(rows: SkillRow[]): string {
   return rows
     .filter((r) => r.name.trim())
@@ -53,6 +60,15 @@ function stringifySkillRows(rows: SkillRow[]): string {
     .join(',');
 }
 
+/**
+ * Gestion de ofertas de empleo de la empresa (ruta "/company/jobs").
+ * Permite crear/editar ofertas (incluyendo las habilidades requeridas,
+ * opcionalmente con nivel minimo por habilidad, usadas por el backend
+ * para calcular el match con cada candidato), publicarlas/cerrarlas/
+ * archivarlas/restaurarlas/eliminarlas, revisar las postulaciones
+ * recibidas por oferta, cambiar el estado de cada postulacion y
+ * contactar directamente a un candidato postulado desde ahi.
+ */
 @Component({
   selector: 'app-company-jobs',
   standalone: true,
@@ -124,6 +140,7 @@ export class CompanyJobsComponent implements OnInit {
     this.loadJobs();
   }
 
+  /** Trae todas las ofertas publicadas por la empresa (en cualquier estado: borrador, publicada, cerrada, archivada). */
   loadJobs(): void {
     this.loading.set(true);
     this.jobsService.getCompanyJobs().subscribe({
@@ -139,11 +156,13 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Convierte el texto ingresado en el campo de salario a un numero entero, o null si no es valido. */
   private parseMoney(value: unknown): number | null {
     const parsed = parseNumericInput(String(value ?? ''));
     return parsed != null ? Math.round(parsed) : null;
   }
 
+  /** Abre el formulario en blanco para crear una oferta nueva. */
   openCreateForm(): void {
     this.editingId.set(null);
     this.formData = {
@@ -156,6 +175,7 @@ export class CompanyJobsComponent implements OnInit {
     this.showForm.set(true);
   }
 
+  /** Carga los datos de una oferta existente en el formulario para editarla, incluyendo el parseo de sus habilidades requeridas. */
   editJob(job: JobOffer): void {
     this.editingId.set(job.id);
     this.formData = {
@@ -171,27 +191,39 @@ export class CompanyJobsComponent implements OnInit {
     this.showForm.set(true);
   }
 
+  /** Agrega una fila vacia al formulario de habilidades requeridas. */
   addSkillRow(): void {
     this.skillRows.push({ name: '', requireLevel: false, level: 'BASIC' });
   }
 
+  /** Quita una fila del formulario de habilidades requeridas por posicion. */
   removeSkillRow(index: number): void {
     this.skillRows.splice(index, 1);
   }
 
+  /** Activa/desactiva si una habilidad requerida exige un nivel minimo de dominio. */
   toggleRequireLevel(row: SkillRow): void {
     row.requireLevel = !row.requireLevel;
   }
 
+  /** Fija el nivel minimo exigido para una fila de habilidad requerida. */
   setRowLevel(row: SkillRow, level: SkillLevel): void {
     row.level = level;
   }
 
+  /** Cierra el formulario de oferta sin guardar y sale del modo edicion. */
   closeForm(): void {
     this.showForm.set(false);
     this.editingId.set(null);
   }
 
+  /**
+   * Valida y guarda el formulario de oferta: exige titulo y descripcion,
+   * valida que el salario maximo no sea menor al minimo, normaliza los
+   * textos (capitalizacion, recorte de espacios) y serializa las filas
+   * de habilidades al formato interno antes de crear o actualizar la
+   * oferta en el backend, segun si `editingId` esta seteado.
+   */
   saveJob(): void {
     if (!this.formData.title || !this.formData.description) {
       this.snackBar.open('Título y descripción son requeridos', 'Cerrar', { duration: 3000 });
@@ -241,6 +273,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Publica una oferta (o la republica si estaba cerrada), haciendola visible para los candidatos. */
   publishJob(job: JobOffer): void {
     this.jobsService.publishJob(job.id).subscribe({
       next: () => {
@@ -255,6 +288,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Pide confirmacion y cierra la oferta, impidiendo nuevas postulaciones. */
   closeJob(job: JobOffer): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -279,6 +313,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Pide confirmacion y archiva la oferta, ocultandola de los candidatos sin eliminarla (se puede restaurar despues). */
   archiveJob(job: JobOffer): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -303,6 +338,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Restaura una oferta archivada, devolviendola al estado de borrador para poder editarla y republicarla. */
   restoreJob(job: JobOffer): void {
     this.jobsService.restoreJob(job.id).subscribe({
       next: () => {
@@ -316,6 +352,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Pide confirmacion y elimina definitivamente la oferta (accion irreversible, a diferencia de archivar). */
   deleteJob(job: JobOffer): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -338,6 +375,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Abre el panel de postulaciones recibidas para una oferta puntual y las carga desde el backend. */
   viewApplications(job: JobOffer): void {
     this.selectedJobForApps.set(job);
     this.showApplications.set(true);
@@ -357,12 +395,14 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Cierra el panel de postulaciones y limpia la lista cargada. */
   closeApplications(): void {
     this.showApplications.set(false);
     this.selectedJobForApps.set(null);
     this.applications = [];
   }
 
+  /** Cambia el estado de una postulacion (ej. en revision, entrevista, rechazada) y refleja el cambio en la lista local sin recargar todo. */
   updateStatus(applicationId: number, status: string): void {
     this.jobsService.updateApplicationStatus(applicationId, status).subscribe({
       next: (updated) => {
@@ -380,6 +420,7 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Crea (o recupera) una conversacion con el candidato postulado y navega a Mensajes con esa conversacion abierta. */
   contactCandidate(candidateUserId: number): void {
     if (this.contactingId() === candidateUserId) return;
 
@@ -398,24 +439,29 @@ export class CompanyJobsComponent implements OnInit {
     });
   }
 
+  /** Traduce el estado de una postulacion a una etiqueta legible en español. */
   statusLabel(status: string): string {
     return statusToLabel(status);
   }
 
+  /** Mapea el estado de una postulacion al tono de color del badge. */
   statusTone(status: string): BadgeTone {
     return statusToTone(status);
   }
 
+  /** Etiqueta de tipo de contrato de la oferta, usando el valor personalizado si aplica. */
   contractTypeLabel(job: JobOffer): string {
     if (job.contractType === 'Otro' && job.customContractType) return job.customContractType;
     return job.contractType || '';
   }
 
+  /** Etiqueta de jornada laboral de la oferta, usando el valor personalizado si aplica. */
   workloadLabel(job: JobOffer): string {
     if (job.workload === 'Otra' && job.customWorkload) return job.customWorkload;
     return job.workload || '';
   }
 
+  /** Rango salarial de la oferta en formato legible, o null si no se informo salario. */
   formatSalary(job: JobOffer): string | null {
     if (!job.salaryMin && !job.salaryMax) return null;
     const c = job.currency || 'COP';
@@ -425,6 +471,7 @@ export class CompanyJobsComponent implements OnInit {
     return `${min || max} ${c}`;
   }
 
+  /** Fecha de publicacion (o de creacion si aun no fue publicada) de la oferta, formateada para mostrar en pantalla. */
   formatJobDate(job: JobOffer): string {
     const date = job.publishedAt || job.createdAt;
     return date ? formatAppDate(date, 'short') : '—';

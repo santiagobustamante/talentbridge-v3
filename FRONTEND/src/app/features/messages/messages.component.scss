@@ -710,3 +710,45 @@
     display: none;
   }
 }
+
+@include bp.mobile {
+  .messages-page__header {
+    padding: 10px 12px;
+  }
+
+  .messages-page__title {
+    font-size: 1.15rem;
+  }
+
+  .chat-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .chat-header__detail {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-header__actions {
+    gap: 4px;
+  }
+
+  .messages-body {
+    padding: 12px;
+  }
+
+  .message-bubble {
+    max-width: 92%;
+  }
+
+  .composer {
+    padding: 10px 12px;
+  }
+
+  .empty-chat {
+    padding: 24px;
+  }
+}

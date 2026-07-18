@@ -3,6 +3,23 @@ import { CandidateGuard, CompanyGuard } from './core/guards/auth.guard';
 import { AppShellComponent } from './shared/layout/app-shell.component';
 import { CompanyShellComponent } from './features/company/company-shell.component';
 
+/**
+ * Tabla de rutas raíz de la aplicación.
+ *
+ * Estructura general:
+ * - Rutas públicas sueltas (`''`, `login`, `register`, `company/login`,
+ *   `company/register`, `portfolio/:slug`): sin guard, accesibles sin sesión.
+ * - `app/*`: shell del candidato (AppShellComponent), protegido por
+ *   `CandidateGuard` — todas sus rutas hijas comparten el layout con
+ *   sidebar/navbar del candidato.
+ * - `company/*`: shell de la empresa (CompanyShellComponent), protegido por
+ *   `CompanyGuard` — mismo patrón pero para el rol empresa.
+ *
+ * Todos los componentes de feature se cargan con `loadComponent` (lazy
+ * loading a nivel de componente standalone) para que el bundle inicial no
+ * incluya código de pantallas que el usuario puede no visitar nunca.
+ * Cualquier ruta no reconocida (`**`) redirige a la home.
+ */
 export const routes: Routes = [
   {
     path: '',

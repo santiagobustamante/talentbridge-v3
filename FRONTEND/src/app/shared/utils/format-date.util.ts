@@ -14,6 +14,13 @@ const FORMAT_MAP: Record<AppDateFormat, string> = {
   monthYear: 'MMM y',
 };
 
+/**
+ * Formatea una fecha (string ISO o `Date`) al patrón elegido, usando el `formatDate`
+ * de Angular. Es la función que envuelve `AppDatePipe` — se expone también como
+ * función suelta para los casos donde hace falta formatear fuera de un template
+ * (ej. armar un string para un `title` o un log). Devuelve `''` si `value` es
+ * nulo/vacío, para no mostrar "Invalid Date" en la UI.
+ */
 export function formatAppDate(
   value: string | Date | null | undefined,
   format: AppDateFormat = 'short',

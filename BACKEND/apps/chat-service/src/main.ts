@@ -3,6 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { ChatModule } from './chat.module';
 
+/**
+ * Punto de entrada del microservicio de Chat. Levanta la app NestJS HTTP
+ * (para el `ChatController`) que internamente también inicializa el
+ * `ChatGateway` de Socket.io sobre el mismo servidor, con prefijo `/api`,
+ * cookies y CORS restringido al origen del frontend.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(ChatModule);
   app.setGlobalPrefix('api');

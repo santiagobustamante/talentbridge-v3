@@ -12,6 +12,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { normalizeEmail } from '../../shared/utils/normalize';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 
+/**
+ * Formulario de registro para empresas (ruta "/company/register"). Crea
+ * una cuenta empresarial (nombre, sector y ciudad opcionales, contraseña
+ * con confirmación) y redirige al dashboard de empresa si el registro
+ * es exitoso.
+ */
 @Component({
   selector: 'app-company-register',
   standalone: true,
@@ -126,12 +132,14 @@ export class CompanyRegisterComponent {
     { validators: this.passwordMatch },
   );
 
+  /** Validador a nivel de formulario: exige que contraseña y confirmación coincidan exactamente. */
   private passwordMatch(group: ReturnType<typeof this.fb.group>) {
     const pass = group.get('password')?.value;
     const confirm = group.get('confirmPassword')?.value;
     return pass === confirm ? null : { mismatch: true };
   }
 
+  /** Envía el registro de empresa al backend (email normalizado) y redirige al dashboard si tiene éxito. */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;

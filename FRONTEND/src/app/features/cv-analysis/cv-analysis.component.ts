@@ -15,11 +15,20 @@ import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
 
+/** Sugerencia de habilidad detectada dentro del texto del CV, con su estado de selección en el checklist. */
 interface CvSkillSuggestion {
   name: string;
   selected: boolean;
 }
 
+/**
+ * Pantalla de análisis inteligente de CV para candidatos (ruta
+ * "/app/cv-analysis"). Permite subir un PDF, analizarlo con IA (vía
+ * `CvService`, que a su vez llama al backend/DeepSeek) para obtener un
+ * puntaje y recomendaciones, y además escanea el texto extraído del PDF
+ * contra el catálogo de habilidades para sugerirle al candidato tecnologías
+ * mencionadas en su CV que todavía no cargó en su perfil.
+ */
 @Component({
   selector: 'app-cv-analysis',
   standalone: true,
@@ -219,15 +228,18 @@ export class CvAnalysisComponent {
     this.loadCandidateSkills();
   }
 
+  /** Cantidad de sugerencias de habilidades actualmente marcadas para agregar al perfil. */
   get selectedSuggestionCount(): number {
     return this.cvSuggestions.filter((s) => s.selected).length;
   }
 
+  /** Guarda el archivo PDF elegido por el usuario (todavía no lo sube). */
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) this.selectedFile = input.files[0];
   }
 
+  /** Sube el PDF seleccionado al backend y refresca la lista de documentos del candidato. */
   upload() {
     if (!this.selectedFile) return;
     this.uploading = true;
@@ -245,6 +257,11 @@ export class CvAnalysisComponent {
     });
   }
 
+  /**
+   * Dispara el análisis con IA de un CV ya subido (puntaje, fortalezas y
+   * recomendaciones) y, si sale bien, calcula además las sugerencias de
+   * habilidades detectadas en el texto extraído de ese documento.
+   */
   analyze(id: number) {
     this.analyzingId = id;
     this.cvService.analyze(id).subscribe({
@@ -261,10 +278,17 @@ export class CvAnalysisComponent {
     });
   }
 
+  /** Marca/desmarca una sugerencia de habilidad en el checklist de "agregar a mi perfil". */
   toggleSuggestion(s: CvSkillSuggestion): void {
     s.selected = !s.selected;
   }
 
+  /**
+   * Crea en el perfil del candidato todas las habilidades sugeridas que
+   * quedaron marcadas (con nivel BASIC por defecto), en paralelo. Los
+   * fallos individuales (ej. habilidad ya existente) no frenan al resto:
+   * se capturan con `catchError` y se reportan como "ya existían o fallaron".
+   */
   addSelectedSuggestions(): void {
     const names = this.cvSuggestions.filter((s) => s.selected).map((s) => s.name);
     if (!names.length || this.addingSuggestions) return;
@@ -286,16 +310,25 @@ export class CvAnalysisComponent {
     });
   }
 
+  /** Trae todos los CVs ya subidos por el candidato. */
   private loadDocuments() {
     this.cvService.getAll().subscribe({ next: (docs) => (this.documents = docs) });
   }
 
+  /** Carga los nombres (normalizados a minúscula) de las habilidades que el candidato ya tiene en su perfil, para no volver a sugerirlas. */
   private loadCandidateSkills(): void {
     this.skillsService.getAll().subscribe({
       next: (skills) => { this.candidateSkillNames = new Set(skills.map((s) => s.name.toLowerCase())); },
     });
   }
 
+  /**
+   * Extrae sugerencias de habilidades comparando el texto plano del CV
+   * (extraído previamente en el backend al momento de subir el PDF)
+   * contra el catálogo global de habilidades (`SKILL_CATALOG`), y las
+   * limita a un máximo de 20 para no saturar la UI. Se descartan las
+   * habilidades que el candidato ya tiene cargadas en su perfil.
+   */
   private computeSuggestions(cvId: number): void {
     const doc = this.documents.find((d) => d.id === cvId);
     const text = doc?.extractedText?.toLowerCase();

@@ -267,3 +267,17 @@
     padding: 1rem 1.25rem;
   }
 }
+
+@include bp.mobile {
+  .company-view-page { padding: 0.75rem; }
+
+  /* Botón "Volver" + ícono + título en una fila fija podían apretarse en
+     320-375px sin espacio para wrap; se permite pasar a 2 líneas. */
+  .page-header { flex-wrap: wrap; gap: 0.6rem; }
+  .header-text h1 { font-size: 1.15rem; }
+
+  .company-hero { padding: 1.25rem; }
+  .company-avatar { width: 56px; height: 56px; font-size: 1.4rem; }
+  .company-details { padding: 1rem; }
+  .detail-item { padding: 0.6rem; }
+}

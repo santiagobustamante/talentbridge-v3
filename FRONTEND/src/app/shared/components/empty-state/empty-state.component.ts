@@ -2,6 +2,13 @@ import { Component, EventEmitter, Input, Output, booleanAttribute } from '@angul
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
+/**
+ * Placeholder compartido para listas/secciones vacías (ej. "todavía no tienes
+ * proyectos", "no hay postulaciones"). Muestra un ícono, un mensaje y, opcionalmente,
+ * un botón/link de acción para guiar al usuario al siguiente paso (crear el primer
+ * elemento, ir a otra pantalla, etc.). La acción puede ser una navegación
+ * (`actionRoute`) o un evento (`actionClick`), según lo que pase el padre.
+ */
 @Component({
   selector: 'app-empty-state',
   standalone: true,

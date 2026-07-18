@@ -130,3 +130,8 @@
   .form-actions { flex-direction: column; align-items: stretch; }
   .btn-save { justify-content: center; }
 }
+
+@include bp.mobile {
+  .summary-header, .summary-block { padding: 18px; }
+  .edit-btn { width: 100%; justify-content: center; }
+}

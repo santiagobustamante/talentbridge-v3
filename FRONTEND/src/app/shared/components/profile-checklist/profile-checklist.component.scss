@@ -1,5 +1,8 @@
+@use 'breakpoints' as bp;
+
 :host {
   display: block;
+  min-width: 0;
 }
 
 .checklist-card {
@@ -11,6 +14,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .checklist-header {
@@ -61,6 +65,9 @@
 }
 
 .checklist-title {
+  min-width: 0;
+  flex: 1;
+
   h3 {
     margin: 0 0 2px;
     font-size: 1.05rem;
@@ -133,5 +140,29 @@
     span {
       font-weight: 400;
     }
+  }
+}
+
+@include bp.mobile {
+  .checklist-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .checklist-header {
+    gap: 12px;
+  }
+
+  .progress-ring {
+    width: 56px;
+    height: 56px;
+  }
+
+  .progress-value {
+    font-size: 0.9rem;
+  }
+
+  .checklist-title h3 {
+    font-size: 0.95rem;
   }
 }

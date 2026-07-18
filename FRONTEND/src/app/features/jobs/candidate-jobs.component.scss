@@ -833,3 +833,40 @@
   .detail-meta-grid { grid-template-columns: 1fr; }
   .job-badges { flex-direction: row; max-width: none; align-items: center; }
 }
+
+@include bp.mobile {
+  .page-content { padding: 0.75rem; }
+
+  .page-header { gap: 0.75rem; }
+  .header-icon { width: 44px; height: 44px; mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+  .header-text h1 { font-size: 1.25rem; }
+
+  .tab-btn { padding: 0.65rem 0.5rem; font-size: 0.82rem; }
+
+  .job-card, .application-card { padding: 1rem; }
+
+  .job-card-header { flex-wrap: wrap; }
+
+  .job-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+
+    .app-btn { width: 100%; justify-content: center; }
+  }
+
+  .app-card-actions .app-btn { width: 100%; justify-content: center; }
+
+  .overlay { padding: 0.75rem; }
+  .detail-modal { padding: 1rem; }
+  .detail-header { padding-right: 0; flex-wrap: wrap; }
+  .modal-close { top: 0.75rem; right: 0.75rem; }
+
+  .apply-actions {
+    flex-direction: column-reverse;
+    .app-btn { width: 100%; justify-content: center; }
+  }
+
+  .detail-footer > .app-btn { width: 100%; justify-content: center; }
+
+  .pagination, .pagination-btns { flex-wrap: wrap; row-gap: 0.5rem; }
+}

@@ -1,3 +1,10 @@
+/**
+ * Catálogo estático de habilidades técnicas/blandas usado para autocompletar
+ * el campo de skills del perfil y para el selector por categorías. Es una
+ * lista fija en el frontend (no viene del backend) porque funciona como
+ * catálogo de referencia/sugerencias, no como fuente de verdad: el
+ * candidato puede escribir una skill que no esté acá y se guarda igual.
+ */
 export interface SkillCatalogEntry {
   name: string;
   category: string;
@@ -660,6 +667,7 @@ export const SKILL_CATALOG: SkillCatalogEntry[] = [
   { name: 'Canva', category: 'Ofimática' },
 ];
 
+/** Filtra el catálogo por coincidencia parcial de nombre (case-insensitive), pensado para el autocompletado de un input de texto: sin agrupar por categoría y acotado a `limit` resultados. */
 export function filterCatalog(query: string, limit = 15): SkillCatalogEntry[] {
   if (!query || query.length < 1) return [];
   const q = query.toLowerCase().trim();

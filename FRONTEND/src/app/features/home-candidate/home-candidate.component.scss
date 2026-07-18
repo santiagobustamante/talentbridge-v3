@@ -172,6 +172,23 @@
 @include bp.tablet {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-grid { grid-template-columns: repeat(2, 1fr); }
-  .hero-card { flex-direction: column; text-align: center; }
+  .hero-card { flex-direction: column; text-align: center; padding: 22px; }
   .hero-actions { justify-content: center; }
+}
+
+@include bp.mobile {
+  .inicio-page { gap: 18px; }
+  .hero-card { padding: 18px; gap: 12px; }
+  .hero-actions { width: 100%; flex-direction: column; }
+  .hero-actions a { width: 100%; justify-content: center; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .quick-grid { grid-template-columns: 1fr; }
+  .next-step-card { padding: 16px; }
+  .section-header { flex-wrap: wrap; gap: 6px; }
+  .job-item, .msg-item { padding: 12px; flex-wrap: wrap; }
+  .job-item-info { flex-basis: 100%; }
+  .job-salary { margin-left: 56px; }
+  .msg-info span { max-width: 100%; }
+  .app-item { flex-wrap: wrap; padding: 12px 14px; }
 }

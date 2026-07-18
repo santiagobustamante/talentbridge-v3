@@ -18,6 +18,11 @@ const STATUS_TONE: Record<string, BadgeTone> = {
   REVIEWED: 'info',
 };
 
+/**
+ * Devuelve el tono de `BadgeComponent` correspondiente a un status del backend.
+ * Si el status no está en el mapa (valor inesperado o nuevo), cae a 'neutral'
+ * en vez de romper la UI.
+ */
 export function statusToTone(status: string): BadgeTone {
   return STATUS_TONE[status] ?? 'neutral';
 }

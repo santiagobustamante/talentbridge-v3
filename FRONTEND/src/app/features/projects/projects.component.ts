@@ -25,6 +25,13 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
 
 const URL_PATTERN = /^https?:\/\/.+/i;
 
+/**
+ * Gestión de proyectos del portafolio del candidato (ruta "/app/projects").
+ * Permite crear/editar/eliminar proyectos con tecnologías (autocompletadas
+ * desde el catálogo global de habilidades), fechas, estado y enlaces
+ * (repositorio/demo), y controlar si la sección de proyectos se muestra
+ * o no en el portafolio público (toggle de visibilidad).
+ */
 @Component({
   selector: 'app-projects',
   standalone: true,
@@ -263,6 +270,11 @@ export class ProjectsComponent implements OnInit {
     endDate: [null as Date | null],
   });
 
+  /**
+   * Carga los proyectos existentes, el flag de visibilidad guardado en el
+   * perfil, y se suscribe al input de tecnologías para ir filtrando el
+   * catálogo global de habilidades a medida que el usuario tipea.
+   */
   ngOnInit() {
     this.load();
     this.profileService.getProfile().subscribe({
@@ -274,8 +286,14 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Trae la lista de proyectos del candidato desde el backend. */
   load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
 
+  /**
+   * Actualiza en el perfil si los proyectos se muestran o no en el
+   * portafolio público. Aplica el cambio de forma optimista en la UI y
+   * lo revierte si falla el guardado en el backend.
+   */
   toggleVisibility(event: any) {
     this.showProjects = event.checked;
     this.profileService.updateProfile({ showProjects: this.showProjects } as any).subscribe({
@@ -284,14 +302,17 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Agrega una tecnología como chip al proyecto en edición, evitando duplicados (case-insensitive). */
   addTechChip(name: string) {
     const exists = this.selectedTechs.some(t => t.toLowerCase() === name.toLowerCase());
     if (!exists) this.selectedTechs.push(name);
     this.techInputCtrl.setValue('');
   }
 
+  /** Quita una tecnología del proyecto en edición por su posición en la lista de chips. */
   removeTechChip(index: number) { this.selectedTechs.splice(index, 1); }
 
+  /** Guarda el formulario: crea un proyecto nuevo o actualiza el que está en edición, según `editing`. */
   save() {
     const v = this.form.value;
     const data: any = {
@@ -322,6 +343,7 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Carga los datos de un proyecto existente en el formulario para editarlo. */
   startEdit(p: Project) {
     this.editing = p.id;
     this.selectedTechs = [...(p.technologies || [])];
@@ -336,6 +358,7 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Sale del modo edición/creación y limpia el formulario a su estado inicial. */
   cancel() {
     this.editing = null;
     this.showForm = false;
@@ -349,6 +372,7 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Pide confirmación y, si se acepta, elimina el proyecto del backend y recarga la lista. */
   remove(id: number) {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Eliminar', message: '¿Eliminar este proyecto?' },
@@ -365,6 +389,7 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
+  /** Traduce el código de estado del proyecto a una etiqueta legible en español. */
   statusLabel(s: string): string {
     const map: Record<string, string> = { PLANNED: 'Planificado', IN_PROGRESS: 'En progreso', COMPLETED: 'Completado' };
     return map[s] || s;

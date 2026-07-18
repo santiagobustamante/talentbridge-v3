@@ -15,6 +15,15 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
 import { formatNumberDisplay } from '../../shared/utils/normalize';
 
+/**
+ * Bolsa de empleo para candidatos (ruta "/app/jobs"). Tiene dos pestañas:
+ * ofertas disponibles (con filtros de texto/ciudad/modalidad/contrato y
+ * el porcentaje de coincidencia de habilidades entre el candidato y cada
+ * oferta) y "mis postulaciones" (historial con su estado). El backend
+ * calcula el match de habilidades (`skillMatch`/`matchedSkills`); este
+ * componente solo lo consume y ordena/filtra las ofertas segun ese dato
+ * para priorizar las que el candidato puede aplicar.
+ */
 @Component({
   selector: 'app-candidate-jobs',
   standalone: true,
@@ -68,6 +77,7 @@ export class CandidateJobsComponent implements OnInit {
     this.loadJobs();
   }
 
+  /** Cambia entre la pestaña de ofertas disponibles y la de postulaciones propias, cargando los datos correspondientes. */
   setTab(tab: 'available' | 'my-applications'): void {
     this.activeTab.set(tab);
     if (tab === 'available') {
@@ -77,6 +87,12 @@ export class CandidateJobsComponent implements OnInit {
     }
   }
 
+  /**
+   * Busca ofertas de empleo segun los filtros activos. Normaliza cada
+   * oferta recibida (listas de habilidades y flag `canApplyBySkills` con
+   * valores por defecto seguros) y las ordena con `sortJobsForCandidate`
+   * para priorizar las que el candidato puede aplicar.
+   */
   loadJobs(): void {
     this.loading.set(true);
     this.hasSearched = true;
@@ -114,6 +130,7 @@ export class CandidateJobsComponent implements OnInit {
     });
   }
 
+  /** Trae el historial de postulaciones del candidato, con filtros opcionales por estado y rango de fechas. */
   loadMyApplications(): void {
     this.loadingApps.set(true);
     const params: any = { page: this.appPage, limit: this.appLimit };
@@ -136,11 +153,13 @@ export class CandidateJobsComponent implements OnInit {
     });
   }
 
+  /** Aplica los filtros de busqueda de ofertas desde la pagina 1. */
   applyFilters(): void {
     this.page = 1;
     this.loadJobs();
   }
 
+  /** Resetea todos los filtros de busqueda de ofertas y recarga la lista completa. */
   clearFilters(): void {
     this.qCtrl.setValue('');
     this.cityCtrl.setValue('');
@@ -150,6 +169,13 @@ export class CandidateJobsComponent implements OnInit {
     this.loadJobs();
   }
 
+  /**
+   * Ordena las ofertas para priorizar lo mas relevante para el candidato,
+   * en este orden de prioridad: (1) ofertas a las que puede aplicar y
+   * todavia no aplico, (2) ofertas a las que ya aplico, (3) ofertas a las
+   * que no puede aplicar porque su perfil no cumple los requisitos
+   * minimos de habilidades; dentro de cada grupo, las mas recientes primero.
+   */
   private sortJobsForCandidate(jobs: JobOffer[]): JobOffer[] {
     return [...jobs].sort((a, b) => {
       const aCanApply = a.canApplyBySkills === true && !a.hasApplied;
@@ -178,6 +204,7 @@ export class CandidateJobsComponent implements OnInit {
     });
   }
 
+  /** Navega a una pagina de resultados de ofertas y sube el scroll al inicio. */
   goToPage(p: number): void {
     if (p < 1 || p > this.totalPages) return;
     this.page = p;
@@ -185,18 +212,25 @@ export class CandidateJobsComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /** Abre el panel de detalle de una oferta desde la lista de disponibles. */
   openDetail(job: JobOffer): void {
     this.selectedJob.set(job);
     this.showApplyForm = false;
     this.coverMessage = '';
   }
 
+  /** Cierra el panel de detalle de oferta y descarta el mensaje de postulacion sin enviar. */
   closeDetail(): void {
     this.selectedJob.set(null);
     this.showApplyForm = false;
     this.coverMessage = '';
   }
 
+  /**
+   * Abre el panel de detalle a partir de una postulacion propia (pestaña
+   * "mis postulaciones"), reconstruyendo un objeto JobOffer con los datos
+   * de esa postulacion (estado, fecha) para reusar la misma vista de detalle.
+   */
   openDetailFromApp(app: JobApplication): void {
     const job = app.jobOffer;
     this.selectedJob.set({
@@ -213,6 +247,13 @@ export class CandidateJobsComponent implements OnInit {
     this.coverMessage = '';
   }
 
+  /**
+   * Envia la postulacion del candidato a una oferta. Antes de llamar al
+   * backend, bloquea localmente los casos que ya se sabe que van a
+   * fallar (ya aplico, o su perfil no cumple los requisitos minimos de
+   * habilidades segun `canApplyBySkills`) para dar feedback instantaneo
+   * sin esperar el round-trip.
+   */
   applyToJob(jobId: number): void {
     if (this.applyingId()) return;
 
@@ -249,32 +290,44 @@ export class CandidateJobsComponent implements OnInit {
     });
   }
 
+  /** Etiqueta de tipo de contrato: usa el valor personalizado si el tipo elegido fue "Otro". */
   contractTypeLabel(job: JobOffer): string {
     if (job.contractType === 'Otro' && job.customContractType) return job.customContractType;
     return job.contractType || '';
   }
 
+  /** Etiqueta de jornada laboral: usa el valor personalizado si el tipo elegido fue "Otra". */
   workloadLabel(job: JobOffer): string {
     if (job.workload === 'Otra' && job.customWorkload) return job.customWorkload;
     return job.workload || '';
   }
 
+  /** Fecha de publicacion de la oferta, formateada para mostrar en la tarjeta. */
   formatDate(job: JobOffer): string {
     const date = job.publishedAt || job.createdAt;
     if (!date) return '';
     return 'Publicado el ' + formatAppDate(date, 'short');
   }
 
+  /** Oculta el logo de la empresa si falla la carga, en vez de mostrar el icono roto del navegador. */
   onImgError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
 
+  /** Nombre de la empresa que publico la oferta, con respaldo si no viene informado. */
   companyName(job: JobOffer): string {
     const c: any = job.company;
     if (!c) return 'Empresa no especificada';
     return c.companyName || c.companyProfile?.companyName || 'Empresa no especificada';
   }
 
+  /**
+   * Porcentaje de coincidencia de habilidades entre el candidato y la
+   * oferta. Prioriza el calculo detallado que ya viene del backend
+   * (`skillMatch.matchPercent`, que tiene en cuenta el nivel minimo
+   * requerido por habilidad); si no esta disponible, hace un calculo
+   * simple como respaldo: habilidades coincidentes sobre requeridas.
+   */
   matchPercent(job: JobOffer): number {
     if (job.skillMatch) return job.skillMatch.matchPercent;
     const total = job.requiredSkillsList?.length || 0;
@@ -283,17 +336,20 @@ export class CandidateJobsComponent implements OnInit {
     return Math.round((matched / total) * 100);
   }
 
+  /** Traduce el estado de coincidencia de una habilidad puntual a una etiqueta legible en español. */
   skillStatusLabel(status: 'met' | 'insufficient' | 'missing'): string {
     const map = { met: 'Cumple', insufficient: 'Nivel insuficiente', missing: 'Te falta' };
     return map[status];
   }
 
+  /** Logo de la empresa que publico la oferta, si esta disponible. */
   companyLogo(job: JobOffer): string | undefined {
     const c: any = job.company;
     if (!c) return undefined;
     return c.logoUrl || c.companyProfile?.logoUrl;
   }
 
+  /** Habilidades requeridas a mostrar como chips en la tarjeta, recortando a 5 y contando el resto como "+N mas". */
   visibleSkills(job: JobOffer): { chips: string[]; more: number } {
     const all = (job.skillsRequired || '').split(',').map(s => this.stripRequiredLevel(s)).filter(Boolean);
     if (all.length <= 5) return { chips: all, more: 0 };
@@ -305,6 +361,7 @@ export class CandidateJobsComponent implements OnInit {
     return raw.split(':')[0].trim();
   }
 
+  /** Rango salarial en formato compacto para la tarjeta de la lista de ofertas. */
   formatSalaryCompact(job: JobOffer): string | null {
     if (job.salaryMin || job.salaryMax) {
       const currency = job.currency || 'COP';
@@ -317,14 +374,17 @@ export class CandidateJobsComponent implements OnInit {
     return null;
   }
 
+  /** Traduce el estado de una postulacion a una etiqueta legible en español. */
   getStatusLabel(status: string): string {
     return statusToLabel(status);
   }
 
+  /** Mapea el estado de una postulacion al tono de color del badge. */
   statusTone(status: string): BadgeTone {
     return statusToTone(status);
   }
 
+  /** Rango salarial en formato detallado para el panel de detalle de la oferta. */
   formatSalary(job: JobOffer): string | null {
     if (!job.salaryMin && !job.salaryMax) return null;
     const currency = job.currency || 'COP';
@@ -335,6 +395,7 @@ export class CandidateJobsComponent implements OnInit {
     return `Hasta $${max} ${currency}`;
   }
 
+  /** Genera la lista de numeros de pagina para el paginador de ofertas, comprimiendo con "..." cuando hay muchas paginas. */
   get pagesArray(): (number | string)[] {
     const pages: (number | string)[] = [];
     const total = this.totalPages;
@@ -351,11 +412,13 @@ export class CandidateJobsComponent implements OnInit {
     return pages;
   }
 
+  /** Aplica los filtros de postulaciones desde la pagina 1. */
   applyFiltersApps(): void {
     this.appPage = 1;
     this.loadMyApplications();
   }
 
+  /** Resetea los filtros de postulaciones (estado y rango de fechas) y recarga la lista completa. */
   clearFiltersApps(): void {
     this.appStatusFilter = '';
     this.appFromDate = '';
@@ -364,6 +427,7 @@ export class CandidateJobsComponent implements OnInit {
     this.loadMyApplications();
   }
 
+  /** Navega a una pagina de postulaciones y sube el scroll al inicio. */
   goToAppPage(p: number): void {
     if (p < 1 || p > this.appTotalPages) return;
     this.appPage = p;
@@ -371,6 +435,7 @@ export class CandidateJobsComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /** Genera la lista de numeros de pagina para el paginador de postulaciones (mismo criterio de compresion que `pagesArray`). */
   get appPagesArray(): (number | string)[] {
     const pages: (number | string)[] = [];
     const total = this.appTotalPages;
@@ -387,39 +452,46 @@ export class CandidateJobsComponent implements OnInit {
     return pages;
   }
 
+  /** Traduce el estado de una postulacion (pestaña "mis postulaciones") a una etiqueta legible en español. */
   appStatusLabel(status: string): string {
     return statusToLabel(status);
   }
 
+  /** Fecha de postulacion, formateada para mostrar en la tarjeta. */
   appFormatDate(date: string | undefined): string {
     if (!date) return '';
     return 'Postulado el ' + formatAppDate(date, 'short');
   }
 
+  /** Nombre de la empresa de la oferta a la que se aplico, con respaldo si no viene informado. */
   appCompanyName(app: JobApplication): string {
     const c: any = app.jobOffer?.company;
     if (!c) return 'Empresa no especificada';
     return c.companyName || c.companyProfile?.companyName || 'Empresa no especificada';
   }
 
+  /** Logo de la empresa de la oferta a la que se aplico. */
   appCompanyLogo(app: JobApplication): string | undefined {
     const c: any = app.jobOffer?.company;
     if (!c) return undefined;
     return c.logoUrl || c.companyProfile?.logoUrl;
   }
 
+  /** Etiqueta de tipo de contrato de la oferta postulada, usando el valor personalizado si aplica. */
   appContractLabel(app: JobApplication): string {
     const ct = app.jobOffer?.contractType;
     if (ct === 'Otro' && app.jobOffer?.customContractType) return app.jobOffer.customContractType;
     return ct || '';
   }
 
+  /** Etiqueta de jornada laboral de la oferta postulada, usando el valor personalizado si aplica. */
   appWorkloadLabel(app: JobApplication): string {
     const wl = app.jobOffer?.workload;
     if (wl === 'Otra' && app.jobOffer?.customWorkload) return app.jobOffer.customWorkload;
     return wl || '';
   }
 
+  /** Rango salarial de la oferta postulada, en formato compacto. */
   appSalary(app: JobApplication): string | null {
     const job = app.jobOffer;
     if (!job?.salaryMin && !job?.salaryMax) return null;

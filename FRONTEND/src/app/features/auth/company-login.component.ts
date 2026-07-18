@@ -12,6 +12,13 @@ import { AuthService } from '../../core/auth/auth.service';
 import { normalizeEmail } from '../../shared/utils/normalize';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 
+/**
+ * Formulario de login para empresas (ruta "/company/login"). Autentica
+ * contra el backend y redirige al dashboard de empresa; si el visitante
+ * llegó desde la landing con un término de búsqueda (query param "q",
+ * ver `HomeComponent.onSearch`), lo manda directo a Candidatos con esa
+ * búsqueda ya aplicada en vez de al dashboard.
+ */
 @Component({
   selector: 'app-company-login',
   standalone: true,
@@ -96,6 +103,11 @@ export class CompanyLoginComponent {
     password: ['', [Validators.required]],
   });
 
+  /**
+   * Autentica a la empresa y decide a dónde redirigir: si venía con una
+   * búsqueda pendiente desde la landing (query param "q") va a Candidatos
+   * con esa búsqueda precargada; si no, al dashboard normal.
+   */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;

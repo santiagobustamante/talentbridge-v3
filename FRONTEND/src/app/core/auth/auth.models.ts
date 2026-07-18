@@ -1,3 +1,12 @@
+/**
+ * Modelos de dominio compartidos por candidato/empresa: usuario, perfil
+ * público (portafolio), y las entidades que lo componen (skills,
+ * experiencia, educación, proyectos). Reflejan la forma en que el backend
+ * (portfolio-service / candidate-service, vía el API Gateway) serializa
+ * estas entidades; se usan como tipo de retorno de los servicios HTTP del
+ * frontend (profile.service.ts, skills.service.ts, etc.) y directamente en
+ * los componentes de features/.
+ */
 export interface User {
   id: number;
   email: string;
@@ -39,6 +48,7 @@ export interface PaginatedResponse<T> {
   meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
+/** Perfil público de un candidato: es el contenido que se muestra en /portfolio/:slug y en las pantallas de edición del shell candidato. Los flags `show*` controlan qué secciones son visibles en el portafolio público sin borrar los datos. */
 export interface Profile {
   id: number;
   userId: number;

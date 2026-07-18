@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 :host {
   display: block;
   min-height: 100vh;
@@ -13,6 +15,25 @@
   max-width: 1120px;
   margin: 0 auto;
   padding: 18px 24px 0;
+}
+
+// app-portfolio-content no trae gutter propio (lo define cada página que lo
+// hospeda). Sin esto, en esta página pública las tarjetas quedaban pegadas
+// al borde del viewport en mobile.
+app-portfolio-content {
+  display: block;
+  padding: 0 24px;
+}
+
+@include bp.tablet {
+  .public-backbar { padding: 14px 16px 0; }
+  app-portfolio-content { padding: 0 16px; }
+}
+
+@include bp.mobile {
+  .public-backbar { padding: 12px 12px 0; }
+  app-portfolio-content { padding: 0 12px; }
+  .error-card { padding: var(--space-xl) var(--space-lg); }
 }
 
 .back-button {

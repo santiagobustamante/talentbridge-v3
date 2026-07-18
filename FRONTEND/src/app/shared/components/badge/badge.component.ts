@@ -8,6 +8,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
  */
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'primary';
 
+/**
+ * Chip/etiqueta compartida (pill de color) usada para mostrar estados de ofertas
+ * y postulaciones, habilidades, y cualquier otro texto corto destacado. El contenido
+ * se pasa por `<ng-content>` (proyección), y el color se controla con `tone`.
+ * `removable` agrega una "x" para que el padre pueda quitar el chip (ej. lista de
+ * habilidades editable).
+ */
 @Component({
   selector: 'app-badge',
   standalone: true,
@@ -29,7 +36,10 @@ export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 
   styleUrl: './badge.component.scss',
 })
 export class BadgeComponent {
+  /** Color/estado visual del chip. Ver `statusToTone()` para mapear un status del backend a un tono. */
   @Input() tone: BadgeTone = 'neutral';
+  /** Si es true, muestra el botón "x" para quitar el badge. */
   @Input() removable = false;
+  /** Emite cuando el usuario hace click en la "x" (solo si `removable` es true). */
   @Output() remove = new EventEmitter<void>();
 }

@@ -12,6 +12,7 @@ export function normalizeUrl(raw: string): string {
 
 const URL_RE = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
+/** Valida que, tras normalizar (agregar https:// si hacía falta), el resultado sea una URL http(s) bien formada. */
 export function isValidUrl(raw: string): boolean {
   const normalized = normalizeUrl(raw);
   if (!normalized) return false;

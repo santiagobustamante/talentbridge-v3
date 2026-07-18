@@ -20,8 +20,17 @@ import {
   normalizeUrl,
 } from '../../shared/utils/normalize';
 
+/** Campos del perfil que el candidato puede ocultar/mostrar de forma independiente en su portafolio público. */
 type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' | 'showWebsite';
 
+/**
+ * Pantalla de edición del perfil del candidato (ruta "/app/profile").
+ * Maneja los datos personales/profesionales (nombre, título, resumen,
+ * contacto, redes), el slug que define la URL publica del portafolio,
+ * y los toggles de visibilidad por campo (qué se muestra públicamente).
+ * Normaliza los datos (teléfono, capitalización de nombres, URLs) tanto
+ * al perder foco de cada input como antes de guardar en el backend.
+ */
 @Component({
   selector: 'app-profile-page',
   standalone: true,
@@ -66,6 +75,7 @@ export class ProfileComponent implements OnInit {
     showWebsite: [true],
   });
 
+  /** Perfil a mostrar en la vista de resumen (modo lectura): el actual, o el último guardado como respaldo. */
   get summaryProfile(): any {
     return this.profile ?? this.lastSavedProfile ?? {};
   }
@@ -100,6 +110,7 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  /** Normaliza el texto libre del resumen (recorta espacios) al perder el foco del campo. */
   onSummaryBlur(): void {
     const control = this.form.get('summary');
     const value = control?.value || '';
@@ -109,6 +120,7 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  /** Normaliza una URL (LinkedIn/GitHub/sitio web) al salir del campo, ej. agregando el esquema https:// si falta. */
   onUrlBlur(controlName: 'linkedinUrl' | 'githubUrl' | 'websiteUrl'): void {
     const control = this.form.get(controlName);
     const value = control?.value || '';
@@ -119,11 +131,13 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  /** Formatea un teléfono almacenado (formato crudo) a su forma legible para mostrar en pantalla. */
   displayPhone(value: unknown): string {
     const text = String(value ?? '').trim();
     return text ? formatPhoneDisplay(text) : 'No agregado todavía';
   }
 
+  /** Carga el perfil del candidato autenticado desde el backend y precarga el formulario. */
   loadProfile(): void {
     this.loading = true;
     this.loadError = null;
@@ -142,6 +156,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  /** Vuelca los datos de un perfil (del backend o el último guardado) al formulario reactivo, formateando el teléfono para lectura. */
   private patchForm(data: any): void {
     this.form.patchValue({
       fullName: data?.fullName ?? '',
@@ -161,10 +176,12 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  /** Lee el valor actual (en el formulario) de un toggle de visibilidad. */
   isVisible(field: VisibilityField): boolean {
     return Boolean(this.form.get(field)?.value);
   }
 
+  /** Invierte un toggle de visibilidad solo en el formulario (modo edición), sin guardar todavía en el backend. */
   toggleLocalVisibility(field: VisibilityField): void {
     const control = this.form.get(field);
     if (!control) return;
@@ -173,6 +190,13 @@ export class ProfileComponent implements OnInit {
     control.markAsTouched();
   }
 
+  /**
+   * Invierte un toggle de visibilidad directamente desde la vista de
+   * resumen (fuera de modo edición) y lo guarda al instante en el
+   * backend, de forma optimista: aplica el cambio ya mismo y lo revierte
+   * si la llamada falla, para no obligar al usuario a entrar a editar
+   * solo para cambiar qué campos se ven en su portafolio público.
+   */
   toggleSummaryVisibility(field: VisibilityField): void {
     if (!this.profile || this.saving) return;
 
@@ -206,11 +230,13 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  /** Entra en modo edición del perfil. */
   editProfile(): void {
     this.isEditing = true;
     this.saved = false;
   }
 
+  /** Descarta los cambios sin guardar y vuelve al formulario a los últimos datos guardados. */
   cancelEdit(): void {
     const source = this.lastSavedProfile ?? this.profile;
     if (source) {
@@ -220,17 +246,25 @@ export class ProfileComponent implements OnInit {
     this.saved = false;
   }
 
+  /** Texto a mostrar para un campo del perfil, o un texto por defecto si está vacío. */
   displayValue(value: unknown, fallback = 'No agregado todavía'): string {
     const text = String(value ?? '').trim();
     return text.length ? text : fallback;
   }
 
+  /** Iniciales (hasta 2) del nombre del candidato, usadas en el avatar cuando no hay foto. */
   getInitials(name: unknown): string {
     const clean = String(name ?? '').trim();
     if (!clean) return 'P';
     return clean.split(/\s+/).slice(0, 2).map((p) => p.charAt(0).toUpperCase()).join('');
   }
 
+  /**
+   * Guarda el formulario completo: normaliza cada campo (capitalización
+   * de nombre/título/ciudad, formato de teléfono, URLs) antes de enviarlo
+   * al backend, y sincroniza el perfil actualizado en el AuthService para
+   * que el resto de la app (ej. el shell) refleje los cambios al instante.
+   */
   save(): void {
     if (this.saving) return;
     this.saving = true;
@@ -274,6 +308,12 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  /**
+   * Genera un slug (URL amigable) sugerido a partir del nombre completo:
+   * pasa a minusculas, quita tildes/diacriticos (normalize NFD + strip),
+   * reemplaza cualquier caracter no alfanumerico por guiones y recorta
+   * guiones sobrantes en los extremos, limitando a 80 caracteres.
+   */
   generateSlug(): void {
     const fullName = this.form.get('fullName')?.value || '';
     const slug = fullName
@@ -287,14 +327,17 @@ export class ProfileComponent implements OnInit {
     this.form.get('slug')?.markAsDirty();
   }
 
+  /** Slug actual del formulario, normalizado a minusculas y sin espacios sueltos. */
   get currentSlug(): string {
     return this.form.get('slug')?.value?.toLowerCase().replace(/\s+/g, '-') || '';
   }
 
+  /** URL publica completa del portafolio, construida a partir del slug actual. */
   get publicUrl(): string {
     return this.currentSlug ? `${window.location.origin}/portfolio/${this.currentSlug}` : '';
   }
 
+  /** Copia la URL publica del portafolio al portapapeles, si ya hay un slug configurado. */
   copyLink(): void {
     if (!this.currentSlug) {
       this.snackBar.open('Completa tu slug primero', 'Cerrar', { duration: 2000 });
@@ -306,6 +349,7 @@ export class ProfileComponent implements OnInit {
     setTimeout(() => (this.copied = false), 2500);
   }
 
+  /** Normaliza un valor arbitrario al mismo formato de slug que `generateSlug` (no se usa como input directo del usuario). */
   private normalizeSlug(value: unknown): string {
     return String(value ?? '')
       .toLowerCase()
@@ -316,21 +360,25 @@ export class ProfileComponent implements OnInit {
       .substring(0, 80);
   }
 
+  /** Recorta espacios de un texto libre antes de guardar; devuelve null si queda vacio (para no mandar strings vacios al backend). */
   private cleanString(value: unknown): string | null {
     const text = trimText(String(value ?? ''));
     return text.length ? text : null;
   }
 
+  /** Aplica capitalizacion tipo "Titulo" antes de guardar; devuelve null si queda vacio. */
   private cleanTitleCase(value: unknown): string | null {
     const text = titleCaseText(String(value ?? ''));
     return text.length ? text : null;
   }
 
+  /** Convierte el telefono ingresado al formato de almacenamiento (sin espacios/guiones) antes de guardar; null si esta vacio. */
   private cleanPhone(value: unknown): string | null {
     const text = String(value ?? '').trim();
     return text.length ? normalizePhoneStorage(text) : null;
   }
 
+  /** Normaliza una URL antes de guardar (esquema, formato); null si esta vacia. */
   private cleanUrl(value: unknown): string | null {
     const text = String(value ?? '').trim();
     return text.length ? normalizeUrl(text) : null;

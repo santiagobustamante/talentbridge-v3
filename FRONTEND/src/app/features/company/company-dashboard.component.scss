@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 :host { display: block; }
 
 .dashboard {
@@ -155,13 +157,30 @@
   span { font-size: 0.8rem; color: var(--text-placeholder); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
 }
 
-@media (max-width: 900px) {
+@include bp.tablet {
   .hero-content { flex-direction: column; padding: 28px 24px; }
   .hero-actions { width: 100%; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* La tabla de "vacantes recientes" tiene 4 columnas (2fr 1fr 0.9fr 0.5fr)
+     que no entran en pantallas angostas — se saca la columna de postulaciones
+     (menos crítica acá, ya está el link "Gestionar vacantes") para dejar
+     respirar título/ciudad/estado. */
+  .job-row { grid-template-columns: 1.6fr 0.9fr 0.7fr; font-size: 0.8rem; padding: 10px 14px; gap: 6px; }
+  .jc-count { display: none; }
 }
-@media (max-width: 600px) {
+
+@include bp.mobile {
   .kpi-grid { grid-template-columns: 1fr; }
   .quick-grid { grid-template-columns: 1fr; }
   .hero-greeting { font-size: 1.2rem; }
+  .hero-content { padding: 22px 18px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions a { justify-content: center; }
+
+  /* En mobile ya no entra ni la ciudad: título + estado. */
+  .job-row { grid-template-columns: 1fr 0.8fr; font-size: 0.78rem; padding: 10px 12px; }
+  .jc-city { display: none; }
+
+  .app-card, .msg-item { padding: 14px 16px; }
 }

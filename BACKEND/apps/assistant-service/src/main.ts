@@ -3,6 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AssistantModule } from './assistant.module';
 
+/**
+ * Punto de entrada del microservicio del asistente virtual "Joaquín".
+ * Igual que los demás microservicios, corre como app NestJS HTTP
+ * independiente detrás del API Gateway, con prefijo `/api`, cookies y CORS
+ * restringido al origen del frontend.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AssistantModule);
   app.setGlobalPrefix('api');

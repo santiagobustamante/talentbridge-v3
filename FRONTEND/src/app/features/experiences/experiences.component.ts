@@ -25,6 +25,13 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { titleCaseText, trimText } from '../../shared/utils/normalize';
 
+/**
+ * Gestion de experiencia laboral del candidato (ruta "/app/experience").
+ * Permite crear/editar/eliminar experiencias con periodo, modalidad,
+ * tipo de contrato, funciones/logros y habilidades aprendidas (con
+ * autocompletado desde el catalogo global de habilidades), y controlar
+ * si la seccion se muestra en el portafolio publico.
+ */
 @Component({
   selector: 'app-experiences',
   standalone: true,
@@ -254,6 +261,11 @@ export class ExperiencesComponent implements OnInit {
     tools: [''],
   });
 
+  /**
+   * Carga las experiencias existentes, el flag de visibilidad del perfil,
+   * y filtra el catalogo de habilidades a medida que el usuario tipea en
+   * el input de "habilidades aprendidas".
+   */
   ngOnInit() {
     this.load();
     this.profileService.getProfile().subscribe({
@@ -265,8 +277,10 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Trae la lista de experiencias laborales del candidato desde el backend. */
   load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
 
+  /** Actualiza si la seccion de experiencia se muestra en el portafolio publico; revierte el cambio si falla el guardado. */
   toggleVisibility(event: any) {
     this.showExperience = event.checked;
     this.profileService.updateProfile({ showExperience: this.showExperience } as any).subscribe({
@@ -275,6 +289,7 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Agrega una habilidad aprendida como chip, evitando duplicados (case-insensitive). */
   addSkillChip(name: string) {
     const exists = this.selectedSkills.some(s => s.toLowerCase() === name.toLowerCase());
     if (!exists) {
@@ -283,10 +298,12 @@ export class ExperiencesComponent implements OnInit {
     this.skillInputCtrl.setValue('');
   }
 
+  /** Quita una habilidad aprendida de la lista de chips por posicion. */
   removeSkillChip(index: number) {
     this.selectedSkills.splice(index, 1);
   }
 
+  /** Guarda el formulario: crea una experiencia nueva o actualiza la que esta en edicion, segun `editing`. */
   save() {
     const v = this.form.value;
     const data = {
@@ -321,6 +338,7 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Carga los datos de una experiencia existente en el formulario para editarla. */
   startEdit(e: Experience) {
     this.editing = e.id;
     this.selectedSkills = [...(e.learnedSkills || [])];
@@ -339,6 +357,7 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Sale del modo edicion/creacion y limpia el formulario a su estado inicial. */
   cancel() {
     this.editing = null;
     this.showForm = false;
@@ -350,6 +369,7 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Pide confirmacion y, si se acepta, elimina la experiencia del backend y recarga la lista. */
   remove(id: number) {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Eliminar', message: '¿Eliminar esta experiencia?' },
@@ -366,11 +386,13 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
+  /** Traduce el codigo de modalidad de trabajo a una etiqueta legible en español. */
   workModeLabel(m: string): string {
     const map: Record<string, string> = { ONSITE: 'Presencial', REMOTE: 'Remoto', HYBRID: 'Híbrido' };
     return map[m] || m;
   }
 
+  /** Traduce el codigo de tipo de contrato a una etiqueta legible en español. */
   contractTypeLabel(t: string): string {
     const map: Record<string, string> = {
       FULL_TIME: 'Tiempo completo', PART_TIME: 'Medio tiempo', CONTRACTOR: 'Contratista',

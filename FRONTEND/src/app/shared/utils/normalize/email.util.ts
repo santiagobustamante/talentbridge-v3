@@ -6,6 +6,7 @@ export function normalizeEmail(raw: string): string {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Validación básica de formato de correo (para feedback en formularios), no exhaustiva RFC 5322. */
 export function isValidEmail(raw: string): boolean {
   return EMAIL_RE.test(raw.trim());
 }

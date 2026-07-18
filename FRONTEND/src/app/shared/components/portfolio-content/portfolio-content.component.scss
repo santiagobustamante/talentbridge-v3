@@ -726,6 +726,10 @@ $max-width: 920px;
 }
 
 @include bp.mobile {
+  .hero {
+    padding: var(--space-xl) var(--space-md) var(--space-lg);
+  }
+
   .hero-name {
     font-size: 1.6rem;
   }
@@ -739,7 +743,17 @@ $max-width: 920px;
     justify-content: center;
   }
 
+  .section {
+    padding: var(--space-md);
+  }
+
   .section-header {
     flex-wrap: wrap;
+  }
+
+  .edu-card,
+  .timeline-card,
+  .project-card {
+    padding: var(--space-md);
   }
 }

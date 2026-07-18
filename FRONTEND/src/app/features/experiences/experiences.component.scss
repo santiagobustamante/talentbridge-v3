@@ -290,3 +290,19 @@
   .form-body { padding: var(--space-md); }
   .form-footer { flex-direction: column; .save-btn, .cancel-btn { width: 100%; justify-content: center; } }
 }
+
+@include bp.mobile {
+  .page-header { gap: 12px; margin-bottom: var(--space-xl); }
+  .header-icon { width: 44px; height: 44px; mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+  .header-text h1 { font-size: 1.3rem; }
+  .visibility-bar { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+  .toggle-form-btn { padding: var(--space-sm) var(--space-md); }
+  .timeline { padding-left: 28px; }
+  .timeline-item:not(:last-child)::before { left: -12px; top: 40px; bottom: calc(-40px - var(--space-xl)); }
+  .timeline-dot { left: -29px; top: 20px; width: 30px; height: 30px; mat-icon { font-size: 14px; width: 14px; height: 14px; } }
+  .timeline-card {
+    padding: var(--space-md);
+    .card-top { flex-wrap: wrap; }
+    .position-title { font-size: 1.05rem; }
+  }
+}

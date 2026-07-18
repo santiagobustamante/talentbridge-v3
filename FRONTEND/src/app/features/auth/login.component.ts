@@ -12,6 +12,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { normalizeEmail } from '../../shared/utils/normalize';
 
+/**
+ * Formulario de login para candidatos (ruta "/login"). Autentica contra
+ * el backend con email + contraseña y redirige al home del candidato
+ * ("/app/inicio") si el login es exitoso. Ofrece enlaces cruzados hacia
+ * el registro de candidato y hacia el login de empresa.
+ */
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -95,6 +101,11 @@ export class LoginComponent {
     password: ['', [Validators.required]],
   });
 
+  /**
+   * Envía las credenciales al backend (normalizando el email antes, para
+   * evitar problemas de mayúsculas/espacios) y navega al home del
+   * candidato si el login es exitoso.
+   */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;

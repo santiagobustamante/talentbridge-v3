@@ -80,16 +80,24 @@ export interface DashboardConversation {
   lastMessageAt?: string;
 }
 
+/**
+ * Datos agregados para las pantallas de inicio de cada rol (`/app/inicio` y
+ * `/company/dashboard`): el backend (dashboard-service) ya arma un solo
+ * payload con contadores y listas recientes para evitar que el frontend
+ * tenga que disparar y combinar varias llamadas a distintos microservicios.
+ */
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
   private readonly api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
+  /** Obtiene el resumen de inicio del candidato: % de perfil completo, contadores, últimas ofertas/postulaciones/conversaciones y el siguiente paso sugerido. */
   getCandidateDashboard(): Observable<CandidateDashboard> {
     return this.http.get<CandidateDashboard>(`${this.api}/dashboard/candidate`);
   }
 
+  /** Obtiene el resumen de inicio de la empresa: candidatos, ofertas por estado, postulaciones y conversaciones recientes. */
   getCompanyDashboard(): Observable<CompanyDashboard> {
     return this.http.get<CompanyDashboard>(`${this.api}/dashboard/company`);
   }

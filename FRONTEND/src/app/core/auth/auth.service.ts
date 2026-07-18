@@ -5,6 +5,22 @@ import { Observable, tap, map, of, catchError } from 'rxjs';
 import { User, Profile } from './auth.models';
 import { environment } from '../../../environments/environment';
 
+/**
+ * Servicio central de autenticación y estado de sesión del frontend.
+ *
+ * Mantiene el usuario actual en signals (no en un BehaviorSubject) para que
+ * los componentes puedan leer `isAuthenticated()`, `isCandidate()`, etc. de
+ * forma reactiva y sincrónica en templates y guards. No guarda ningún token:
+ * la sesión real vive en la cookie HttpOnly que setea el backend en cada
+ * login (ver auth.interceptor.ts para el porqué de ese enfoque); acá solo se
+ * cachea la info del usuario ya autenticado para no tener que pedirla de
+ * nuevo en cada guard o componente.
+ *
+ * `authReady` distingue "todavía no sabemos si hay sesión" de "sabemos que
+ * no hay sesión" — es clave para que los guards no redirijan a /login antes
+ * de que el `APP_INITIALIZER` (ver app.config.ts) termine de consultar
+ * `/auth/me` al arrancar la app.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = environment.apiUrl;
@@ -19,30 +35,35 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  /** Actualiza el perfil del usuario en memoria sin volver a pedirlo al backend (evita un round-trip tras editar el perfil). */
   updateCurrentProfile(profile: Profile): void {
     const current = this._currentUser();
     if (!current) return;
     this._currentUser.set({ ...current, profile });
   }
 
+  /** Registra un nuevo candidato; el backend responde con la cookie de sesión ya seteada, por eso withCredentials: true. */
   register(email: string, password: string, confirmPassword: string): Observable<{ user: User }> {
     return this.http
       .post<{ user: User }>(`${this.api}/auth/register`, { email, password, confirmPassword }, { withCredentials: true })
       .pipe(tap((res) => this._currentUser.set(res.user)));
   }
 
+  /** Login de candidato con email/contraseña. */
   login(email: string, password: string): Observable<{ user: User }> {
     return this.http
       .post<{ user: User }>(`${this.api}/auth/login`, { email, password }, { withCredentials: true })
       .pipe(tap((res) => this._currentUser.set(res.user)));
   }
 
+  /** Login de empresa; usa un endpoint distinto al de candidatos porque valida contra el modelo CompanyProfile. */
   loginCompany(email: string, password: string): Observable<{ user: User }> {
     return this.http
       .post<{ user: User }>(`${this.api}/auth/login-company`, { email, password }, { withCredentials: true })
       .pipe(tap((res) => this._currentUser.set(res.user)));
   }
 
+  /** Registro de empresa, con los campos propios de su perfil (nombre, sector, ciudad) además de las credenciales. */
   registerCompany(
     email: string,
     password: string,
@@ -58,6 +79,7 @@ export class AuthService {
       .pipe(tap((res) => this._currentUser.set(res.user)));
   }
 
+  /** Cierra sesión: pide al backend que invalide la cookie, limpia el estado local y redirige a la home. */
   logout(): Observable<{ message: string }> {
     return this.http
       .post<{ message: string }>(`${this.api}/auth/logout`, {}, { withCredentials: true })
@@ -70,6 +92,7 @@ export class AuthService {
       );
   }
 
+  /** Consulta al backend quién es el usuario de la cookie actual (si la hay) y actualiza el estado en memoria. Usado por los guards como fallback y por initAuth() al arrancar. */
   fetchMe(): Observable<User> {
     return this.http.get<User>(`${this.api}/auth/me`, { withCredentials: true }).pipe(
       tap((user) => {
@@ -81,6 +104,12 @@ export class AuthService {
     );
   }
 
+  /**
+   * Punto de entrada llamado por el APP_INITIALIZER (app.config.ts) antes de
+   * que Angular termine de arrancar. Resuelve siempre (nunca rechaza),
+   * incluso si no hay sesión o el backend falla, para que el bootstrap de la
+   * app no quede bloqueado esperando una petición que puede fallar.
+   */
   initAuth(): Observable<User | null> {
     this._authReady.set(false);
     return this.fetchMe().pipe(

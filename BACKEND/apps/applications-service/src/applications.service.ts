@@ -2,10 +2,25 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException,
 import { PrismaService, JobOfferStatus, JobApplicationStatus } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
 
+/**
+ * Lógica de negocio de las postulaciones. Encapsula todas las reglas de
+ * validación (oferta publicada, perfil completo, no duplicar postulación,
+ * match mínimo de habilidades) y las consultas paginadas/filtradas que
+ * consume el controller, tanto desde el lado candidato como empresa.
+ */
 @Injectable()
 export class ApplicationsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Crea una postulación de un candidato a una oferta. Antes de guardar,
+   * valida en cadena: que la oferta exista y esté publicada, que el
+   * candidato tenga perfil, que no se haya postulado ya (constraint única
+   * jobOfferId+candidateId) y que tenga al menos una habilidad que matchee
+   * con los requisitos — esto evita postulaciones "spam" a ofertas para las
+   * que el candidato claramente no califica, usando la misma función de
+   * matching (`computeSkillMatch`) que usa el resto de la plataforma.
+   */
   async apply(candidateUserId: number, jobId: number, coverMessage?: string) {
     const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
     if (!job) throw new NotFoundException('Oferta no encontrada');
@@ -38,6 +53,12 @@ export class ApplicationsService {
     });
   }
 
+  /**
+   * Devuelve, paginadas, las postulaciones del candidato autenticado, con
+   * la info de la oferta y la empresa embebida para que el frontend no
+   * tenga que hacer otro round-trip. Soporta filtro opcional por estado y
+   * por rango de fechas de creación.
+   */
   async getMyApplications(
     candidateUserId: number,
     params?: { page?: string; limit?: string; status?: string; fromDate?: string; toDate?: string },
@@ -113,6 +134,12 @@ export class ApplicationsService {
     };
   }
 
+  /**
+   * Lista los candidatos que se postularon a una oferta puntual de la
+   * empresa. Verifica que la oferta pertenezca a la empresa autenticada
+   * (companyUserId) antes de devolver datos — evita que una empresa vea
+   * postulaciones de ofertas ajenas.
+   */
   async getJobApplications(companyUserId: number, jobId: number) {
     const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
     if (!job) throw new NotFoundException('Oferta no encontrada');
@@ -141,6 +168,11 @@ export class ApplicationsService {
     });
   }
 
+  /**
+   * Cambia el estado de una postulación (ej. aceptarla o rechazarla).
+   * Solo la empresa dueña de la oferta asociada puede hacerlo, y el nuevo
+   * estado debe ser uno de los valores válidos del enum JobApplicationStatus.
+   */
   async updateStatus(companyUserId: number, applicationId: number, newStatus: string) {
     const application = await this.prisma.jobApplication.findUnique({
       where: { id: applicationId },

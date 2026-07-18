@@ -305,3 +305,17 @@
     white-space: normal;
   }
 }
+
+@include bp.mobile {
+  .profile-page { gap: 16px; }
+  .page-header { gap: 12px; }
+  .edit-btn { width: 100%; justify-content: center; }
+  .summary-avatar-row, .summary-resume, .form-card { padding: 16px; }
+  .summary-avatar-row { flex-wrap: wrap; }
+  .summary-avatar { flex-shrink: 0; }
+  .summary-contact-item { padding: 14px; }
+  .slug-row { flex-wrap: wrap; }
+  .slug-row .app-btn { width: 100%; justify-content: center; }
+  .slug-actions .app-btn { width: 100%; justify-content: center; }
+  .form-card-header { flex-wrap: wrap; }
+}

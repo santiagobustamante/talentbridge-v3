@@ -13,6 +13,13 @@ import { statusToLabel } from '../../shared/components/badge/status-label.util';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 
+/**
+ * Dashboard principal de la empresa autenticada (ruta "/company/dashboard").
+ * Muestra un resumen de la actividad: ofertas publicadas, postulaciones
+ * recientes y su estado, y el contador de mensajes no leídos. También
+ * refresca ese contador cada vez que la empresa vuelve a esta pantalla
+ * (navegación interna), para que el badge de mensajes no quede desactualizado.
+ */
 @Component({
   selector: 'app-company-dashboard',
   standalone: true,
@@ -34,6 +41,12 @@ export class CompanyDashboardComponent implements OnInit, OnDestroy {
   private unreadSub: Subscription | null = null;
   private routerSub: Subscription | null = null;
 
+  /**
+   * Carga los datos del dashboard, se suscribe al contador global de
+   * mensajes no leídos, y además escucha la navegación del router para
+   * refrescar ese contador cada vez que se vuelve a entrar al dashboard
+   * (por ejemplo, después de leer mensajes y volver atrás).
+   */
   ngOnInit(): void {
     this.dashboardService.getCompanyDashboard().subscribe({
       next: (d) => { this.data.set(d); this.loading.set(false); },
@@ -59,24 +72,29 @@ export class CompanyDashboardComponent implements OnInit, OnDestroy {
     this.routerSub?.unsubscribe();
   }
 
+  /** Nombre a mostrar de la empresa: el del dashboard, o el usuario del email como respaldo. */
   get companyName(): string {
     return this.data()?.companyName || this.auth.currentUser()?.email?.split('@')[0] || 'Empresa';
   }
 
+  /** Iniciales (hasta 2) del nombre de la empresa, para el avatar cuando no hay logo. */
   get companyInitials(): string {
     const clean = this.companyName.trim();
     if (!clean) return 'E';
     return clean.split(/\s+/).slice(0, 2).map((p) => p.charAt(0).toUpperCase()).join('');
   }
 
+  /** Traduce el estado interno de una postulación a una etiqueta legible en español. */
   statusLabel(s: string): string {
     return statusToLabel(s);
   }
 
+  /** Mapea el estado de una postulación al tono de color del badge (ej. éxito, pendiente). */
   statusTone(s: string): BadgeTone {
     return statusToTone(s);
   }
 
+  /** Chips de sugerencias rápidas de búsqueda de candidatos mostrados en el dashboard. */
   searchChips = [
     { label: 'desarrollador', q: 'desarrollador' },
     { label: 'ingeniero', q: 'ingeniero' },

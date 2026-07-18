@@ -14,6 +14,14 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import type { ConversationDto, MessageDto } from '../../core/models/chat.models';
 
+/**
+ * Bandeja de mensajería en tiempo real, compartida por candidatos y
+ * empresas (`isCandidate`/`isCompany` determinan el rol actual). Muestra
+ * la lista de conversaciones a la izquierda y el hilo de mensajes de la
+ * conversación activa a la derecha; combina llamadas REST (historial,
+ * marcar como leído) con WebSocket (`ChatSocketService`) para recibir
+ * mensajes nuevos sin recargar la página.
+ */
 @Component({
   selector: 'app-messages',
   standalone: true,
@@ -45,6 +53,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
+  /**
+   * Conecta el socket de chat, carga la lista de conversaciones y se
+   * suscribe a mensajes entrantes por WebSocket (actualizando el hilo
+   * activo y el contador de no leídos en tiempo real). También escucha
+   * el query param `conversationId` para abrir una conversación puntual
+   * cuando se llega a esta pantalla desde un link externo (ej. desde el
+   * perfil de un candidato/empresa o desde una notificación).
+   */
   ngOnInit(): void {
     this.currentUserId = this.auth.currentUser()?.id ?? null;
     this.chatSocket.connect();
@@ -89,6 +105,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.messages.update((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
   }
 
+  /** Recarga la lista de conversaciones del usuario actual desde el backend. */
   loadConversations(): void {
     this.chatService.getConversations().subscribe({
       next: (data) => {
@@ -99,6 +116,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Abre una conversación por id. Si ya está en la lista cargada la
+   * selecciona directo (evita un round-trip innecesario); si no, la pide
+   * al backend primero (caso típico: se llega por query param desde afuera).
+   */
   openConversation(id: number): void {
     const existing = this.conversations().find((c) => c.id === id);
     if (existing) {
@@ -110,6 +132,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Marca la conversación como activa, une el socket a su sala y trae el
+   * historial de mensajes. El parseo normaliza distintos formatos posibles
+   * de respuesta del backend (array plano, `{data: [...]}` o `{messages: [...]}`)
+   * y castea los ids a number porque a veces llegan como string desde la API.
+   * Además marca la conversación como leída, tanto por REST como por socket.
+   */
   private selectConversation(conv: ConversationDto): void {
     this.activeConversation.set(conv);
     this.loadingMessages.set(true);
@@ -151,6 +180,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.chatSocket.markAsRead(conv.id);
   }
 
+  /** Envía el mensaje escrito en el input a la conversación activa, con límite de 2000 caracteres. */
   send(): void {
     const body = this.inputMessage.trim();
     if (!body || body.length > 2000 || this.sending()) return;
@@ -175,6 +205,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Envía el mensaje con Enter, salvo que se mantenga Shift (para permitir saltos de línea). */
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -182,6 +213,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Pide confirmación antes de bloquear al contacto de la conversación activa. */
   blockConversation(): void {
     const conv = this.activeConversation();
     if (!conv) return;
@@ -197,6 +229,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Ejecuta el bloqueo ya confirmado por el usuario y actualiza el estado local de la conversación. */
   private confirmBlock(): void {
     const conv = this.activeConversation();
     if (!conv) return;
@@ -215,6 +248,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Desbloquea al contacto de la conversación activa, permitiendo volver a recibir sus mensajes. */
   unblockConversation(): void {
     const conv = this.activeConversation();
     if (!conv) return;
@@ -236,38 +270,46 @@ export class MessagesComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Nombre del "otro lado" de la conversación: la empresa si soy candidato, o el candidato si soy empresa. */
   contactName(conv: ConversationDto): string {
     if (this.isCandidate) return conv.company?.companyName || 'Empresa no especificada';
     return conv.candidate?.fullName || 'Candidato';
   }
 
+  /** Logo del contacto (solo aplica cuando el usuario actual es candidato y el contacto es una empresa). */
   contactLogo(conv: ConversationDto): string | undefined | null {
     if (this.isCandidate) return conv.company?.logoUrl;
     return undefined;
   }
 
+  /** Oculta la imagen del logo si falla la carga, en vez de mostrar el ícono roto del navegador. */
   onImgError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
 
+  /** Subtítulo del contacto en la lista: sector de la empresa, o título profesional del candidato. */
   contactTitle(conv: ConversationDto): string {
     if (this.isCandidate) return conv.company?.sector || '';
     return conv.candidate?.professionalTitle || '';
   }
 
+  /** Ciudad del contacto, según el rol del usuario actual. */
   contactCity(conv: ConversationDto): string | null {
     if (this.isCandidate) return conv.company?.city || null;
     return conv.candidate?.city || null;
   }
 
+  /** Determina si una burbuja de mensaje corresponde al usuario actual ("me") o al contacto ("other"), para alinearla en el hilo. */
   getBubbleSender(msg: MessageDto): 'me' | 'other' {
     return msg.senderId === this.currentUserId ? 'me' : 'other';
   }
 
+  /** Indica si la conversación activa está bloqueada, ya sea porque yo bloqueé o porque me bloquearon. */
   isBlocked(): boolean {
     return this.activeConversation()?.blockedByMe || this.activeConversation()?.blockedByOther || false;
   }
 
+  /** Baja el scroll del panel de mensajes hasta el final, para que el último mensaje siempre quede visible. */
   private scrollToBottom(): void {
     const el = document.querySelector('.messages-body');
     if (el) el.scrollTop = el.scrollHeight;

@@ -163,4 +163,16 @@
   .projects-grid { grid-template-columns: 1fr; }
   .form-body { padding: var(--space-md); }
   .form-footer { flex-direction: column; .save-btn, .cancel-btn { width: 100%; justify-content: center; } }
+  // Los botones editar/eliminar solo se mostraban con :hover, inalcanzable
+  // en touch: se dejan siempre visibles a partir de tablet.
+  .project-actions { opacity: 1; transform: translateX(0); }
+}
+
+@include bp.mobile {
+  .page-header { gap: 12px; margin-bottom: var(--space-xl); }
+  .header-icon { width: 44px; height: 44px; mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+  .header-text h1 { font-size: 1.3rem; }
+  .visibility-bar { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+  .toggle-form-btn { padding: var(--space-sm) var(--space-md); }
+  .project-body { padding: var(--space-md); }
 }

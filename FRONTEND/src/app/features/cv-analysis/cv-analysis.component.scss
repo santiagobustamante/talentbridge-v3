@@ -601,3 +601,46 @@ $ring-circumference: 326.7px;
     }
   }
 }
+
+@include bp.mobile {
+  .cv-page {
+    padding: var(--space-md) var(--space-sm);
+    gap: var(--space-lg);
+  }
+
+  .header-icon {
+    width: 44px;
+    height: 44px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .page-header .header-text h1 {
+    font-size: 1.25rem;
+  }
+
+  .upload-zone {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .score-card {
+    padding: var(--space-lg);
+  }
+
+  .score-ring {
+    width: 110px;
+    height: 110px;
+
+    .score-value {
+      font-size: 1.8rem;
+    }
+  }
+
+  .detail-card {
+    padding: var(--space-md);
+  }
+}

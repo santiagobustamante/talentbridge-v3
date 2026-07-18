@@ -43,11 +43,16 @@
   --info-border: #bae6fd;
   --info-bright: #0ea5e9;
 
-  /* Acento decorativo secundario (avatares de ícono, segmentos de gráfico) —
-     intencionalmente separado de success/warning/danger/info: no representa un estado. */
-  --accent-purple: #4338ca;
-  --accent-purple-hover: #3730a3;
-  --accent-purple-soft: #e0e7ff;
+  /* Acento decorativo secundario (avatares de ícono, segmentos de gráfico de la
+     sección "empresa"). Pedido explícito del usuario: toda la marca de la app debe
+     ser el mismo teal principal + blanco, sin un segundo color de acento (ni azul
+     ni violeta) — así que este token es intencionalmente idéntico a --primary/
+     --primary-hover/--primary-soft, no un color propio. Se mantiene como variable
+     aparte (en vez de usar --primary directo en cada componente) solo para no
+     tener que retocar cada .scss si en el futuro se decide diferenciarlo de nuevo. */
+  --accent-purple: #0f766e;
+  --accent-purple-hover: #0b5a53;
+  --accent-purple-soft: #e1f2ef;
 
   /* Colores de marca de terceros (no forman parte de la paleta propia) */
   --brand-github: #6e5494;
@@ -57,8 +62,9 @@
   --border-strong: #94a3b8;
   --border-focus: #0f766e;
 
-  /* Acento sobre superficie oscura (ej. acción del snackbar, que usa fondo casi negro) */
-  --accent-on-dark: #93c5fd;
+  /* Acento sobre superficie oscura (ej. acción del snackbar, que usa fondo casi negro) —
+     teal claro, no azul, para no introducir un segundo color fuera de la marca. */
+  --accent-on-dark: #5eead4;
 
   /* Fondo semitransparente detrás de modales/diálogos */
   --overlay-scrim: rgba(0, 0, 0, 0.45);
@@ -137,7 +143,9 @@ $theme: mat.define-theme((
   color: (
     theme-type: light,
     primary: mat.$cyan-palette,
-    tertiary: mat.$blue-palette,
+    /* Antes mat.$blue-palette. Sin uso real (ningún componente pide color="tertiary"),
+       pero se alinea igual al mismo teal para no dejar ningún residuo azul en el tema. */
+    tertiary: mat.$cyan-palette,
   ),
   typography: (
     brand-family: var(--font-sans),

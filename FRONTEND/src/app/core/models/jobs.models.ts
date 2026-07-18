@@ -1,3 +1,10 @@
+/**
+ * Modelos de dominio del módulo de ofertas laborales (jobs.service.ts):
+ * ofertas publicadas por empresas, postulaciones de candidatos y el
+ * resultado de comparar las skills requeridas por la oferta contra las del
+ * candidato (SkillMatchResult), usado para mostrar el % de match y decidir
+ * si puede postularse.
+ */
 export interface JobOffer {
   id: number;
   companyId: number;
