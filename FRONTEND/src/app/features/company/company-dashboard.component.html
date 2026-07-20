@@ -45,48 +45,48 @@
 
     <!-- KPI Grid -->
     <div class="kpi-grid animate-fade-in-up">
-      <div class="kpi-card">
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-candidates"><mat-icon>people</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ data()?.candidatesCount ?? 0 }}</span>
           <span class="kpi-label">Candidatos disponibles</span>
         </div>
-      </div>
-      <div class="kpi-card">
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-published"><mat-icon>publish</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ data()?.publishedJobsCount ?? 0 }}</span>
           <span class="kpi-label">Vacantes publicadas</span>
         </div>
-      </div>
-      <div class="kpi-card">
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-draft"><mat-icon>edit_note</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ data()?.draftJobsCount ?? 0 }}</span>
           <span class="kpi-label">Vacantes en borrador</span>
         </div>
-      </div>
-      <div class="kpi-card">
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-closed"><mat-icon>do_not_disturb</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ data()?.closedJobsCount ?? 0 }}</span>
           <span class="kpi-label">Vacantes cerradas</span>
         </div>
-      </div>
-      <div class="kpi-card">
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-apps"><mat-icon>assignment</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ data()?.applicationsCount ?? 0 }}</span>
           <span class="kpi-label">Postulaciones recibidas</span>
         </div>
-      </div>
-      <div class="kpi-card">
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
         <div class="kpi-icon kpi-msgs"><mat-icon>chat</mat-icon></div>
         <div class="kpi-info">
           <span class="kpi-value">{{ unreadMessagesCount() }}</span>
           <span class="kpi-label">Mensajes sin leer</span>
         </div>
-      </div>
+      </div></app-card>
     </div>
 
     <!-- Recent jobs -->

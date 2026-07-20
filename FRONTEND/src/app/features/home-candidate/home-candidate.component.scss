@@ -30,8 +30,6 @@
 
 .hero-card {
   display: flex; align-items: center; gap: 20px;
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px 32px;
-  box-shadow: var(--shadow-xs);
   flex-wrap: wrap;
 }
 .hero-avatar {
@@ -55,8 +53,7 @@
   gap: 14px;
 }
 .stat-card {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px;
-  box-shadow: var(--shadow-xs); text-align: center;
+  text-align: center;
   .stat-label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
   .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
 }
@@ -172,17 +169,19 @@
 @include bp.tablet {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-grid { grid-template-columns: repeat(2, 1fr); }
-  .hero-card { flex-direction: column; text-align: center; padding: 22px; }
+  .hero-card { flex-direction: column; text-align: center; }
+  ::ng-deep .hero-card-wrap .app-card { padding: 22px; }
   .hero-actions { justify-content: center; }
 }
 
 @include bp.mobile {
   .inicio-page { gap: 18px; }
-  .hero-card { padding: 18px; gap: 12px; }
+  .hero-card { gap: 12px; }
+  ::ng-deep .hero-card-wrap .app-card { padding: 18px; }
   .hero-actions { width: 100%; flex-direction: column; }
   .hero-actions a { width: 100%; justify-content: center; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .stat-card { padding: 14px; }
+  ::ng-deep .stats-grid .app-card { padding: 14px; }
   .quick-grid { grid-template-columns: 1fr; }
   .next-step-card { padding: 16px; }
   .section-header { flex-wrap: wrap; gap: 6px; }

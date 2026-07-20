@@ -10,6 +10,7 @@ import { CompanyService, CandidateResult, FilterOptions } from '../../core/servi
 import { ChatService } from '../../core/services/chat.service';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { CardComponent } from '../../shared/components/card/card.component';
 
 /**
  * Buscador de candidatos para empresas (ruta "/company/candidates").
@@ -24,7 +25,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
     MatIconModule, MatTooltipModule, MatProgressBarModule, MatSnackBarModule,
-    BadgeComponent, ButtonDirective,
+    BadgeComponent, ButtonDirective, CardComponent,
   ],
   styleUrl: './company-candidates.component.scss',
   templateUrl: './company-candidates.component.html',

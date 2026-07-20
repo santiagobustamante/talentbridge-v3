@@ -8,6 +8,7 @@ import { DashboardService, CandidateDashboard, DashboardJob } from '../../core/s
 import { ChatService } from '../../core/services/chat.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { CardComponent } from '../../shared/components/card/card.component';
 import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
 import { statusToTone } from '../../shared/components/badge/status-tone.util';
 import { statusToLabel } from '../../shared/components/badge/status-label.util';
@@ -28,7 +29,7 @@ import { ProfileChecklistComponent, ProfileChecklistItem } from '../../shared/co
 @Component({
   selector: 'app-home-candidate',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, ButtonDirective, BadgeComponent, EmptyStateComponent, AppDatePipe, ProfileChecklistComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, ButtonDirective, CardComponent, BadgeComponent, EmptyStateComponent, AppDatePipe, ProfileChecklistComponent],
   templateUrl: './home-candidate.component.html',
   styleUrl: './home-candidate.component.scss',
 })

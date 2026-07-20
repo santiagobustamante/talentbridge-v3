@@ -11,6 +11,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Profile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { CardComponent } from '../../shared/components/card/card.component';
 import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
 import {
   normalizePhoneStorage,
@@ -37,7 +38,7 @@ type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' 
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule,
     MatIconModule, MatSlideToggleModule, MatSnackBarModule, MatTooltipModule,
-    ButtonDirective, GithubWarningComponent,
+    ButtonDirective, CardComponent, GithubWarningComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',

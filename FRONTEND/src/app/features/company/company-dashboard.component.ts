@@ -7,6 +7,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { DashboardService, CompanyDashboard } from '../../core/services/dashboard.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { CardComponent } from '../../shared/components/card/card.component';
 import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
 import { statusToTone } from '../../shared/components/badge/status-tone.util';
 import { statusToLabel } from '../../shared/components/badge/status-label.util';
@@ -23,7 +24,7 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 @Component({
   selector: 'app-company-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, ButtonDirective, BadgeComponent, EmptyStateComponent, AppDatePipe],
+  imports: [CommonModule, RouterModule, MatIconModule, ButtonDirective, CardComponent, BadgeComponent, EmptyStateComponent, AppDatePipe],
   styleUrl: './company-dashboard.component.scss',
   templateUrl: './company-dashboard.component.html',
 })

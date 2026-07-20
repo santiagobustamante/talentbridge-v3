@@ -32,43 +32,47 @@
   <!-- ===================== MODO LECTURA ===================== -->
   @if (!isEditing && !loading && !loadError) {
     <div class="company-summary">
-      <div class="summary-header">
-        <div class="company-avatar">
-          @if (summaryProfile.logoUrl; as logo) {
-            <img [src]="logo" [alt]="summaryProfile.companyName" />
-          } @else {
-            {{ getInitials(summaryProfile.companyName) }}
-          }
+      <app-card variant="flat" padding="lg">
+        <div class="summary-header">
+          <div class="company-avatar">
+            @if (summaryProfile.logoUrl; as logo) {
+              <img [src]="logo" [alt]="summaryProfile.companyName" />
+            } @else {
+              {{ getInitials(summaryProfile.companyName) }}
+            }
+          </div>
+          <div>
+            <h2>{{ displayValue(summaryProfile.companyName, 'Nombre de empresa no agregado') }}</h2>
+            <p>{{ displayValue(summaryProfile.sector, 'Sector no agregado') }}</p>
+            <span class="summary-location">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
+          </div>
         </div>
-        <div>
-          <h2>{{ displayValue(summaryProfile.companyName, 'Nombre de empresa no agregado') }}</h2>
-          <p>{{ displayValue(summaryProfile.sector, 'Sector no agregado') }}</p>
-          <span class="summary-location">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
-        </div>
-      </div>
+      </app-card>
 
-      <div class="summary-block">
-        <h3>Descripción empresarial</h3>
-        <p>{{ displayValue(summaryProfile.description) }}</p>
-      </div>
+      <app-card variant="flat" padding="lg">
+        <div class="summary-block">
+          <h3>Descripción empresarial</h3>
+          <p>{{ displayValue(summaryProfile.description) }}</p>
+        </div>
+      </app-card>
 
       <div class="summary-grid">
-        <div class="summary-item">
+        <app-card variant="flat" padding="sm"><div class="summary-item">
           <span>Teléfono</span>
           <strong>{{ displayPhone(summaryProfile.phone) }}</strong>
-        </div>
-        <div class="summary-item">
+        </div></app-card>
+        <app-card variant="flat" padding="sm"><div class="summary-item">
           <span>Sitio web</span>
           <strong>{{ displayValue(summaryProfile.websiteUrl) }}</strong>
-        </div>
-        <div class="summary-item">
+        </div></app-card>
+        <app-card variant="flat" padding="sm"><div class="summary-item">
           <span>NIT</span>
           <strong>{{ displayNit(summaryProfile.nit) }}</strong>
-        </div>
-        <div class="summary-item">
+        </div></app-card>
+        <app-card variant="flat" padding="sm"><div class="summary-item">
           <span>Logo</span>
           <strong>{{ displayValue(summaryProfile.logoUrl) }}</strong>
-        </div>
+        </div></app-card>
       </div>
     </div>
   }
@@ -77,7 +81,7 @@
   @if (isEditing && !loading && !loadError) {
     <form [formGroup]="form" (ngSubmit)="save()" class="company-form">
 
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>business</mat-icon>
           <h2>Información principal</h2>
@@ -104,9 +108,9 @@
             <textarea class="app-textarea" formControlName="description" rows="4" (blur)="onDescriptionBlur()" placeholder="Describe tu empresa, misión, y el tipo de talento que buscas..."></textarea>
           </div>
         </div>
-      </div>
+      </app-card>
 
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>contact_phone</mat-icon>
           <h2>Contacto</h2>
@@ -121,9 +125,9 @@
             <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" (blur)="onWebsiteBlur()" placeholder="https://miempresa.com" />
           </div>
         </div>
-      </div>
+      </app-card>
 
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>image</mat-icon>
           <h2>Logo</h2>
@@ -134,7 +138,7 @@
             <input class="app-input" type="url" formControlName="logoUrl" autocomplete="url" placeholder="https://miempresa.com/logo.png" />
           </div>
         </div>
-      </div>
+      </app-card>
 
       <div class="form-actions">
         <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>

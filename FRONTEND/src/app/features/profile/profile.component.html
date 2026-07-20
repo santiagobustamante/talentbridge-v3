@@ -32,75 +32,87 @@
   <!-- ===================== MODO LECTURA ===================== -->
   @if (!isEditing && !loading && !loadError) {
     <div class="profile-summary">
-      <div class="summary-avatar-row">
-        <div class="summary-avatar">{{ getInitials(summaryProfile.fullName) }}</div>
-        <div class="summary-avatar-info">
-          <h2>{{ displayValue(summaryProfile.fullName, 'Nombre no agregado') }}</h2>
-          <p>{{ displayValue(summaryProfile.professionalTitle, 'Título profesional no agregado') }}</p>
-          <span class="summary-city">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
-          <div class="summary-visibility-control">
-            <span>{{ summaryProfile.showCity ? 'Visible en perfil público' : 'Oculta en perfil público' }}</span>
-            <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showCity" [attr.aria-pressed]="profile?.showCity" aria-label="Cambiar visibilidad de ciudad" (click)="toggleSummaryVisibility('showCity')">
-              <span></span>
-            </button>
+      <app-card variant="flat" padding="lg">
+        <div class="summary-avatar-row">
+          <div class="summary-avatar">{{ getInitials(summaryProfile.fullName) }}</div>
+          <div class="summary-avatar-info">
+            <h2>{{ displayValue(summaryProfile.fullName, 'Nombre no agregado') }}</h2>
+            <p>{{ displayValue(summaryProfile.professionalTitle, 'Título profesional no agregado') }}</p>
+            <span class="summary-city">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
+            <div class="summary-visibility-control">
+              <span>{{ summaryProfile.showCity ? 'Visible en perfil público' : 'Oculta en perfil público' }}</span>
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showCity" [attr.aria-pressed]="profile?.showCity" aria-label="Cambiar visibilidad de ciudad" (click)="toggleSummaryVisibility('showCity')">
+                <span></span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </app-card>
 
-      <div class="summary-resume">
-        <h3>Resumen profesional</h3>
-        <p>{{ displayValue(summaryProfile.summary) }}</p>
-      </div>
+      <app-card variant="flat" padding="lg">
+        <div class="summary-resume">
+          <h3>Resumen profesional</h3>
+          <p>{{ displayValue(summaryProfile.summary) }}</p>
+        </div>
+      </app-card>
 
       <div class="summary-contact-grid">
-        <div class="summary-contact-item summary-item--with-switch">
-          <div class="summary-item-main">
-            <span>Teléfono</span>
-            <strong>{{ displayPhone(summaryProfile.phone) }}</strong>
+        <app-card variant="flat" padding="sm">
+          <div class="summary-contact-item summary-item--with-switch">
+            <div class="summary-item-main">
+              <span>Teléfono</span>
+              <strong>{{ displayPhone(summaryProfile.phone) }}</strong>
+            </div>
+            <div class="summary-visibility-control">
+              <span>{{ profile?.showPhone ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showPhone" [attr.aria-pressed]="profile?.showPhone" aria-label="Cambiar visibilidad del teléfono" (click)="toggleSummaryVisibility('showPhone')">
+                <span></span>
+              </button>
+            </div>
           </div>
-          <div class="summary-visibility-control">
-            <span>{{ profile?.showPhone ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
-            <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showPhone" [attr.aria-pressed]="profile?.showPhone" aria-label="Cambiar visibilidad del teléfono" (click)="toggleSummaryVisibility('showPhone')">
-              <span></span>
-            </button>
+        </app-card>
+        <app-card variant="flat" padding="sm">
+          <div class="summary-contact-item summary-item--with-switch">
+            <div class="summary-item-main">
+              <span>LinkedIn</span>
+              <strong>{{ displayValue(summaryProfile.linkedinUrl) }}</strong>
+            </div>
+            <div class="summary-visibility-control">
+              <span>{{ profile?.showLinkedin ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showLinkedin" [attr.aria-pressed]="profile?.showLinkedin" aria-label="Cambiar visibilidad de LinkedIn" (click)="toggleSummaryVisibility('showLinkedin')">
+                <span></span>
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="summary-contact-item summary-item--with-switch">
-          <div class="summary-item-main">
-            <span>LinkedIn</span>
-            <strong>{{ displayValue(summaryProfile.linkedinUrl) }}</strong>
+        </app-card>
+        <app-card variant="flat" padding="sm">
+          <div class="summary-contact-item summary-item--with-switch">
+            <div class="summary-item-main">
+              <span>GitHub</span>
+              <strong>{{ displayValue(summaryProfile.githubUrl) }}</strong>
+            </div>
+            <div class="summary-visibility-control">
+              <span>{{ profile?.showGithub ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showGithub" [attr.aria-pressed]="profile?.showGithub" aria-label="Cambiar visibilidad de GitHub" (click)="toggleSummaryVisibility('showGithub')">
+                <span></span>
+              </button>
+            </div>
           </div>
-          <div class="summary-visibility-control">
-            <span>{{ profile?.showLinkedin ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
-            <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showLinkedin" [attr.aria-pressed]="profile?.showLinkedin" aria-label="Cambiar visibilidad de LinkedIn" (click)="toggleSummaryVisibility('showLinkedin')">
-              <span></span>
-            </button>
+        </app-card>
+        <app-card variant="flat" padding="sm">
+          <div class="summary-contact-item summary-item--with-switch">
+            <div class="summary-item-main">
+              <span>Sitio web</span>
+              <strong>{{ displayValue(summaryProfile.websiteUrl) }}</strong>
+            </div>
+            <div class="summary-visibility-control">
+              <span>{{ profile?.showWebsite ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showWebsite" [attr.aria-pressed]="profile?.showWebsite" aria-label="Cambiar visibilidad del sitio web" (click)="toggleSummaryVisibility('showWebsite')">
+                <span></span>
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="summary-contact-item summary-item--with-switch">
-          <div class="summary-item-main">
-            <span>GitHub</span>
-            <strong>{{ displayValue(summaryProfile.githubUrl) }}</strong>
-          </div>
-          <div class="summary-visibility-control">
-            <span>{{ profile?.showGithub ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
-            <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showGithub" [attr.aria-pressed]="profile?.showGithub" aria-label="Cambiar visibilidad de GitHub" (click)="toggleSummaryVisibility('showGithub')">
-              <span></span>
-            </button>
-          </div>
-        </div>
-        <div class="summary-contact-item summary-item--with-switch">
-          <div class="summary-item-main">
-            <span>Sitio web</span>
-            <strong>{{ displayValue(summaryProfile.websiteUrl) }}</strong>
-          </div>
-          <div class="summary-visibility-control">
-            <span>{{ profile?.showWebsite ? 'Visible en perfil público' : 'Oculto en perfil público' }}</span>
-            <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showWebsite" [attr.aria-pressed]="profile?.showWebsite" aria-label="Cambiar visibilidad del sitio web" (click)="toggleSummaryVisibility('showWebsite')">
-              <span></span>
-            </button>
-          </div>
-        </div>
+        </app-card>
       </div>
 
       @if (summaryProfile.slug) {
@@ -117,7 +129,7 @@
     <form [formGroup]="form" (ngSubmit)="save()" class="profile-form">
 
       <!-- Card 1: Información principal -->
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>person</mat-icon>
           <h2>Información principal</h2>
@@ -146,10 +158,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </app-card>
 
       <!-- Card 2: Contacto -->
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>contact_phone</mat-icon>
           <h2>Contacto</h2>
@@ -166,10 +178,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </app-card>
 
       <!-- Card 3: Enlaces profesionales -->
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>hub</mat-icon>
           <h2>Enlaces profesionales</h2>
@@ -207,10 +219,10 @@
             </div>
           </div>
         </div>
-      </div>
+      </app-card>
 
       <!-- Card 4: URL pública -->
-      <div class="form-card">
+      <app-card variant="flat" padding="lg">
         <div class="form-card-header">
           <mat-icon>link</mat-icon>
           <h2>URL pública</h2>
@@ -242,7 +254,7 @@
             </a>
           </div>
         }
-      </div>
+      </app-card>
 
       <div class="form-actions">
         <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>

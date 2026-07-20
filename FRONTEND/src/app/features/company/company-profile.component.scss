@@ -45,8 +45,6 @@
 
 .summary-header {
   display: flex; align-items: center; gap: 16px;
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-xs);
   h2 { margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
   p { margin: 4px 0 0; color: var(--text-muted); }
   .summary-location { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 4px; }
@@ -66,26 +64,18 @@
 }
 
 .summary-block {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-xs);
   h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
   p { margin: 0; color: var(--text-secondary); line-height: 1.55; overflow-wrap: anywhere; }
 }
 
 .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .summary-item {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px;
-  box-shadow: var(--shadow-xs);
   span { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 5px; }
   strong { color: var(--text-main); overflow-wrap: anywhere; font-size: 0.95rem; }
 }
 
 .company-form { display: grid; gap: 24px; }
 
-.form-card {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-sm);
-}
 .form-card-header {
   display: flex; align-items: center; gap: 12px; padding-bottom: 16px; margin-bottom: 22px;
   border-bottom: 1px solid var(--border-soft);
@@ -126,12 +116,12 @@
 @include bp.tablet {
   .page-header { flex-direction: column; align-items: flex-start; }
   .summary-grid { grid-template-columns: 1fr; }
-  .form-card { padding: 18px; }
+  ::ng-deep .company-form .app-card { padding: 18px; }
   .form-actions { flex-direction: column; align-items: stretch; }
   .btn-save { justify-content: center; }
 }
 
 @include bp.mobile {
-  .summary-header, .summary-block { padding: 18px; }
+  ::ng-deep .company-summary .app-card { padding: 18px; }
   .edit-btn { width: 100%; justify-content: center; }
 }

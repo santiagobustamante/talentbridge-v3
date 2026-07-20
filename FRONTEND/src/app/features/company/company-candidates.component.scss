@@ -19,11 +19,6 @@
   p { font-size: 0.85rem; color: var(--text-muted); margin: 3px 0 0; }
 }
 
-.search-card {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 22px;
-  box-shadow: var(--shadow-xs);
-}
-
 .search-row {
   display: flex; gap: 10px; align-items: center;
 }
@@ -156,12 +151,6 @@
   display: grid; gap: 16px;
 }
 
-.candidate-card {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 24px;
-  box-shadow: var(--shadow-xs); transition: box-shadow 150ms ease;
-  &:hover { box-shadow: var(--shadow-md); }
-}
-
 .card-top {
   display: flex; align-items: flex-start; gap: 14px;
   .app-btn { flex-shrink: 0; }
@@ -278,7 +267,7 @@
 }
 
 @include bp.mobile {
-  .search-card { padding: 16px; }
+  ::ng-deep .candidates-page > .app-card { padding: 16px; }
 
   /* Input + botón Buscar + botón Filtros en una fila no entran en 375px —
      se apilan, cada uno a ancho completo. */
@@ -286,7 +275,7 @@
   .search-input-wrap { width: 100%; }
   .btn-search, .btn-toggle-filters { width: 100%; justify-content: center; }
 
-  .candidate-card { padding: 16px; }
+  ::ng-deep .results-grid .app-card { padding: 16px; }
   .card-top { gap: 10px; }
   .view-btn, .card-top .app-btn { flex: 1 1 auto; justify-content: center; }
 }

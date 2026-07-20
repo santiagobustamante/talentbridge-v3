@@ -12,7 +12,7 @@
     </div>
   </header>
 
-  <div class="search-card">
+  <app-card variant="flat" padding="lg">
     <div class="search-row">
       <div class="search-input-wrap">
         <mat-icon class="search-icon">search</mat-icon>
@@ -98,7 +98,7 @@
         </button>
       </div>
     }
-  </div>
+  </app-card>
 
   @if (loading()) {
     <div class="loading-bar">
@@ -133,7 +133,7 @@
   @if (candidates.length > 0) {
     <div class="results-grid">
       @for (c of candidates; track c.id) {
-        <div class="candidate-card">
+        <app-card variant="flat" padding="lg">
           <div class="card-top">
             <div class="candidate-avatar">{{ (c.fullName || 'C').charAt(0).toUpperCase() }}</div>
             <div class="candidate-main">
@@ -195,7 +195,7 @@
               }
             </div>
           }
-        </div>
+        </app-card>
       }
     </div>
   }

@@ -22,24 +22,26 @@
     </div>
   } @else {
     <!-- Hero -->
-    <div class="hero-card animate-fade-in-scale">
-      <div class="hero-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
-      <div class="hero-text">
-        <h2>Bienvenido de vuelta, {{ userName }}</h2>
-        <p>Gestiona tu perfil profesional, revisa oportunidades y mantén tu portafolio actualizado.</p>
+    <app-card variant="flat" padding="lg" class="hero-card-wrap animate-fade-in-scale">
+      <div class="hero-card">
+        <div class="hero-avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+        <div class="hero-text">
+          <h2>Bienvenido de vuelta, {{ userName }}</h2>
+          <p>Gestiona tu perfil profesional, revisa oportunidades y mantén tu portafolio actualizado.</p>
+        </div>
+        <div class="hero-actions">
+          <a appButton="primary" routerLink="/app/profile">
+            <mat-icon>person</mat-icon>Editar perfil
+          </a>
+          <a appButton="secondary" routerLink="/app/public-view">
+            <mat-icon>visibility</mat-icon>Vista pública
+          </a>
+          <a appButton="secondary" routerLink="/app/jobs">
+            <mat-icon>work</mat-icon>Buscar trabajos
+          </a>
+        </div>
       </div>
-      <div class="hero-actions">
-        <a appButton="primary" routerLink="/app/profile">
-          <mat-icon>person</mat-icon>Editar perfil
-        </a>
-        <a appButton="secondary" routerLink="/app/public-view">
-          <mat-icon>visibility</mat-icon>Vista pública
-        </a>
-        <a appButton="secondary" routerLink="/app/jobs">
-          <mat-icon>work</mat-icon>Buscar trabajos
-        </a>
-      </div>
-    </div>
+    </app-card>
 
     <!-- Profile checklist -->
     @if (data.profilePercent < 100) {
@@ -48,26 +50,26 @@
 
     <!-- Stats grid -->
     <div class="stats-grid animate-fade-in-up">
-      <div class="stat-card">
+      <app-card variant="flat" padding="sm"><div class="stat-card">
         <span class="stat-label">Habilidades</span>
         <strong class="stat-value">{{ data.skillsCount }}</strong>
-      </div>
-      <div class="stat-card">
+      </div></app-card>
+      <app-card variant="flat" padding="sm"><div class="stat-card">
         <span class="stat-label">Proyectos</span>
         <strong class="stat-value">{{ data.projectsCount }}</strong>
-      </div>
-      <div class="stat-card">
+      </div></app-card>
+      <app-card variant="flat" padding="sm"><div class="stat-card">
         <span class="stat-label">Postulaciones</span>
         <strong class="stat-value">{{ data.applicationsCount }}</strong>
-      </div>
-      <div class="stat-card">
+      </div></app-card>
+      <app-card variant="flat" padding="sm"><div class="stat-card">
         <span class="stat-label">Mensajes sin leer</span>
         <strong class="stat-value">{{ unreadMessagesCount }}</strong>
-      </div>
-      <div class="stat-card">
+      </div></app-card>
+      <app-card variant="flat" padding="sm"><div class="stat-card">
         <span class="stat-label">Vistas de tu perfil</span>
         <strong class="stat-value">{{ data.profileViewsCount }}</strong>
-      </div>
+      </div></app-card>
     </div>
 
     <!-- Next step -->
@@ -100,7 +102,7 @@
             <a class="job-item" [routerLink]="'/app/jobs'">
               <div class="job-item-avatar">
                 @if (job.company?.logoUrl; as logo) {
-                  <img [src]="logo" [alt]="job.company?.companyName || ''" style="width:100%;height:100%;object-fit:cover" />
+                  <img [src]="logo" [alt]="job.company?.companyName || ''" loading="lazy" style="width:100%;height:100%;object-fit:cover" />
                 } @else {
                   {{ (job.company?.companyName || 'E').charAt(0) }}
                 }

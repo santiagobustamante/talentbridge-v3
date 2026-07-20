@@ -68,8 +68,6 @@
 
 .summary-avatar-row {
   display: flex; align-items: flex-start; gap: 16px;
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-xs);
   h2 { margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
   p { margin: 4px 0 0; color: var(--text-muted); }
   .summary-city { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 4px; }
@@ -92,8 +90,6 @@
 }
 
 .summary-resume {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-xs);
   h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; color: var(--text-main); }
   p { margin: 0; color: var(--text-secondary); line-height: 1.55; overflow-wrap: anywhere; }
 }
@@ -105,8 +101,6 @@
 }
 
 .summary-contact-item {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px;
-  box-shadow: var(--shadow-xs);
   span { display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 5px; }
   strong { color: var(--text-main); overflow-wrap: anywhere; font-size: 0.95rem; }
 }
@@ -151,11 +145,6 @@
 /* ─── Form (edit mode) ───────────────────── */
 .profile-form {
   display: grid; gap: 24px;
-}
-
-.form-card {
-  background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 18px; padding: 28px;
-  box-shadow: var(--shadow-sm);
 }
 
 .form-card-header {
@@ -293,7 +282,13 @@
 @include bp.tablet {
   .summary-contact-grid { grid-template-columns: 1fr; }
   .page-header { flex-direction: column; align-items: flex-start; }
-  .form-card { padding: 18px; }
+  // El padding de app-card es fijo por @Input (no responsive) — se reduce acá
+  // con ::ng-deep para no perder el ajuste de espaciado en pantallas chicas
+  // que tenía el CSS hecho a mano antes de adoptar el componente compartido.
+  ::ng-deep .profile-form .app-card,
+  ::ng-deep .profile-summary .app-card {
+    padding: 18px;
+  }
   .form-actions { flex-direction: column; align-items: stretch; }
   .form-actions .app-btn { justify-content: center; }
   .summary-item--with-switch {
@@ -310,10 +305,12 @@
   .profile-page { gap: 16px; }
   .page-header { gap: 12px; }
   .edit-btn { width: 100%; justify-content: center; }
-  .summary-avatar-row, .summary-resume, .form-card { padding: 16px; }
+  ::ng-deep .profile-form .app-card,
+  ::ng-deep .profile-summary .app-card {
+    padding: 16px;
+  }
   .summary-avatar-row { flex-wrap: wrap; }
   .summary-avatar { flex-shrink: 0; }
-  .summary-contact-item { padding: 14px; }
   .slug-row { flex-wrap: wrap; }
   .slug-row .app-btn { width: 100%; justify-content: center; }
   .slug-actions .app-btn { width: 100%; justify-content: center; }

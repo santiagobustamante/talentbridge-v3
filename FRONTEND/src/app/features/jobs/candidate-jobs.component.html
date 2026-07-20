@@ -74,7 +74,7 @@
             <div class="job-card-header">
               <div class="company-avatar">
                 @if (companyLogo(job); as logo) {
-                  <img [src]="logo" [alt]="companyName(job)" (error)="onImgError($event)" />
+                  <img [src]="logo" [alt]="companyName(job)" loading="lazy" (error)="onImgError($event)" />
                 } @else {
                   {{ companyName(job).charAt(0).toUpperCase() }}
                 }
@@ -258,7 +258,7 @@
             <div class="app-card-header">
               <div class="app-company-avatar">
                 @if (appCompanyLogo(app); as logo) {
-                  <img [src]="logo" [alt]="appCompanyName(app)" (error)="onImgError($event)" />
+                  <img [src]="logo" [alt]="appCompanyName(app)" loading="lazy" (error)="onImgError($event)" />
                 } @else {
                   {{ appCompanyName(app).charAt(0).toUpperCase() }}
                 }

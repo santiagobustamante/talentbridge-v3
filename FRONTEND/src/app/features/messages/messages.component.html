@@ -43,7 +43,7 @@
             >
               <div class="conversation-avatar">
                 @if (contactLogo(conv); as logo) {
-                  <img [src]="logo" [alt]="contactName(conv)" (error)="onImgError($event)" />
+                  <img [src]="logo" [alt]="contactName(conv)" loading="lazy" (error)="onImgError($event)" />
                 } @else {
                   {{ contactName(conv).charAt(0).toUpperCase() }}
                 }

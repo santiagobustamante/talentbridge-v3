@@ -7,6 +7,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CompanyService } from '../../core/services/company.service';
 import { CompanyProfile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { CardComponent } from '../../shared/components/card/card.component';
 import {
   normalizePhoneStorage,
   formatPhoneDisplay,
@@ -27,7 +28,7 @@ import {
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, CardComponent],
   templateUrl: './company-profile.component.html',
   styleUrl: './company-profile.component.scss',
 })
