@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } f
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { JobsService } from './jobs.service';
+import { CreateJobOfferDto } from './dto/create-job-offer.dto';
 
 @Controller('company/jobs')
 export class CompanyJobsController {
@@ -24,14 +25,14 @@ export class CompanyJobsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Post()
-  async createJob(@CurrentUser() user: { sub: number }, @Body() dto: any) {
+  async createJob(@CurrentUser() user: { sub: number }, @Body() dto: CreateJobOfferDto) {
     return this.jobsService.createJob(user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id')
-  async updateJob(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() dto: any) {
+  async updateJob(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() dto: CreateJobOfferDto) {
     return this.jobsService.updateJob(user.sub, +id, dto);
   }
 

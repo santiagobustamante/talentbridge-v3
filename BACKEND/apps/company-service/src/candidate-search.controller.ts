@@ -1,18 +1,21 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard, CurrentUser } from '@app/auth';
+import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
+import { UserRole } from '@app/database';
 import { CandidateSearchService } from './candidate-search.service';
 
 @Controller('company')
 export class CandidateSearchController {
   constructor(private readonly candidateSearchService: CandidateSearchService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COMPANY)
   @Get('candidates/filter-options')
   async getFilterOptions() {
     return this.candidateSearchService.getFilterOptions();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COMPANY)
   @Get('candidates/search')
   async search(
     @CurrentUser() user: { sub: number },
@@ -31,7 +34,8 @@ export class CandidateSearchController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.COMPANY)
   @Get('candidates/suggestions')
   async suggestions(@Query('q') q?: string) {
     return this.candidateSearchService.suggestions(q || '');

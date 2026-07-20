@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { Readable } from 'stream';
 
 @Injectable()
 export class HttpClient {
@@ -23,24 +24,42 @@ export class HttpClient {
     const contentType = (req.headers['content-type'] || '') as string;
     const isMultipart = contentType.includes('multipart/form-data');
 
-    if (!isMultipart && ['POST', 'PATCH', 'PUT'].includes(method)) {
+    if (isMultipart) {
+      // El body-parser de Nest/Express no consume multipart (eso lo hace multer,
+      // que este gateway no usa), así que el stream crudo de la request sigue
+      // disponible acá — se reenvía tal cual en vez de perderlo, junto con el
+      // Content-Type original (incluye el boundary, imprescindible para que el
+      // servicio destino pueda parsear el archivo).
+      headers['Content-Type'] = contentType;
+    } else if (['POST', 'PATCH', 'PUT'].includes(method)) {
       if (!contentType || contentType.includes('application/json')) {
         headers['Content-Type'] = 'application/json';
       }
     }
 
     let body: BodyInit | undefined;
-    if (['POST', 'PATCH', 'PUT'].includes(method) && !isMultipart && req.body) {
-      try {
-        body = JSON.stringify(req.body);
-      } catch {
-        body = undefined;
+    if (['POST', 'PATCH', 'PUT'].includes(method)) {
+      if (isMultipart) {
+        body = Readable.toWeb(req) as unknown as ReadableStream;
+      } else if (req.body) {
+        try {
+          body = JSON.stringify(req.body);
+        } catch {
+          body = undefined;
+        }
       }
     }
 
     this.logger.log(`Proxying ${method} ${targetUrl}`);
 
-    fetch(targetUrl, { method, headers, body })
+    fetch(targetUrl, {
+      method,
+      headers,
+      body,
+      // Requerido por Node/undici cuando el body es un stream en vez de un
+      // buffer/string ya completo (caso multipart de arriba).
+      ...(isMultipart ? { duplex: 'half' as const } : {}),
+    })
       .then(async (response) => {
         const setCookie = response.headers.get('set-cookie');
         if (setCookie) {

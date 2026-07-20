@@ -13,13 +13,21 @@ const cookieExtractor = (req: Request): string | null => {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
+    const secret = process.env['JWT_SECRET'];
+    if (!secret) {
+      // Antes caía a un secreto hardcodeado ('dev_secret') si faltaba la
+      // variable de entorno — cualquier deploy sin JWT_SECRET seteado firmaba
+      // y validaba tokens con un valor público y predecible. Mejor fallar al
+      // arrancar que arrancar inseguro en silencio.
+      throw new Error('JWT_SECRET no está seteado. El servicio no puede arrancar sin este secreto.');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         cookieExtractor,
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-      secretOrKey: process.env['JWT_SECRET'] || 'dev_secret',
+      secretOrKey: secret,
     });
   }
 

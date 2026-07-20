@@ -166,6 +166,14 @@ Basado en una auditoría de código + navegación en vivo del 2026-07-11, más 1
 
 ---
 
+## Plan vigente: Correcciones de seguridad y bugs reales (`plan-correcciones-seguridad-y-bugs.md`)
+
+**Objetivo:** Cerrar los hallazgos reales (no hipotéticos) de la auditoría técnica completa del 2026-07-18 — 4 críticos de seguridad/funcionalidad, 5 altos, 3 medios. Detalle completo, con archivo/línea y criterio de aceptación por ítem, en [`plan-correcciones-seguridad-y-bugs.md`](./plan-correcciones-seguridad-y-bugs.md).
+**Estado:** Planificado, sin implementar — el usuario pidió dejarlo listo para la próxima sesión ("lo haremos mañana").
+**Al retomar:** Empezar por la Fase 0 (crítico) del plan, en orden, uno por uno con su propio build/prueba.
+
+---
+
 ## Plan previo (ya completo, no vigente): Consistencia de CSS
 
 Ver [`plan-consistencia-css.md`](./plan-consistencia-css.md) — sistema de diseño base (tokens, componentes compartidos Button/Badge/Card). Completo, es la base sobre la que se construye el plan de arriba.

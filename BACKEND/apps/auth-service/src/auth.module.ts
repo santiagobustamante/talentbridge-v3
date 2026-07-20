@@ -10,6 +10,15 @@ import { JwtStrategy, OptionalJwtAuthGuard } from '@app/auth';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
+// Antes caía a un secreto hardcodeado ('dev_secret') si faltaba la variable
+// de entorno — cualquier deploy sin JWT_SECRET seteado firmaba tokens con un
+// valor público y predecible. Mejor fallar al arrancar que arrancar inseguro
+// en silencio.
+const jwtSecret = process.env['JWT_SECRET'];
+if (!jwtSecret) {
+  throw new Error('JWT_SECRET no está seteado. El servicio no puede arrancar sin este secreto.');
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -17,7 +26,7 @@ import { AuthService } from './auth.service';
     CommonModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env['JWT_SECRET'] || 'dev_secret',
+      secret: jwtSecret,
       signOptions: { expiresIn: '1d' as StringValue },
     }),
   ],

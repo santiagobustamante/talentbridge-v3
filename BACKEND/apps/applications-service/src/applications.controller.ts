@@ -2,6 +2,8 @@ import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@ne
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { ApplicationsService } from './applications.service';
+import { ApplyDto } from './dto/apply.dto';
+import { UpdateApplicationStatusDto } from './dto/update-application-status.dto';
 
 /**
  * Controller HTTP del microservicio de Postulaciones. Expone los endpoints
@@ -22,7 +24,7 @@ export class ApplicationsController {
    */
   @UseGuards(JwtAuthGuard)
   @Post('jobs/:id/apply')
-  async apply(@CurrentUser() user: { sub: number }, @Param('id') jobId: string, @Body() body: any) {
+  async apply(@CurrentUser() user: { sub: number }, @Param('id') jobId: string, @Body() body: ApplyDto) {
     return this.applicationsService.apply(user.sub, +jobId, body.coverMessage);
   }
 
@@ -63,7 +65,7 @@ export class ApplicationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch('company/applications/:id/status')
-  async updateStatus(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() body: any) {
+  async updateStatus(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() body: UpdateApplicationStatusDto) {
     return this.applicationsService.updateStatus(user.sub, +id, body.status);
   }
 }
