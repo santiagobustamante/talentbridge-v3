@@ -73,6 +73,10 @@ Más cuentas y su origen (qué seed las crea): [`docs/DATABASE.md`](./docs/DATAB
 - El frontend **no** está en `docker-compose.yml` — se corre aparte con `npm start`.
 - Nunca `docker compose down -v`. Si hace falta bajar servicios, `docker compose -p version3 down` (sin `-v`) o `docker compose -p version3 stop <servicio>`.
 
+## Despliegue en producción
+
+El proyecto está desplegado: frontend en Vercel, los 10 microservicios en Render, base de datos en Supabase. URLs, IDs de servicio, variables de entorno, cómo redesplegar, cómo migrar el schema contra producción (¡ojo con el pooler de Supabase, tiene una trampa!) y usuarios de prueba: **[`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)**. Leer antes de tocar cualquier cosa relacionada al entorno desplegado — no repetir el diagnóstico de cero.
+
 ## Reglas de Git
 
 - `git status` **antes** de cualquier cambio (para saber qué ya estaba modificado y no es tuyo) y **después** (para confirmar que lo tocado es lo esperado).
