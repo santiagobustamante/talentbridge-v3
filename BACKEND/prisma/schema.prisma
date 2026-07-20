@@ -33,6 +33,7 @@ model User {
   jobOffers              JobOffer[]
   jobApplications        JobApplication[]
   skillEndorsementsGiven SkillEndorsement[]
+  notifications          Notification[]
 
   @@map("users")
 }
@@ -340,4 +341,34 @@ model JobApplication {
   @@index([jobOfferId])
   @@index([status])
   @@map("job_applications")
+}
+
+/**
+ * Tipo de evento que genera una notificación in-app. NEW_APPLICATION y
+ * APPLICATION_STATUS_CHANGED se disparan desde applications-service (los dos
+ * puntos donde ya existía el evento real: alguien se postula, alguien cambia
+ * el estado). JOB_MATCH se dispara desde jobs-service al publicar una vacante
+ * nueva, para los candidatos cuyo perfil matchea razonablemente los requisitos.
+ */
+enum NotificationType {
+  NEW_APPLICATION
+  APPLICATION_STATUS_CHANGED
+  JOB_MATCH
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

@@ -6,6 +6,8 @@ import { AllExceptionsFilter, CommonModule } from '@app/common';
 import { AuthLibModule } from '@app/auth';
 import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
+import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
 
 /**
  * Módulo raíz del microservicio de Postulaciones (Applications Service).
@@ -23,9 +25,10 @@ import { ApplicationsService } from './applications.service';
     CommonModule,
     AuthLibModule,
   ],
-  controllers: [ApplicationsController],
+  controllers: [ApplicationsController, NotificationsController],
   providers: [
     ApplicationsService,
+    NotificationsService,
     {
       provide: APP_PIPE,
       useFactory: () =>

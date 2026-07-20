@@ -9,6 +9,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
 import { AssistantChatComponent } from '../assistant/assistant-chat.component';
+import { NotificationBellComponent } from '../components/notification-bell/notification-bell.component';
 
 /** Un ítem del menú de navegación lateral (label largo + subtítulo corto, ícono e ruta destino). */
 interface NavItem {
@@ -36,6 +37,7 @@ interface NavItem {
     MatButtonModule,
     MatTooltipModule,
     AssistantChatComponent,
+    NotificationBellComponent,
   ],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',

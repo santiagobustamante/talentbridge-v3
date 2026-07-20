@@ -1,6 +1,16 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
-import { PrismaService, JobOfferStatus, JobApplicationStatus } from '@app/database';
+import { PrismaService, JobOfferStatus, JobApplicationStatus, NotificationType } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
+import { NotificationsService } from './notifications.service';
+
+/** Traduce el estado de una postulación al texto que ve el candidato en su notificación. */
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: 'Pendiente',
+  REVIEWED: 'Revisada',
+  PRESELECTED: 'Preseleccionado',
+  REJECTED: 'Rechazada',
+  HIRED: 'Contratado',
+};
 
 /**
  * Lógica de negocio de las postulaciones. Encapsula todas las reglas de
@@ -10,7 +20,10 @@ import { computeSkillMatch } from '@app/contracts';
  */
 @Injectable()
 export class ApplicationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   /**
    * Crea una postulación de un candidato a una oferta. Antes de guardar,
@@ -43,7 +56,7 @@ export class ApplicationsService {
       throw new BadRequestException('No tienes al menos una habilidad que coincida con los requisitos de esta oferta');
     }
 
-    return this.prisma.jobApplication.create({
+    const application = await this.prisma.jobApplication.create({
       data: {
         jobOfferId: jobId,
         candidateId: candidateUserId,
@@ -51,6 +64,17 @@ export class ApplicationsService {
         status: JobApplicationStatus.PENDING,
       },
     });
+
+    const candidateName = profile.fullName || 'Un candidato';
+    await this.notifications.create(
+      job.companyId,
+      NotificationType.NEW_APPLICATION,
+      'Nueva postulación',
+      `${candidateName} se postuló a tu vacante "${job.title}"`,
+      `/company/jobs`,
+    );
+
+    return application;
   }
 
   /**
@@ -187,9 +211,20 @@ export class ApplicationsService {
       throw new BadRequestException('Estado no válido');
     }
 
-    return this.prisma.jobApplication.update({
+    const updated = await this.prisma.jobApplication.update({
       where: { id: applicationId },
       data: { status: newStatus as JobApplicationStatus },
     });
+
+    const statusLabel = STATUS_LABELS[newStatus] || newStatus;
+    await this.notifications.create(
+      application.candidateId,
+      NotificationType.APPLICATION_STATUS_CHANGED,
+      'Tu postulación cambió de estado',
+      `Tu postulación a "${application.jobOffer.title}" ahora está: ${statusLabel}`,
+      `/app/jobs`,
+    );
+
+    return updated;
   }
 }

@@ -1,0 +1,51 @@
+<div class="bell-wrap">
+  <button
+    type="button"
+    class="bell-btn"
+    [attr.aria-label]="unreadCount() > 0 ? 'Notificaciones (' + unreadCount() + ' sin leer)' : 'Notificaciones'"
+    (click)="toggle()"
+  >
+    <mat-icon>notifications</mat-icon>
+    @if (unreadCount() > 0) {
+      <span class="bell-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="bell-dropdown">
+      <div class="bell-dropdown-header">
+        <h3>Notificaciones</h3>
+        @if (unreadCount() > 0) {
+          <button type="button" class="mark-all-btn" (click)="markAllRead()">Marcar todas como leídas</button>
+        }
+      </div>
+
+      @if (loading()) {
+        <div class="bell-loading">
+          <mat-icon>hourglass_top</mat-icon>
+          <span>Cargando...</span>
+        </div>
+      } @else if (notifications().length === 0) {
+        <app-empty-state compact icon="notifications_none" message="No tenés notificaciones todavía." />
+      } @else {
+        <div class="bell-list">
+          @for (n of notifications(); track n.id) {
+            <button type="button" class="bell-item" [class.unread]="!n.read" (click)="openNotification(n)">
+              <div class="bell-item-icon" [class.unread]="!n.read">
+                <mat-icon>{{ typeIcon(n.type) }}</mat-icon>
+              </div>
+              <div class="bell-item-body">
+                <strong>{{ n.title }}</strong>
+                <p>{{ n.body }}</p>
+                <span class="bell-item-date">{{ n.createdAt | appDate:'datetime' }}</span>
+              </div>
+              @if (!n.read) {
+                <span class="bell-item-dot"></span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

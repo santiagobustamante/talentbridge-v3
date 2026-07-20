@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService, JobOfferStatus } from '@app/database';
 import { ApplicationsService } from './applications.service';
+import { NotificationsService } from './notifications.service';
 
 /**
  * Cubre la cadena de validación de `apply()` — la lógica de negocio con más
@@ -17,8 +18,9 @@ describe('ApplicationsService.apply', () => {
     skill: { findMany: jest.Mock };
   };
 
-  const publishedJob = { id: 10, status: JobOfferStatus.PUBLISHED, skillsRequired: 'Angular' };
-  const profile = { id: 100, userId: 1 };
+  const publishedJob = { id: 10, companyId: 50, title: 'Dev Angular', status: JobOfferStatus.PUBLISHED, skillsRequired: 'Angular' };
+  const profile = { id: 100, userId: 1, fullName: 'Ana Torres' };
+  let notifications: { create: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
@@ -27,9 +29,14 @@ describe('ApplicationsService.apply', () => {
       jobApplication: { findUnique: jest.fn(), create: jest.fn() },
       skill: { findMany: jest.fn() },
     };
+    notifications = { create: jest.fn().mockResolvedValue({}) };
 
     const module = await Test.createTestingModule({
-      providers: [ApplicationsService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        ApplicationsService,
+        { provide: PrismaService, useValue: prisma },
+        { provide: NotificationsService, useValue: notifications },
+      ],
     }).compile();
 
     service = module.get(ApplicationsService);
@@ -89,6 +96,13 @@ describe('ApplicationsService.apply', () => {
         status: 'PENDING',
       },
     });
+    expect(notifications.create).toHaveBeenCalledWith(
+      50,
+      'NEW_APPLICATION',
+      'Nueva postulación',
+      expect.stringContaining('Ana Torres'),
+      '/company/jobs',
+    );
   });
 
   it('no bloquea la postulación si la oferta no exige ninguna habilidad puntual (skillsRequired vacío)', async () => {
