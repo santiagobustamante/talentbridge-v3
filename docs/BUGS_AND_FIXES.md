@@ -201,3 +201,15 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** `normalizeUrl` ahora deja intacto cualquier valor que ya empiece con `/` (ruta relativa válida tal cual), sin anteponerle protocolo. Se corrigió además el dato ya corrompido de `empresa001@demo.com` (único registro afectado — el único guardado de perfil de empresa hecho durante esta sesión) de vuelta a `/assets/company-logos/logo-1.svg`.
 **Prueba realizada:** Confirmado por consulta directa al endpoint (`GET /api/company/profile`) que el valor corrupto tenía el triple slash antes del fix. Tras corregir la utilidad y el dato, verificado en vivo que el logo (ícono de circuito azul) vuelve a renderizar correctamente en el header y en el hero del dashboard. `nest build` (`common-lib` + `company-service`) limpio.
 **Estado:** Corregido.
+
+---
+
+### BUG-018 — El gateway devolvía 502 ("Error al iniciar sesión" / "No se pudo cargar el perfil") cuando un microservicio recién se despertaba, reportado por el usuario con captura de pantalla
+
+**Módulo:** Backend — `api-gateway` (`http-client.service.ts`)
+**Descripción:** El usuario reportó (con dos capturas de pantalla en momentos distintos) errores de login y de carga de perfil ("Http failure response ... 502") navegando la app recién desplegada, sin relación aparente con ningún cambio de código de la sesión.
+**Causa:** Los 10 microservicios corren en el plan free de Render, que duerme cualquier servicio sin tráfico en ~15 min. El primer pedido después lo despierta, pero el contenedor tarda hasta 25-30 segundos en volver a estar listo (confirmado midiendo una llamada directa a `candidate-service`: 25188ms). La capa de borde de Render corta la conexión gateway→servicio antes de que ese arranque termine y devuelve 502 — el servicio en sí nunca estuvo roto, solo no llegó a tiempo. El gateway (`HttpClient.proxy()`) no tenía timeout ni reintento: el primer 502 se lo pasaba directo al usuario sin darle al servicio la chance de terminar de despertar.
+**Archivos afectados:** `BACKEND/apps/api-gateway/src/http-client.service.ts`
+**Solución:** Reintento automático cuando la respuesta del servicio destino es 502/503/504 (o falla la conexión) — hasta 2 reintentos con 4s de espera entre cada uno. Limitado a peticiones `GET`, las únicas seguras de repetir sin riesgo de duplicar un efecto (ej. crear una postulación dos veces) si la petición original ya había llegado a procesarse del otro lado y solo se cortó la respuesta.
+**Prueba realizada:** Diagnóstico: pegándole directo a cada servicio (bypaseando el gateway) todos respondían bien — confirmó que el problema estaba en el hop gateway→servicio, no en los servicios en sí. `npm run build:gateway` limpio. `npx jest` → 44/44 (sin tests nuevos — el fix depende de latencia/red real, no se presta a mockear). Verificación en vivo pendiente de confirmar tras el redeploy.
+**Estado:** Corregido, verificación en vivo pendiente.
