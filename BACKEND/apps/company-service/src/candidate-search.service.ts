@@ -96,6 +96,26 @@ export class CandidateSearchService {
       this.prisma.profile.count({ where }),
     ]);
 
+    // Para saber, sin N+1 queries, a qué candidatos de esta página ya puede
+    // avalar la empresa (misma regla que SkillsService.companyHasContactedCandidate:
+    // conversación o postulación previa) — se resuelve en 2 queries batch en vez
+    // de una por candidato.
+    const candidateUserIds = profiles.map((p) => p.userId);
+    const [conversedWith, appliedFrom] = await Promise.all([
+      this.prisma.conversation.findMany({
+        where: { companyId: companyUserId, candidateId: { in: candidateUserIds } },
+        select: { candidateId: true },
+      }),
+      this.prisma.jobApplication.findMany({
+        where: { jobOffer: { companyId: companyUserId }, candidateId: { in: candidateUserIds } },
+        select: { candidateId: true },
+      }),
+    ]);
+    const endorsableCandidateIds = new Set([
+      ...conversedWith.map((c) => c.candidateId),
+      ...appliedFrom.map((a) => a.candidateId),
+    ]);
+
     const data = profiles.map((profile) => {
       const profileSkillNames = profile.skills.map((s) => s.normalizedName.toLowerCase());
       const matchedSkills = searchSkills.length
@@ -120,6 +140,7 @@ export class CandidateSearchService {
         })),
         matchedSkills,
         experiencesCount: profile._count.experiences,
+        canEndorse: endorsableCandidateIds.has(profile.userId),
       };
     })
     .filter((candidate): candidate is NonNullable<typeof candidate> => {

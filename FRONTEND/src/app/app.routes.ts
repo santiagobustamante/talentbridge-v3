@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 import { CandidateGuard, CompanyGuard } from './core/guards/auth.guard';
-import { AppShellComponent } from './shared/layout/app-shell.component';
-import { CompanyShellComponent } from './features/company/company-shell.component';
 
 /**
  * Tabla de rutas raíz de la aplicación.
@@ -48,7 +46,8 @@ export const routes: Routes = [
   },
   {
     path: 'app',
-    component: AppShellComponent,
+    loadComponent: () =>
+      import('./shared/layout/app-shell.component').then((m) => m.AppShellComponent),
     canActivate: [CandidateGuard],
     children: [
       {
@@ -134,7 +133,8 @@ export const routes: Routes = [
   },
   {
     path: 'company',
-    component: CompanyShellComponent,
+    loadComponent: () =>
+      import('./features/company/company-shell.component').then((m) => m.CompanyShellComponent),
     canActivate: [CompanyGuard],
     children: [
       {

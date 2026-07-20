@@ -41,6 +41,8 @@ export interface CandidateSearchResult {
   isPublished: boolean;
   skills: { id: number; name: string; level: string; endorsementCount?: number; endorsedByMe?: boolean }[];
   _count?: { experiences: number };
+  /** Si la empresa que busca ya tuvo conversación o postulación con este candidato — condición para poder avalar sus habilidades. */
+  canEndorse?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -74,6 +76,8 @@ export interface Profile {
   showSkills?: boolean;
   _count?: { views?: number };
   skills?: Skill[];
+  /** Presente solo cuando el visitante es una empresa: si ya puede avalar habilidades de este candidato (tuvo conversación o postulación previa). */
+  canEndorse?: boolean;
   experiences?: Experience[];
   educations?: Education[];
   projects?: Project[];
@@ -84,6 +88,8 @@ export interface Skill {
   name: string;
   level: string;
   endorsements?: string[];
+  endorsementCount?: number;
+  endorsedByMe?: boolean;
 }
 
 export interface Experience {

@@ -98,5 +98,7 @@
 </div>
 
 @if (!isActive('/app/messages')) {
-  <app-assistant-chat />
+  @defer (on idle) {
+    <app-assistant-chat />
+  }
 }

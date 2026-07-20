@@ -28,6 +28,19 @@ Registro de decisiones que no son obvias mirando el código, o que se descartaro
 **Riesgos:** Si en el futuro se confía ciegamente en una captura `fullPage` con elementos flotantes fijos, se puede repetir el falso diagnóstico — de ahí quedar documentado acá y en la skill reutilizable.
 **Cómo revertir:** No aplica.
 
+---
+
+## Dar acceso a los candidatos al perfil público de la empresa desde las vacantes
+
+**Fecha:** 2026-07-20
+**Contexto:** El usuario pidió agregar un botón "ver perfil empresarial" en las vacantes, pero primero quería saber si convenía al negocio — es decir, si había alguna razón para que las empresas prefirieran que los candidatos NO tuvieran ese acceso.
+**Opciones consideradas:** (a) implementar el botón directo; (b) investigar primero si el dato de la empresa ya se trata como público o como restringido en el resto del sistema, antes de decidir.
+**Decisión tomada:** (b) primero, y con el hallazgo, sí implementar el botón.
+**Motivo:** La investigación encontró que el backend ya expone `GET company/public/:id` **sin ningún guard de autenticación**, y que la pantalla `CompanyViewComponent` (`/app/company-view/:id`) ya existe y ya es de solo lectura — hoy solo enlazada desde Mensajes. O sea, el sistema ya trata el perfil de empresa como dato público; no había ninguna decisión de negocio protegiendo esa información, era simplemente un vínculo que nunca se agregó desde Vacantes por falta de tiempo, no a propósito. Mostrarlo en las vacantes es además el comportamiento esperable en cualquier portal de empleo (LinkedIn, Indeed, Computrabajo).
+**Impacto:** `jobs.service.ts` ahora selecciona `company.id` en el listado de vacantes; `candidate-jobs.component` tiene el botón en la tarjeta y en el modal de detalle. Se aprovechó para corregir un bug de paso en `CompanyViewComponent` (el logo de la empresa nunca se renderizaba).
+**Riesgos:** Ninguno nuevo — el dato ya era accesible por API directa a cualquiera con el id; esto solo lo hace descubrible desde la UI en vez de requerir conocer el id de antemano.
+**Cómo revertir:** Quitar el botón de `candidate-jobs.component.html` y el `id` del `select` en `jobs.service.ts`. El endpoint público seguiría existiendo (no forma parte de este cambio).
+
 **Adenda (mismo día, mismo patrón, esta vez con un bug real de por medio):** Al verificar el fix de BUG-012 (mensaje de chat duplicado), un primer script de verificación con selector CSS `.msg-row` (clase que no existe en `messages.component.html`, es de otro componente — `assistant-chat`) y `[class*="bubble"]` combinado con lectura de `document.body.innerText` completo dio "2 ocurrencias" después de aplicado el fix, sugiriendo que no había funcionado del todo. Un segundo script, contando específicamente `.message-row` (la clase real) y sin mezclar con el texto de la vista previa de la conversación en el sidebar (que legítimamente repite el último mensaje), confirmó "1 ocurrencia" — el fix sí funcionaba, el script de verificación tenía el selector equivocado. Lección reforzada: cuando una verificación automatizada da un resultado ambiguo o sospechoso, revisar primero el propio selector/script contra el HTML real del componente antes de asumir que el código de la app está mal.
 
 ---

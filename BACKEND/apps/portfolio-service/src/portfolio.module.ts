@@ -16,6 +16,7 @@ import { CvController } from './cv.controller';
 import { CvService } from './cv.service';
 import { PublicPortfolioController } from './public-portfolio.controller';
 import { PublicPortfolioService } from './public-portfolio.service';
+import { CandidateAccessService } from './candidate-access.service';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PublicPortfolioService } from './public-portfolio.service';
     ProjectsService,
     CvService,
     PublicPortfolioService,
+    CandidateAccessService,
     {
       provide: APP_PIPE,
       useFactory: () =>

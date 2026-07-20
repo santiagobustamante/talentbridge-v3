@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, ConflictException, BadRequestException, 
 import { PrismaService } from '@app/database';
 import { normalizeSkillDisplay, normalizeSkillKey } from '@app/common';
 import { SkillDto } from './dto/skill.dto';
+import { CandidateAccessService } from './candidate-access.service';
 
 @Injectable()
 export class SkillsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly candidateAccess: CandidateAccessService,
+  ) {}
 
   async getSkills(userId: number) {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
@@ -89,7 +93,7 @@ export class SkillsService {
     });
     if (!skill) throw new NotFoundException('Habilidad no encontrada');
 
-    const hasRelationship = await this.companyHasContactedCandidate(companyUserId, skill.profile.userId);
+    const hasRelationship = await this.candidateAccess.companyHasContactedCandidate(companyUserId, skill.profile.userId);
     if (!hasRelationship) {
       throw new ForbiddenException('Solo puedes avalar habilidades de candidatos con los que ya tuviste una conversación o postulación');
     }
@@ -108,17 +112,5 @@ export class SkillsService {
       where: { skillId, companyId: companyUserId },
     });
     return { message: 'Aval retirado' };
-  }
-
-  private async companyHasContactedCandidate(companyUserId: number, candidateUserId: number): Promise<boolean> {
-    const conversation = await this.prisma.conversation.findUnique({
-      where: { candidateId_companyId: { candidateId: candidateUserId, companyId: companyUserId } },
-    });
-    if (conversation) return true;
-
-    const application = await this.prisma.jobApplication.findFirst({
-      where: { candidateId: candidateUserId, jobOffer: { companyId: companyUserId } },
-    });
-    return !!application;
   }
 }

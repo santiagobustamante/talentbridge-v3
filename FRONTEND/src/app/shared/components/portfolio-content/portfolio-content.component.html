@@ -45,6 +45,24 @@
       <div class="skill-pill" *ngFor="let s of profile.skills" [class]="levelClass(s.level)">
         <span class="skill-name">{{ s.name }}</span>
         <span class="skill-level">{{ levelLabel(s.level) }}</span>
+        <button
+          *ngIf="profile.canEndorse !== undefined"
+          type="button"
+          class="endorse-btn"
+          [class.endorsed]="s.endorsedByMe"
+          [disabled]="endorsingSkillId === s.id || (!profile.canEndorse && !s.endorsedByMe)"
+          [attr.aria-label]="s.endorsedByMe ? 'Quitar aval de ' + s.name : 'Avalar ' + s.name"
+          [matTooltip]="!profile.canEndorse && !s.endorsedByMe
+            ? 'Contactá a este candidato (mensaje o postulación a tu vacante) para poder avalar sus habilidades'
+            : (s.endorsedByMe ? 'Avalada por tu empresa — clic para quitar' : 'Avalar esta habilidad')"
+          (click)="toggleEndorse(s)"
+        >
+          <mat-icon>{{ s.endorsedByMe ? 'verified' : 'add_task' }}</mat-icon>
+          <span *ngIf="s.endorsementCount">{{ s.endorsementCount }}</span>
+        </button>
+        <span class="endorse-badge" *ngIf="profile.canEndorse === undefined && s.endorsementCount">
+          <mat-icon>verified</mat-icon>{{ s.endorsementCount }}
+        </span>
       </div>
     </div>
     <ng-template #emptySkills>

@@ -34,7 +34,11 @@
     <div class="company-card animate-fade-in-scale">
       <div class="company-hero">
         <div class="company-avatar">
-          {{ initial(c.companyName) }}
+          @if (c.logoUrl) {
+            <img [src]="c.logoUrl" [alt]="c.companyName" (error)="onImgError($event)" />
+          } @else {
+            {{ initial(c.companyName) }}
+          }
         </div>
         <div class="company-hero-text">
           <h2>{{ c.companyName }}</h2>

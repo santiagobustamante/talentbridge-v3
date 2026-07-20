@@ -66,4 +66,9 @@ export class CompanyViewComponent implements OnInit {
   initial(name: string): string {
     return name.charAt(0).toUpperCase();
   }
+
+  /** Oculta el logo de la empresa si falla la carga, en vez de mostrar el icono roto del navegador. */
+  onImgError(event: Event): void {
+    (event.target as HTMLImageElement).style.display = 'none';
+  }
 }

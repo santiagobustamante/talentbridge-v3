@@ -101,5 +101,7 @@
     </section>
   </main>
 
-  <app-assistant-chat />
+  @defer (on idle) {
+    <app-assistant-chat />
+  }
 </div>

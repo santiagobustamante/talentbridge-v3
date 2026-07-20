@@ -179,9 +179,11 @@
                     type="button"
                     class="endorse-btn"
                     [class.endorsed]="s.endorsedByMe"
-                    [disabled]="endorsingSkillId === s.id"
+                    [disabled]="endorsingSkillId === s.id || (!c.canEndorse && !s.endorsedByMe)"
                     [attr.aria-label]="s.endorsedByMe ? 'Quitar aval de ' + s.name : 'Avalar ' + s.name"
-                    [matTooltip]="s.endorsedByMe ? 'Avalada por tu empresa — clic para quitar' : 'Avalar esta habilidad'"
+                    [matTooltip]="!c.canEndorse && !s.endorsedByMe
+                      ? 'Contactá a este candidato (mensaje o postulación a tu vacante) para poder avalar sus habilidades'
+                      : (s.endorsedByMe ? 'Avalada por tu empresa — clic para quitar' : 'Avalar esta habilidad')"
                     (click)="toggleEndorse(c, s)"
                   >
                     <mat-icon>{{ s.endorsedByMe ? 'verified' : 'add_task' }}</mat-icon>

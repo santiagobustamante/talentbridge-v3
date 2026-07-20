@@ -178,9 +178,11 @@
   gap: 0.75rem;
 }
 
-.company-avatar {
-  width: 46px;
-  height: 46px;
+// Los 3 avatares circulares de empresa (tarjeta, modal de detalle, tarjeta de
+// postulación) comparten el mismo look — solo cambian tamaño/font-size. Se
+// extrae a un placeholder para no repetir las mismas 9 propiedades 3 veces
+// (este archivo ya venía pegado al presupuesto de tamaño por componente).
+%company-avatar-base {
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--primary-soft), var(--accent-purple-soft));
   color: var(--primary);
@@ -188,9 +190,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.05rem;
   flex-shrink: 0;
-  letter-spacing: 0.02em;
   overflow: hidden;
 
   img {
@@ -199,6 +199,14 @@
     object-fit: cover;
     border-radius: var(--radius-md);
   }
+}
+
+.company-avatar {
+  @extend %company-avatar-base;
+  width: 46px;
+  height: 46px;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
 }
 
 .job-titles {
@@ -554,25 +562,10 @@
 }
 
 .detail-avatar {
+  @extend %company-avatar-base;
   width: 52px;
   height: 52px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-soft), var(--accent-purple-soft));
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
   font-size: 1.2rem;
-  flex-shrink: 0;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-  }
 }
 
 .detail-header-info {
@@ -592,6 +585,27 @@
   font-size: 0.88rem;
   color: var(--text-secondary);
   margin: 0;
+}
+
+.detail-company-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .detail-applied-badge {
@@ -720,25 +734,10 @@
 }
 
 .app-company-avatar {
+  @extend %company-avatar-base;
   width: 42px;
   height: 42px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-soft), var(--accent-purple-soft));
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
   font-size: 1rem;
-  flex-shrink: 0;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-  }
 }
 
 .app-card-titles {

@@ -180,6 +180,11 @@
               <button appButton="secondary" (click)="openDetail(job)">
                 <mat-icon>visibility</mat-icon>Ver detalle
               </button>
+              @if (job.company?.id) {
+                <a appButton="secondary" [routerLink]="['/app/company-view', job.company!.id]">
+                  <mat-icon>business</mat-icon>Ver empresa
+                </a>
+              }
               @if (!job.hasApplied) {
                 <button appButton="primary" (click)="applyToJob(job.id)"
                   [disabled]="applyingId() === job.id || job.canApplyBySkills === false">
@@ -343,6 +348,11 @@
         <div class="detail-header-info">
           <h2 class="detail-title">{{ job.title }}</h2>
           <p class="detail-company-name">{{ companyName(job) }}</p>
+          @if (job.company?.id) {
+            <a class="detail-company-link" [routerLink]="['/app/company-view', job.company!.id]">
+              <mat-icon>business</mat-icon>Ver perfil de la empresa
+            </a>
+          }
         </div>
       </div>
 

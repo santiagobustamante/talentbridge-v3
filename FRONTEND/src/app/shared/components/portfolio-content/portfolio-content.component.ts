@@ -1,8 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Profile } from '../../../core/auth/auth.models';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Profile, Skill } from '../../../core/auth/auth.models';
+import { CompanyService } from '../../../core/services/company.service';
 import { GithubWarningComponent } from '../github-warning/github-warning.component';
 import { AppDatePipe } from '../../pipes/app-date.pipe';
 import { formatPhoneDisplay } from '../../utils/normalize';
@@ -17,15 +20,21 @@ import { formatPhoneDisplay } from '../../utils/normalize';
 @Component({
   selector: 'app-portfolio-content',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, GithubWarningComponent, AppDatePipe],
+  imports: [CommonModule, RouterModule, MatIconModule, MatTooltipModule, MatSnackBarModule, GithubWarningComponent, AppDatePipe],
   templateUrl: './portfolio-content.component.html',
   styleUrl: './portfolio-content.component.scss',
 })
 export class PortfolioContentComponent {
+  private companyService = inject(CompanyService);
+  private snackBar = inject(MatSnackBar);
+
   /** Perfil completo (datos personales + experiencia + educación + proyectos + habilidades) a renderizar. */
   @Input({ required: true }) profile!: Profile;
   /** Modo vista previa autenticada: muestra links "Editar" por sección. */
   @Input() editable = false;
+
+  /** Id de la skill con un avalar/quitar aval en curso, para deshabilitar su botón mientras responde el backend. */
+  endorsingSkillId: number | null = null;
 
   /** Formatea un teléfono guardado (dígitos crudos) al formato agrupado para mostrar; vacío si no hay valor. */
   displayPhone(value: unknown): string {
@@ -66,5 +75,34 @@ export class PortfolioContentComponent {
     if (!status) return '';
     const map: Record<string, string> = { PLANNED: 'Planificado', IN_PROGRESS: 'En progreso', COMPLETED: 'Completado' };
     return map[status] || status;
+  }
+
+  /**
+   * Avala o retira el aval de una habilidad desde el propio portafolio del
+   * candidato (visible solo cuando `profile.canEndorse` viene informado, es
+   * decir, el visitante es una empresa). Mismo patrón optimista que usa
+   * `company-candidates.component.ts` para la búsqueda de candidatos.
+   */
+  toggleEndorse(skill: Skill): void {
+    if (this.endorsingSkillId === skill.id) return;
+    this.endorsingSkillId = skill.id;
+
+    const wasEndorsed = !!skill.endorsedByMe;
+    const request = wasEndorsed
+      ? this.companyService.unendorseSkill(skill.id)
+      : this.companyService.endorseSkill(skill.id);
+
+    request.subscribe({
+      next: () => {
+        this.endorsingSkillId = null;
+        skill.endorsedByMe = !wasEndorsed;
+        skill.endorsementCount = (skill.endorsementCount || 0) + (wasEndorsed ? -1 : 1);
+      },
+      error: (err) => {
+        this.endorsingSkillId = null;
+        const msg = err?.error?.message || 'No se pudo avalar esta habilidad';
+        this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
+      },
+    });
   }
 }

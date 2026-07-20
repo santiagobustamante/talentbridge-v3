@@ -55,6 +55,7 @@ export interface SkillMatchResult {
 }
 
 export interface JobCompany {
+  id?: number;
   companyName?: string;
   sector?: string;
   city?: string;

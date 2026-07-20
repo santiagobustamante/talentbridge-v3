@@ -168,7 +168,7 @@ export class JobsService {
         where,
         include: {
           company: {
-            select: { companyProfile: { select: { companyName: true, logoUrl: true, city: true } } },
+            select: { id: true, companyProfile: { select: { companyName: true, logoUrl: true, city: true } } },
           },
           applications: {
             where: { candidateId: candidateUserId },
