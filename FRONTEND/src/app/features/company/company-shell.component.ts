@@ -53,6 +53,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
     { label: 'Información de la empresa', subtitle: 'Perfil', icon: 'business', route: '/company/profile' },
     { label: 'Descubrir talento', subtitle: 'Candidatos', icon: 'search', route: '/company/candidates' },
     { label: 'Ofertas', subtitle: 'Vacantes publicadas', icon: 'work', route: '/company/jobs' },
+    { label: 'Analítica', subtitle: 'Cómo te está yendo', icon: 'bar_chart', route: '/company/analytics' },
     { label: 'Mensajes', subtitle: 'Chat', icon: 'chat', route: '/company/messages' },
   ];
 

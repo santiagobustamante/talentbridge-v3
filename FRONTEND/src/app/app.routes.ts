@@ -166,6 +166,13 @@ export const routes: Routes = [
             (m) => m.CompanyJobsComponent,
           ),
       },
+      {
+        path: 'analytics',
+        loadComponent: () =>
+          import('./features/company/company-analytics.component').then(
+            (m) => m.CompanyAnalyticsComponent,
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

@@ -8,6 +8,8 @@ import { ApplicationsController } from './applications.controller';
 import { ApplicationsService } from './applications.service';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
+import { AnalyticsController } from './analytics.controller';
+import { AnalyticsService } from './analytics.service';
 
 /**
  * Módulo raíz del microservicio de Postulaciones (Applications Service).
@@ -25,10 +27,11 @@ import { NotificationsService } from './notifications.service';
     CommonModule,
     AuthLibModule,
   ],
-  controllers: [ApplicationsController, NotificationsController],
+  controllers: [ApplicationsController, NotificationsController, AnalyticsController],
   providers: [
     ApplicationsService,
     NotificationsService,
+    AnalyticsService,
     {
       provide: APP_PIPE,
       useFactory: () =>

@@ -1,0 +1,147 @@
+<div class="analytics-page">
+
+  <header class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>bar_chart</mat-icon>
+      </div>
+      <div>
+        <h1>Analítica</h1>
+        <p>Cómo le está yendo a tus vacantes con los candidatos.</p>
+      </div>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="state-card state-loading">
+      <mat-icon>hourglass_top</mat-icon>
+      <span>Cargando analítica...</span>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="state-card state-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>No se pudo cargar la analítica. Recargá la página.</span>
+    </div>
+  }
+
+  @if (data(); as d) {
+    <div class="kpi-grid animate-fade-in-up">
+      <app-card variant="flat" padding="md"><div class="kpi-card">
+        <div class="kpi-icon kpi-total"><mat-icon>work</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ d.totalJobs }}</span>
+          <span class="kpi-label">Vacantes totales</span>
+        </div>
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
+        <div class="kpi-icon kpi-published"><mat-icon>publish</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ d.publishedJobs }}</span>
+          <span class="kpi-label">Publicadas</span>
+        </div>
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
+        <div class="kpi-icon kpi-apps"><mat-icon>assignment</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ d.totalApplications }}</span>
+          <span class="kpi-label">Postulaciones recibidas</span>
+        </div>
+      </div></app-card>
+      <app-card variant="flat" padding="md"><div class="kpi-card">
+        <div class="kpi-icon kpi-conversion"><mat-icon>trending_up</mat-icon></div>
+        <div class="kpi-info">
+          <span class="kpi-value">{{ d.conversionRate }}%</span>
+          <span class="kpi-label">Tasa de conversión</span>
+        </div>
+      </div></app-card>
+    </div>
+
+    @if (d.totalApplications === 0) {
+      <app-empty-state
+        icon="query_stats"
+        title="Todavía no hay datos suficientes"
+        message="Cuando recibas postulaciones vas a ver acá el embudo por estado, la tendencia y tus vacantes con más movimiento."
+        actionLabel="Publicar una vacante"
+        actionRoute="/company/jobs"
+      />
+    } @else {
+      <app-card variant="flat" padding="lg" class="animate-fade-in-up">
+        <div class="section-inner">
+          <h2 class="section-title">
+            <mat-icon>filter_alt</mat-icon>
+            Embudo de postulaciones
+          </h2>
+          <p class="section-sub">Dónde están hoy las {{ d.totalApplications }} postulaciones que recibiste, por estado.</p>
+
+          <div class="funnel">
+            @for (bar of funnel(); track bar.status) {
+              <div class="funnel-row">
+                <app-badge [tone]="bar.tone" class="funnel-label">{{ bar.label }}</app-badge>
+                <div class="funnel-track">
+                  <div
+                    class="funnel-fill"
+                    [class]="'tone-' + bar.tone"
+                    [style.width.%]="bar.widthPercent"
+                    [attr.title]="bar.label + ': ' + bar.count + ' postulación(es)'"
+                  ></div>
+                </div>
+                <span class="funnel-count">{{ bar.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </app-card>
+
+      <app-card variant="flat" padding="lg" class="animate-fade-in-up">
+        <div class="section-inner">
+          <h2 class="section-title">
+            <mat-icon>show_chart</mat-icon>
+            Postulaciones — últimos 30 días
+          </h2>
+          <p class="section-sub">Cuántas postulaciones nuevas llegaron cada día.</p>
+
+          <div class="trend-chart">
+            @for (bar of trendBars(); track bar.date) {
+              <div class="trend-bar-wrap">
+                <div
+                  class="trend-bar"
+                  [style.height.%]="bar.heightPercent"
+                  [attr.title]="(bar.date | appDate:'short') + ': ' + bar.count + ' postulación(es)'"
+                ></div>
+                @if (bar.showLabel) {
+                  <span class="trend-label">{{ shortDayLabel(bar.date) }}</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </app-card>
+
+      @if (d.topJobs.length > 0) {
+        <app-card variant="flat" padding="lg" class="animate-fade-in-up">
+          <div class="section-inner">
+            <h2 class="section-title">
+              <mat-icon>military_tech</mat-icon>
+              Tus vacantes con más postulaciones
+            </h2>
+
+            <div class="top-jobs-list">
+              @for (job of d.topJobs; track job.id) {
+                <a class="top-job-row" routerLink="/company/jobs">
+                  <div class="top-job-info">
+                    <strong>{{ job.title }}</strong>
+                    <app-badge [tone]="statusTone(job.status)">{{ statusLabel(job.status) }}</app-badge>
+                  </div>
+                  <span class="top-job-count">{{ job.applicationsCount }} postulación{{ job.applicationsCount === 1 ? '' : 'es' }}</span>
+                </a>
+              }
+            </div>
+          </div>
+        </app-card>
+      }
+    }
+  }
+
+</div>

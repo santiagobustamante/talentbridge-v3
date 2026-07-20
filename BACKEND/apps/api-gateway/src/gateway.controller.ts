@@ -36,6 +36,10 @@ export class GatewayController {
       return this.httpClient.proxy(req, res, process.env['APPLICATIONS_SERVICE_URL'] || 'http://localhost:3007');
     }
 
+    if (fullPath.startsWith('/api/company/analytics')) {
+      return this.httpClient.proxy(req, res, process.env['APPLICATIONS_SERVICE_URL'] || 'http://localhost:3007');
+    }
+
     if (fullPath.startsWith('/api/company/jobs')) {
       return this.httpClient.proxy(req, res, process.env['JOBS_SERVICE_URL'] || 'http://localhost:3006');
     }

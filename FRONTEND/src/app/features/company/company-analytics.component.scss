@@ -1,0 +1,150 @@
+@use 'breakpoints' as bp;
+
+:host { display: block; }
+
+.analytics-page {
+  display: grid;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex; align-items: center; gap: 14px;
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-icon {
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--primary-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    mat-icon { color: var(--primary); font-size: 24px; width: 24px; height: 24px; }
+  }
+  h1 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); margin: 0; }
+  p { font-size: 0.85rem; color: var(--text-muted); margin: 3px 0 0; }
+}
+
+.state-card {
+  display: flex; align-items: center; gap: 12px; padding: 16px 22px;
+  border-radius: 14px; font-size: 0.9rem; font-weight: 500;
+  mat-icon { font-size: 22px; width: 22px; height: 22px; flex-shrink: 0; }
+}
+.state-loading { background: var(--info-soft); border: 1px solid var(--info-border); color: var(--info); mat-icon { animation: spin 1.2s linear infinite; } }
+.state-error { background: var(--danger-soft); border: 1px solid var(--danger-border); color: var(--danger-strong); }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.kpi-card { display: flex; align-items: center; gap: 12px; }
+.kpi-icon {
+  width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--text-on-color); }
+}
+.kpi-total { background: var(--primary); }
+.kpi-published { background: var(--success); }
+.kpi-apps { background: var(--info); }
+.kpi-conversion { background: var(--accent-purple); }
+.kpi-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.kpi-value { font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+.kpi-label { font-size: 0.76rem; color: var(--text-muted); }
+
+/* Section shell shared by funnel / trend / top jobs cards */
+.section-inner { display: flex; flex-direction: column; gap: 4px; }
+.section-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1.02rem; font-weight: 700; color: var(--text-main); margin: 0;
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--primary); }
+}
+.section-sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 18px; }
+
+/* Funnel */
+.funnel { display: flex; flex-direction: column; gap: 12px; }
+.funnel-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 34px;
+  align-items: center;
+  gap: 12px;
+}
+.funnel-label { justify-self: start; white-space: nowrap; }
+.funnel-track {
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-soft);
+  overflow: hidden;
+}
+.funnel-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  min-width: 4px;
+  transition: width 400ms ease;
+
+  &.tone-info { background: var(--info); }
+  &.tone-success { background: var(--success); }
+  &.tone-warning { background: var(--warning); }
+  &.tone-danger { background: var(--danger); }
+  &.tone-neutral { background: var(--text-placeholder); }
+  &.tone-primary { background: var(--primary); }
+}
+.funnel-count { font-size: 0.85rem; font-weight: 700; color: var(--text-main); text-align: right; }
+
+/* Trend */
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 140px;
+  padding-top: 8px;
+}
+.trend-bar-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 0;
+  position: relative;
+}
+.trend-bar {
+  width: 100%;
+  max-width: 14px;
+  border-radius: 3px 3px 0 0;
+  background: var(--primary);
+  opacity: 0.85;
+  transition: opacity 120ms ease;
+
+  &:hover { opacity: 1; }
+}
+.trend-label {
+  position: absolute;
+  bottom: -20px;
+  font-size: 0.62rem;
+  color: var(--text-placeholder);
+  white-space: nowrap;
+}
+
+/* Top jobs */
+.top-jobs-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.top-job-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-surface-soft);
+  text-decoration: none;
+  transition: background 120ms ease;
+
+  &:hover { background: var(--bg-surface-hover); }
+}
+.top-job-info {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  strong { font-size: 0.88rem; font-weight: 700; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.top-job-count { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+
+@include bp.tablet {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@include bp.mobile {
+  .funnel-row { grid-template-columns: 100px 1fr 28px; gap: 8px; }
+  .funnel-label { font-size: 0.7rem; }
+  .trend-chart { height: 110px; }
+  .top-job-info strong { max-width: 160px; }
+}
