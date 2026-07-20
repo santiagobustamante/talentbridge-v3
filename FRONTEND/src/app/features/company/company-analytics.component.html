@@ -134,7 +134,7 @@
                     <strong>{{ job.title }}</strong>
                     <app-badge [tone]="statusTone(job.status)">{{ statusLabel(job.status) }}</app-badge>
                   </div>
-                  <span class="top-job-count">{{ job.applicationsCount }} postulación{{ job.applicationsCount === 1 ? '' : 'es' }}</span>
+                  <span class="top-job-count">{{ job.applicationsCount }} {{ job.applicationsCount === 1 ? 'postulación' : 'postulaciones' }}</span>
                 </a>
               }
             </div>
