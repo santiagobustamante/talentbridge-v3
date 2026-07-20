@@ -2,7 +2,8 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import type { StringValue } from 'ms';
 import { PrismaModule } from '@app/database';
 import { AllExceptionsFilter, CommonModule } from '@app/common';
@@ -29,12 +30,21 @@ if (!jwtSecret) {
       secret: jwtSecret,
       signOptions: { expiresIn: '1d' as StringValue },
     }),
+    // Sin esto, nada frenaba intentos repetidos de login/registro por fuerza
+    // bruta — 10 requests por minuto por IP contra todo el servicio (login,
+    // register, login-company, register-company son los de mayor riesgo,
+    // pero el límite aplica parejo a todo el módulo por simplicidad).
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 10 }]),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     JwtStrategy,
     OptionalJwtAuthGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_PIPE,
       useFactory: () =>

@@ -3,6 +3,9 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtUtil } from '@app/auth';
@@ -15,13 +18,15 @@ interface AuthenticatedSocket extends Socket {
 
 /**
  * Gateway WebSocket (Socket.io, namespace `/chat`) del chat en tiempo real
- * entre candidato y empresa. A diferencia de un chat con `@SubscribeMessage`
- * bidireccional, este gateway es principalmente "push": no recibe mensajes
- * del cliente por socket (el envío de mensajes se hace vía HTTP en
- * `ChatController`/`ChatService`, que persiste primero en base de datos y
- * recién después llama a este gateway para retransmitir en vivo). Su
- * trabajo es mantener el mapeo usuario→sockets conectados y las salas
- * (`user:<id>` y `conversation:<id>`) para poder emitir eventos dirigidos.
+ * entre candidato y empresa. Es principalmente "push": el envío de mensajes
+ * se hace vía HTTP en `ChatController`/`ChatService`, que persiste primero
+ * en base de datos y recién después llama a este gateway para retransmitir
+ * en vivo (no por socket directo, para no arriesgar duplicados — ver
+ * BUG-012 en `docs/BUGS_AND_FIXES.md`). La única excepción es el indicador
+ * de "escribiendo...", que no persiste nada y no tiene sentido que pase por
+ * HTTP — ver `handleTyping`. Además de eso, el gateway mantiene el mapeo
+ * usuario→sockets conectados y las salas (`user:<id>` y `conversation:<id>`)
+ * para poder emitir eventos dirigidos.
  */
 @WebSocketGateway({
   cors: {
@@ -101,6 +106,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.userSockets.delete(authClient.userId);
       }
     }
+  }
+
+  /**
+   * Recibe `chat:typing` del cliente (el frontend ya lo mandaba desde
+   * `chat-socket.service.ts`, pero no había ningún listener del lado
+   * servidor — el indicador nunca le llegaba al otro participante). Lo
+   * reenvía con `socket.to()` en vez de `server.to()` para excluir al
+   * propio emisor de la sala (nadie necesita ver su propio "escribiendo...").
+   */
+  @SubscribeMessage('chat:typing')
+  handleTyping(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { conversationId: number; isTyping: boolean },
+  ) {
+    const authClient = client as AuthenticatedSocket;
+    if (!authClient.userId || !data?.conversationId) return;
+
+    client.to(`conversation:${data.conversationId}`).emit('chat:typing', {
+      conversationId: data.conversationId,
+      userId: authClient.userId,
+      isTyping: !!data.isTyping,
+    });
   }
 
   /**

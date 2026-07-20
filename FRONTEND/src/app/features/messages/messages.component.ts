@@ -51,6 +51,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   unblockLoading = false;
 
+  /** Si el otro participante de la conversación activa está escribiendo ahora mismo. */
+  otherTyping = signal(false);
+  private typingClearTimeout: ReturnType<typeof setTimeout> | null = null;
+  private stopTypingTimeout: ReturnType<typeof setTimeout> | null = null;
+  private lastTypingSent = false;
+
   private subs: Subscription[] = [];
 
   /**
@@ -90,10 +96,48 @@ export class MessagesComponent implements OnInit, OnDestroy {
         this.openConversation(cid);
       }
     });
+
+    this.subs.push(
+      this.chatSocket.typing$.subscribe((data) => {
+        const active = this.activeConversation();
+        if (!active || data.conversationId !== active.id || data.userId === this.currentUserId) return;
+
+        this.otherTyping.set(data.isTyping);
+        if (this.typingClearTimeout) clearTimeout(this.typingClearTimeout);
+        if (data.isTyping) {
+          // Respaldo por si nunca llega el "dejó de escribir" (ej. cerró la
+          // pestaña a mitad de escribir) — el indicador no queda pegado.
+          this.typingClearTimeout = setTimeout(() => this.otherTyping.set(false), 5000);
+        }
+      }),
+    );
   }
 
   ngOnDestroy(): void {
     this.subs.forEach((s) => s.unsubscribe());
+    if (this.typingClearTimeout) clearTimeout(this.typingClearTimeout);
+    if (this.stopTypingTimeout) clearTimeout(this.stopTypingTimeout);
+  }
+
+  /**
+   * Se dispara en cada tecla del composer. Avisa "estoy escribiendo" una
+   * sola vez (no en cada tecla) y programa el aviso de "dejé de escribir"
+   * 2 segundos después de la última tecla, para no spamear el socket.
+   */
+  onTyping(): void {
+    const conv = this.activeConversation();
+    if (!conv) return;
+
+    if (!this.lastTypingSent) {
+      this.chatSocket.sendTyping(conv.id, true);
+      this.lastTypingSent = true;
+    }
+
+    if (this.stopTypingTimeout) clearTimeout(this.stopTypingTimeout);
+    this.stopTypingTimeout = setTimeout(() => {
+      this.chatSocket.sendTyping(conv.id, false);
+      this.lastTypingSent = false;
+    }, 2000);
   }
 
   /**
@@ -143,6 +187,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.activeConversation.set(conv);
     this.loadingMessages.set(true);
     this.messages.set([]);
+    this.otherTyping.set(false);
     this.chatSocket.joinConversation(conv.id);
 
     this.chatService.getMessages(conv.id).pipe(
@@ -187,6 +232,12 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
     const conv = this.activeConversation();
     if (!conv) return;
+
+    if (this.stopTypingTimeout) clearTimeout(this.stopTypingTimeout);
+    if (this.lastTypingSent) {
+      this.chatSocket.sendTyping(conv.id, false);
+      this.lastTypingSent = false;
+    }
 
     this.sending.set(true);
     this.chatService.sendMessage(conv.id, body).subscribe({

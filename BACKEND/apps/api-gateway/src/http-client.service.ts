@@ -21,6 +21,12 @@ export class HttpClient {
       headers['Authorization'] = req.headers['authorization'] as string;
     }
 
+    // Sin esto, todo el tráfico le llega a los servicios internos con la IP
+    // del propio gateway (es un fetch() servidor-a-servidor) — cualquier
+    // rate limiting por IP del lado del servicio destino (ver auth-service)
+    // terminaría agrupando a todos los usuarios reales bajo un mismo balde.
+    headers['X-Forwarded-For'] = (req.headers['x-forwarded-for'] as string) || req.ip || '';
+
     const contentType = (req.headers['content-type'] || '') as string;
     const isMultipart = contentType.includes('multipart/form-data');
 

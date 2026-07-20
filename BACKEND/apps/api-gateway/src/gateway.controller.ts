@@ -14,18 +14,13 @@ export class GatewayController {
       return this.httpClient.proxy(req, res, process.env['AUTH_SERVICE_URL'] || 'http://localhost:3001');
     }
 
-    if (fullPath.startsWith('/api/health')) {
-      return this.httpClient.proxy(req, res, process.env['AUTH_SERVICE_URL'] || 'http://localhost:3001');
-    }
-
     if (fullPath.startsWith('/api/profile')) {
       return this.httpClient.proxy(req, res, process.env['CANDIDATE_SERVICE_URL'] || 'http://localhost:3002');
     }
 
     if (fullPath.startsWith('/api/skills') || fullPath.startsWith('/api/experiences') ||
         fullPath.startsWith('/api/education') || fullPath.startsWith('/api/projects') ||
-        fullPath.startsWith('/api/cv') || fullPath.startsWith('/api/portfolio') ||
-        fullPath.startsWith('/api/analysis')) {
+        fullPath.startsWith('/api/cv') || fullPath.startsWith('/api/portfolio')) {
       return this.httpClient.proxy(req, res, process.env['PORTFOLIO_SERVICE_URL'] || 'http://localhost:3003');
     }
 
@@ -51,10 +46,6 @@ export class GatewayController {
 
     if (fullPath.startsWith('/api/jobs')) {
       return this.httpClient.proxy(req, res, process.env['JOBS_SERVICE_URL'] || 'http://localhost:3006');
-    }
-
-    if (fullPath.startsWith('/api/applications')) {
-      return this.httpClient.proxy(req, res, process.env['APPLICATIONS_SERVICE_URL'] || 'http://localhost:3007');
     }
 
     if (fullPath.startsWith('/api/chat')) {

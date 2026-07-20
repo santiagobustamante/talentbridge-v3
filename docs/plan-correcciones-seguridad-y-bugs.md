@@ -47,32 +47,31 @@ Crítico primero (son rápidos y son huecos reales de seguridad/funcionalidad) �
 
 ## Fase 1 — Alto
 
-- [ ] **1.1 — Sin rate limiting en ningún endpoint (incluido login).** No hay `@nestjs/throttler` ni equivalente instalado.
+- [x] **1.1 — Sin rate limiting en ningún endpoint (incluido login).** No hay `@nestjs/throttler` ni equivalente instalado.
   - **Fix propuesto:** instalar `@nestjs/throttler` en `auth-service` como mínimo (login/register son los de mayor riesgo — fuerza bruta de contraseña), evaluar si extenderlo al resto de servicios o solo al gateway.
   - **Criterio de aceptación:** N intentos de login fallidos seguidos desde la misma IP en poco tiempo devuelven 429 en vez de seguir intentando indefinidamente.
 
-- [ ] **1.2 — 3 rutas del gateway sin destino real.** `/api/health`, `/api/analysis`, `/api/applications` en `gateway.controller.ts` no tienen un controller real del otro lado (dead code / confunde).
+- [x] **1.2 — 3 rutas del gateway sin destino real.** `/api/health`, `/api/analysis`, `/api/applications` en `gateway.controller.ts` no tienen un controller real del otro lado (dead code / confunde).
   - **Fix propuesto:** revisar cada una — `/api/health` ya lo maneja `AppController` antes del catch-all (la regla es redundante, se puede borrar); `/api/analysis` y `/api/applications` revisar si deberían apuntar a algo que hoy no existe, o si son reglas obsoletas a borrar.
   - **Criterio de aceptación:** el archivo de reglas del gateway solo tiene reglas que efectivamente apuntan a algo real.
 
-- [ ] **1.3 — Indicador "escribiendo..." del chat roto.** El frontend (`chat-socket.service.ts`) emite `chat:typing` y otros eventos por WebSocket, pero `chat.gateway.ts` no tiene ningún `@SubscribeMessage` — no tiene efecto del lado servidor. Los mensajes en sí funcionan bien (van por HTTP), solo el indicador de "está escribiendo" está roto de punta a punta.
+- [x] **1.3 — Indicador "escribiendo..." del chat roto.** El frontend (`chat-socket.service.ts`) emite `chat:typing` y otros eventos por WebSocket, pero `chat.gateway.ts` no tiene ningún `@SubscribeMessage` — no tiene efecto del lado servidor. Los mensajes en sí funcionan bien (van por HTTP), solo el indicador de "está escribiendo" está roto de punta a punta.
   - **Fix propuesto:** decidir si vale la pena implementarlo (agregar los `@SubscribeMessage` correspondientes en el gateway y reenviar el evento a la sala de la conversación) o si se saca el código muerto del frontend si no se prioriza la feature.
   - **Criterio de aceptación:** o el indicador funciona de punta a punta, o se documenta explícitamente como feature no implementada y se limpia el código muerto del emit sin efecto.
 
-- [ ] **1.4 — Historial de migraciones de Prisma desalineado.** Ya documentado en `DECISIONS.md` — `prisma migrate dev` pide reset completo de la base.
+- [x] **1.4 — Historial de migraciones de Prisma desalineado.** Ya documentado en `DECISIONS.md` — `prisma migrate dev` pide reset completo de la base.
   - **Fix propuesto:** regenerar el historial de migraciones una vez contra una base vacía (no la de producción), siguiendo el camino que la propia entrada de `DECISIONS.md` recomienda. Evaluar si vale la pena hacerlo ahora o dejarlo para cuando haga falta levantar la base desde cero en otra máquina (ej. antes de la entrega final).
   - **Criterio de aceptación:** `npx prisma migrate dev` corre limpio contra una base nueva y reproduce el schema real actual.
 
-- [ ] **1.5 — Cero tests automatizados (backend y frontend).** Evaluar alcance con el usuario antes de invertir tiempo (ya lo pedía `NEXT_STEPS.md`) — si se decide encarar, priorizar `auth-service` (login/registro/JWT) y `applications-service` (validación de habilidades) por ser los de mayor riesgo funcional.
-  - **Esto es una decisión de alcance, no un fix mecánico — confirmar con el usuario antes de arrancar** si entra en esta sesión o queda para más adelante.
+- [x] **1.5 — Cero tests automatizados (backend y frontend).** Alcance acotado a lo que el propio plan priorizaba: `auth-service` (login/registro/JWT) y `applications-service` (validación de habilidades/elegibilidad), más `libs/contracts/skill-match.util.ts` (la lógica de matching que comparten ambos). 31 tests nuevos, 3 suites, todos pasando. No se tocó el resto de servicios ni el frontend — cobertura total del proyecto sigue siendo baja, pero la lógica de mayor riesgo real ya tiene tests.
 
 ---
 
 ## Fase 2 — Medio (si queda tiempo)
 
-- [ ] **2.1 — `npm run build` (backend, sin sufijo) roto.** Documentar en `README`/`CLAUDE.md` que no existe un build agregado real, o agregar un script `build:all` que encadene los 10 + `build:libs`.
-- [ ] **2.2 — 19 warnings de presupuesto de bundle en el frontend.** Ya evaluado y aceptado a propósito (mixins de `_forms.scss`) — no re-litigar salvo pedido explícito nuevo.
-- [ ] **2.3 — `Card` compartido sin adopción real (14 componentes duplicando estilo).** Ya diferido a propósito por decisión documentada — encarar como tanda dedicada, un componente a la vez, solo si se pide explícitamente.
+- [x] **2.1 — `npm run build` (backend, sin sufijo) roto.** Agregado script `build:all` (encadena `build:libs` + los 10 `build:<servicio>`) y `build` ahora es un alias de `build:all` en vez de `nest build` a secas. Verificado corriendo `npm run build` completo: los 10 servicios + 5 libs compilan limpio. `CLAUDE.md` ya documentaba este comando como la forma correcta de compilar "varios/todos los servicios" — antes era una promesa falsa, ahora es cierta, no hizo falta tocar la documentación.
+- [ ] **2.2 — 19 warnings de presupuesto de bundle en el frontend.** Ya evaluado y aceptado a propósito (mixins de `_forms.scss`) — no re-litigar salvo pedido explícito nuevo. **Sin tocar, según lo ya decidido.**
+- [ ] **2.3 — `Card` compartido sin adopción real (14 componentes duplicando estilo).** Ya diferido a propósito por decisión documentada — encarar como tanda dedicada, un componente a la vez, solo si se pide explícitamente. **Sin tocar, según lo ya decidido.**
 
 ---
 

@@ -197,7 +197,15 @@
             </div>
           }
 
-          <!-- Typing indicator placeholder -->
+          @if (otherTyping()) {
+            <div class="message-row message-row--other">
+              <div class="message-bubble message-bubble--other typing-indicator">
+                <span class="typing-indicator__dot"></span>
+                <span class="typing-indicator__dot"></span>
+                <span class="typing-indicator__dot"></span>
+              </div>
+            </div>
+          }
         </div>
 
         <!-- Composer -->
@@ -211,6 +219,7 @@
               class="composer__input"
               [(ngModel)]="inputMessage"
               (keydown)="onKeydown($event)"
+              (input)="onTyping()"
               placeholder="Escribe un mensaje..."
               rows="1"
               maxlength="2000"
