@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService, UserRole } from '@app/database';
+import { PrismaService, UserRole, NotificationType } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
 import { titleCaseText, trimText } from '@app/common';
+
+/** Debajo de este % de coincidencia con los requisitos, no vale la pena alertar al candidato — sería ruido. */
+const JOB_MATCH_ALERT_THRESHOLD = 50;
 
 const PUBLISHED = 'PUBLISHED' as any;
 const DRAFT = 'DRAFT' as any;
@@ -114,9 +117,49 @@ export class JobsService {
     if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
     if (!job.title || !job.description) throw new BadRequestException('La oferta necesita título y descripción');
 
-    return this.prisma.jobOffer.update({
+    const published = await this.prisma.jobOffer.update({
       where: { id: jobId },
       data: { status: PUBLISHED, publishedAt: new Date() },
+    });
+
+    await this.notifyMatchingCandidates(published);
+
+    return published;
+  }
+
+  /**
+   * Al publicar una vacante, alerta (notificación in-app tipo JOB_MATCH) a los
+   * candidatos cuyo perfil matchea razonablemente los requisitos — mismo
+   * `computeSkillMatch` que usa el resto de la plataforma para el % de match.
+   * Si la oferta no pide ninguna skill puntual, no hay "match" real que avisar
+   * (todo el mundo "matchea" trivialmente) — se omite para no generar ruido.
+   */
+  private async notifyMatchingCandidates(job: { id: number; title: string; skillsRequired: string | null }): Promise<void> {
+    if (!job.skillsRequired?.trim()) return;
+
+    const profiles = await this.prisma.profile.findMany({
+      where: { isPublished: true },
+      select: {
+        userId: true,
+        skills: { select: { normalizedName: true, level: true } },
+      },
+    });
+
+    const matchingUserIds = profiles
+      .map((p) => ({ userId: p.userId, match: computeSkillMatch(job.skillsRequired, p.skills) }))
+      .filter((p) => p.match.matchPercent >= JOB_MATCH_ALERT_THRESHOLD)
+      .map((p) => p.userId);
+
+    if (matchingUserIds.length === 0) return;
+
+    await this.prisma.notification.createMany({
+      data: matchingUserIds.map((userId) => ({
+        userId,
+        type: NotificationType.JOB_MATCH,
+        title: 'Vacante que podría interesarte',
+        body: `"${job.title}" coincide con tu perfil — revisala antes de que se llene.`,
+        link: '/app/jobs',
+      })),
     });
   }
 
