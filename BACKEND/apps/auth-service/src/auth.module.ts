@@ -3,13 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import type { StringValue } from 'ms';
 import { PrismaModule } from '@app/database';
 import { AllExceptionsFilter, CommonModule } from '@app/common';
 import { JwtStrategy, OptionalJwtAuthGuard } from '@app/auth';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { IpThrottlerGuard } from './ip-throttler.guard';
 
 // Antes caía a un secreto hardcodeado ('dev_secret') si faltaba la variable
 // de entorno — cualquier deploy sin JWT_SECRET seteado firmaba tokens con un
@@ -43,7 +44,7 @@ if (!jwtSecret) {
     OptionalJwtAuthGuard,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: IpThrottlerGuard,
     },
     {
       provide: APP_PIPE,
