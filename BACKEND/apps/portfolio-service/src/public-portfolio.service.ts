@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@app/database';
+import { PrismaService, Prisma } from '@app/database';
 import { CandidateAccessService } from './candidate-access.service';
 
 @Injectable()
@@ -34,17 +34,36 @@ export class PublicPortfolioService {
     return this.filterByVisibility(profile, viewer, canEndorse);
   }
 
-  /** No registra un nuevo view si la misma empresa ya vio este perfil en los últimos 10 minutos — evita inflar el contador con refrescos de la misma visita. */
+  /**
+   * No registra un nuevo view si la misma empresa ya vio este perfil en los
+   * últimos 10 minutos — evita inflar el contador con refrescos de la misma
+   * visita. El chequeo-y-creación va en una transacción SERIALIZABLE: sin
+   * esto, dos requests casi simultáneas (doble tab, refresh muy rápido)
+   * podían leer las dos "sin vista reciente" antes de que cualquiera
+   * insertara, duplicando la fila. Bajo SERIALIZABLE, Postgres rechaza una
+   * de las dos transacciones en conflicto — se ignora ese error porque acá
+   * el objetivo es justamente deduplicar, así que un conflicto confirma que
+   * la otra transacción concurrente ya registró la vista.
+   */
   private async recordView(profileId: number, companyUserId: number): Promise<void> {
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-    const recent = await this.prisma.profileView.findFirst({
-      where: { profileId, companyUserId, createdAt: { gte: tenMinutesAgo } },
-    });
-    if (recent) return;
+    try {
+      await this.prisma.$transaction(
+        async (tx) => {
+          const recent = await tx.profileView.findFirst({
+            where: { profileId, companyUserId, createdAt: { gte: tenMinutesAgo } },
+          });
+          if (recent) return;
 
-    await this.prisma.profileView.create({
-      data: { profileId, companyUserId },
-    });
+          await tx.profileView.create({
+            data: { profileId, companyUserId },
+          });
+        },
+        { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      );
+    } catch (err) {
+      if (!(err instanceof Prisma.PrismaClientKnownRequestError)) throw err;
+    }
   }
 
   async getPreview(userId: number) {

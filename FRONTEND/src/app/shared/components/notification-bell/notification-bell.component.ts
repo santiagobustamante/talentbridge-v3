@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener, ElementRef, inject, signal 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Subscription, interval, startWith, switchMap } from 'rxjs';
+import { Subscription, interval, startWith, switchMap, catchError, of } from 'rxjs';
 import { NotificationService, AppNotification } from '../../../core/services/notification.service';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { AppDatePipe } from '../../pipes/app-date.pipe';
@@ -38,11 +38,17 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.pollSub = interval(POLL_INTERVAL_MS)
       .pipe(
         startWith(0),
-        switchMap(() => this.notificationService.unreadCount()),
+        // El catchError va DENTRO del switchMap, envolviendo solo la llamada
+        // HTTP puntual: si un solo ciclo de sondeo falla (ej. un hipo de
+        // red), `of(null)` absorbe ese error ahí mismo. Antes se
+        // encadenaba directo — un solo fallo hacía que switchMap propagara
+        // el error hacia arriba, lo que termina el observable completo
+        // (incluido el `interval` de origen) y mataba el sondeo para
+        // siempre, silenciosamente, hasta que el usuario recargara la página.
+        switchMap(() => this.notificationService.unreadCount().pipe(catchError(() => of(null)))),
       )
-      .subscribe({
-        next: (res) => this.unreadCount.set(res.count),
-        error: () => {},
+      .subscribe((res) => {
+        if (res) this.unreadCount.set(res.count);
       });
   }
 
@@ -96,9 +102,19 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   /** Marca como leída (si no lo estaba), cierra el dropdown y navega al link asociado, si tiene. */
   openNotification(n: AppNotification): void {
     if (!n.read) {
-      this.notificationService.markRead(n.id).subscribe();
-      this.notifications.update((list) => list.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
-      this.unreadCount.update((c) => Math.max(0, c - 1));
+      // La actualización local va DENTRO de `next`, no antes de suscribirse —
+      // con el `.subscribe()` en blanco de antes, si `markRead` fallaba (red,
+      // 401, etc.) la notificación igual quedaba marcada como leída y el
+      // contador decrementado en la UI, sin que el backend se hubiera
+      // enterado y sin ningún aviso de error — quedaba desincronizado hasta
+      // el próximo sondeo (ver POLL_INTERVAL_MS más arriba).
+      this.notificationService.markRead(n.id).subscribe({
+        next: () => {
+          this.notifications.update((list) => list.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+          this.unreadCount.update((c) => Math.max(0, c - 1));
+        },
+        error: () => {},
+      });
     }
     this.open.set(false);
     if (n.link) {

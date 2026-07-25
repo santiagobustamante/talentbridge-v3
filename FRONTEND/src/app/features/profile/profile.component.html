@@ -38,10 +38,10 @@
           <div class="summary-avatar-info">
             <h2>{{ displayValue(summaryProfile.fullName, 'Nombre no agregado') }}</h2>
             <p>{{ displayValue(summaryProfile.professionalTitle, 'Título profesional no agregado') }}</p>
-            <span class="summary-city">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
+            <span class="summary-city">{{ displayValue(summaryProfile.city, 'Municipio no agregado') }}</span>
             <div class="summary-visibility-control">
               <span>{{ summaryProfile.showCity ? 'Visible en perfil público' : 'Oculta en perfil público' }}</span>
-              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showCity" [attr.aria-pressed]="profile?.showCity" aria-label="Cambiar visibilidad de ciudad" (click)="toggleSummaryVisibility('showCity')">
+              <button type="button" class="visibility-switch" [class.visibility-switch--active]="profile?.showCity" [attr.aria-pressed]="profile?.showCity" aria-label="Cambiar visibilidad de municipio" (click)="toggleSummaryVisibility('showCity')">
                 <span></span>
               </button>
             </div>
@@ -148,10 +148,10 @@
             <textarea class="app-textarea" formControlName="summary" rows="4" (blur)="onSummaryBlur()" placeholder="Breve descripción de tu perfil profesional..."></textarea>
           </div>
           <div class="form-field full-width">
-            <label>Ciudad</label>
-            <input class="app-input" formControlName="city" autocomplete="address-level2" (blur)="onNameLikeBlur('city')" placeholder="Ej. Madrid, España" />
+            <label>Municipio</label>
+            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
             <div class="inline-visibility-control">
-              <span>Mostrar ciudad en perfil público</span>
+              <span>Mostrar municipio en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showCity')?.value" [attr.aria-pressed]="form.get('showCity')?.value" (click)="toggleLocalVisibility('showCity')">
                 <span></span>
               </button>
@@ -257,7 +257,7 @@
       </app-card>
 
       <div class="form-actions">
-        <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>
+        <button type="button" appButton="secondary" (click)="cancelEdit()">Cancelar</button>
         <button type="submit" appButton="primary" [disabled]="saving">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}

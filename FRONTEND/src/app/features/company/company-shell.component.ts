@@ -47,6 +47,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
   companyLogoUrl = signal<string | null>(null);
 
   private unreadSub: Subscription | null = null;
+  private routerSub: Subscription | null = null;
 
   readonly navItems: NavItem[] = [
     { label: 'Panel de control', subtitle: 'Dashboard', icon: 'dashboard', route: '/company/dashboard' },
@@ -59,7 +60,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
 
   /** Mantiene `currentRoute` sincronizada con el router para resaltar el ítem de menú activo. */
   constructor() {
-    this.router.events
+    this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.currentRoute.set(e.urlAfterRedirects));
   }
@@ -85,6 +86,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.unreadSub?.unsubscribe();
+    this.routerSub?.unsubscribe();
   }
 
   /** Determina si una ruta del menú corresponde a la sección actual (para resaltarla). */

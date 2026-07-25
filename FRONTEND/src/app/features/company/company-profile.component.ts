@@ -8,6 +8,7 @@ import { CompanyService } from '../../core/services/company.service';
 import { CompanyProfile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 import {
   normalizePhoneStorage,
   formatPhoneDisplay,
@@ -28,7 +29,7 @@ import {
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, CardComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, CardComponent, MunicipioInputComponent],
   templateUrl: './company-profile.component.html',
   styleUrl: './company-profile.component.scss',
 })
@@ -90,7 +91,7 @@ export class CompanyProfileComponent implements OnInit {
   }
 
   /** Capitaliza tipo "Titulo" (nombre de empresa, sector, ciudad) al salir del campo. */
-  onNameLikeBlur(controlName: 'companyName' | 'sector' | 'city'): void {
+  onNameLikeBlur(controlName: 'companyName' | 'sector'): void {
     const control = this.form.get(controlName);
     const value = control?.value || '';
     const formatted = titleCaseText(value);
@@ -202,7 +203,7 @@ export class CompanyProfileComponent implements OnInit {
       companyName: this.cleanTitleCase(raw.companyName),
       nit: this.cleanNit(raw.nit),
       sector: this.cleanTitleCase(raw.sector),
-      city: this.cleanTitleCase(raw.city),
+      city: this.cleanString(raw.city),
       phone: this.cleanPhone(raw.phone),
       websiteUrl: this.cleanUrl(raw.websiteUrl),
       description: this.cleanString(raw.description),

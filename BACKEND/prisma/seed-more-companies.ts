@@ -110,7 +110,8 @@ const jobTemplates = [
   { title: 'Administrador de Bases de Datos Junior', skills: 'PostgreSQL, MySQL, SQL Server, Backups, Performance, Tuning, Linux', salaryMin: 2500000, salaryMax: 3800000 },
 ];
 
-const cities = ['Bogotá, Colombia', 'Medellín, Colombia', 'Cali, Colombia', 'Barranquilla, Colombia', 'Bucaramanga, Colombia', 'Neiva, Colombia', 'Pereira, Colombia', 'Villavicencio, Colombia', 'Remoto, Colombia'];
+// Formato "Municipio, Departamento" (catálogo DIVIPOLA) o "Remoto" — ver seed.ts.
+const cities = ['Bogotá, D.C.', 'Medellín, Antioquia', 'Cali, Valle del Cauca', 'Barranquilla, Atlántico', 'Bucaramanga, Santander', 'Neiva, Huila', 'Pereira, Risaralda', 'Villavicencio, Meta', 'Remoto'];
 const modalities = ['Remoto', 'Híbrido', 'Presencial'];
 const contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas'];
 const workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Flexible'];

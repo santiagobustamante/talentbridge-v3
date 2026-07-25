@@ -19,6 +19,16 @@
   --primary-soft: #e1f2ef;
   --primary-ghost: #f0f9f8;
 
+  /* Escala de 4 pasos para el nivel de una habilidad (level-meter): de más clara
+     (Básico) a más profunda (Experto), toda dentro de la misma familia teal de
+     --primary — no un color por nivel sin relación entre sí, para no romper la
+     regla de "solo teal + blanco, sin un segundo acento" de arriba. Avanzado
+     reusa --primary tal cual (es el tono "de marca" central de la escala).
+     Nunca rojo: reservado para alertas/--danger, no para un nivel de habilidad. */
+  --level-basic: #14b8a6;
+  --level-intermediate: #0d9488;
+  --level-expert: #134e4a;
+
   --accent: #0b5cad;
   --accent-soft: #e8f1fb;
 

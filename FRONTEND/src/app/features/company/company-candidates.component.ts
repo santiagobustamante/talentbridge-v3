@@ -11,6 +11,7 @@ import { ChatService } from '../../core/services/chat.service';
 import { BadgeComponent } from '../../shared/components/badge/badge.component';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { CardComponent } from '../../shared/components/card/card.component';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 
 /**
  * Buscador de candidatos para empresas (ruta "/company/candidates").
@@ -25,7 +26,7 @@ import { CardComponent } from '../../shared/components/card/card.component';
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
     MatIconModule, MatTooltipModule, MatProgressBarModule, MatSnackBarModule,
-    BadgeComponent, ButtonDirective, CardComponent,
+    BadgeComponent, ButtonDirective, CardComponent, MunicipioInputComponent,
   ],
   styleUrl: './company-candidates.component.scss',
   templateUrl: './company-candidates.component.html',
@@ -47,7 +48,6 @@ export class CompanyCandidatesComponent implements OnInit {
   skillMatch: 'any' | 'all' = 'any';
 
   skillInput = '';
-  cityInput = '';
   professionInput = '';
   contactingCandidateId: number | null = null;
   endorsingSkillId: number | null = null;
@@ -60,6 +60,7 @@ export class CompanyCandidatesComponent implements OnInit {
   total = 0;
   totalPages = 1;
   hasSearched = false;
+  private searchRequestId = 0;
 
   /** Sugerencias de autocompletado de habilidades: catálogo global filtrado por el texto tipeado, sin repetir las ya elegidas. */
   get filteredSkillSuggestions(): string[] {
@@ -68,15 +69,6 @@ export class CompanyCandidatesComponent implements OnInit {
     return this.filterOptions().skills
       .filter((s) => s.toLowerCase().includes(input) && !this.selectedSkills.includes(s))
       .slice(0, 8);
-  }
-
-  /** Sugerencias de autocompletado de ciudades a partir del texto tipeado en el filtro. */
-  get filteredCitySuggestions(): string[] {
-    const input = this.cityInput.trim().toLowerCase();
-    if (!input) return [];
-    return this.filterOptions().cities
-      .filter((c) => c.toLowerCase().includes(input))
-      .slice(0, 6);
   }
 
   /** Sugerencias de autocompletado de profesiones a partir del texto tipeado en el filtro. */
@@ -194,12 +186,6 @@ export class CompanyCandidatesComponent implements OnInit {
     }
   }
 
-  /** Aplica una sugerencia de ciudad al filtro y limpia el input de autocompletado. */
-  selectCity(suggestion: string): void {
-    this.cityCtrl.setValue(suggestion);
-    this.cityInput = '';
-  }
-
   /** Aplica una sugerencia de profesión al filtro y limpia el input de autocompletado. */
   selectProfession(suggestion: string): void {
     this.professionCtrl.setValue(suggestion);
@@ -221,7 +207,6 @@ export class CompanyCandidatesComponent implements OnInit {
     this.selectedSkills = [];
     this.skillMatch = 'any';
     this.skillInput = '';
-    this.cityInput = '';
     this.professionInput = '';
     this.filtersOpen.set(false);
     this.candidates = [];
@@ -236,10 +221,18 @@ export class CompanyCandidatesComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /** Arma los query params activos (texto, ciudad, profesión, habilidades) y consulta el backend paginado. */
+  /**
+   * Arma los query params activos (texto, ciudad, profesión, habilidades) y
+   * consulta el backend paginado. Usa un `requestId` incremental para
+   * descartar la respuesta si ya salió otra búsqueda más nueva mientras
+   * esta estaba en vuelo (ej. el usuario cambia de página rápido) — sin
+   * esto, una respuesta vieja que llega tarde podía pisar el resultado
+   * de la búsqueda más reciente.
+   */
   private fetchResults(): void {
     this.loading.set(true);
     this.candidates = [];
+    const requestId = ++this.searchRequestId;
 
     const params: any = { page: this.page, limit: this.limit };
     const q = this.qCtrl.value?.trim();
@@ -256,12 +249,14 @@ export class CompanyCandidatesComponent implements OnInit {
 
     this.companyService.searchCandidates(params).subscribe({
       next: (res) => {
+        if (requestId !== this.searchRequestId) return;
         this.candidates = res.data;
         this.total = res.total;
         this.totalPages = res.totalPages;
         this.loading.set(false);
       },
       error: (err) => {
+        if (requestId !== this.searchRequestId) return;
         this.loading.set(false);
         const msg = err?.error?.message || 'No pudimos cargar los candidatos en este momento. Intenta nuevamente.';
         this.snackBar.open(msg, 'Cerrar', { duration: 5000 });

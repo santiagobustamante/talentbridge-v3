@@ -266,13 +266,18 @@ export class CvAnalysisComponent {
     this.analyzingId = id;
     this.cvService.analyze(id).subscribe({
       next: (analysis) => {
+        // Si mientras esta llamada estaba en curso el usuario ya lanzó el
+        // análisis de OTRO CV (analyzingId apunta a otro id), esta respuesta
+        // quedó vieja — descartarla en vez de pisar el resultado que se está
+        // mostrando para el CV que el usuario está mirando ahora.
+        if (this.analyzingId !== id) return;
         this.analyzingId = null;
         this.currentAnalysis = analysis;
         this.computeSuggestions(id);
         this.snackBar.open('Análisis completado', 'Cerrar', { duration: 3000 });
       },
       error: (err) => {
-        this.analyzingId = null;
+        if (this.analyzingId === id) this.analyzingId = null;
         this.snackBar.open(err.error?.message || 'Error al analizar', 'Cerrar', { duration: 5000 });
       },
     });
@@ -312,13 +317,17 @@ export class CvAnalysisComponent {
 
   /** Trae todos los CVs ya subidos por el candidato. */
   private loadDocuments() {
-    this.cvService.getAll().subscribe({ next: (docs) => (this.documents = docs) });
+    this.cvService.getAll().subscribe({
+      next: (docs) => (this.documents = docs),
+      error: () => this.snackBar.open('No se pudieron cargar tus CVs — intenta recargar la página', 'Cerrar', { duration: 4000 }),
+    });
   }
 
   /** Carga los nombres (normalizados a minúscula) de las habilidades que el candidato ya tiene en su perfil, para no volver a sugerirlas. */
   private loadCandidateSkills(): void {
     this.skillsService.getAll().subscribe({
       next: (skills) => { this.candidateSkillNames = new Set(skills.map((s) => s.name.toLowerCase())); },
+      error: () => this.snackBar.open('No se pudieron cargar tus habilidades — algunas sugerencias podrían repetirse', 'Cerrar', { duration: 4000 }),
     });
   }
 

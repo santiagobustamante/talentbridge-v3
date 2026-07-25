@@ -37,7 +37,9 @@ export class ExperiencesService {
         profileId: profile.id,
         company: titleCaseText(dto.company),
         position: titleCaseText(dto.position),
-        city: dto.city ? titleCaseText(dto.city) : dto.city,
+        // Sin titleCaseText: viene del catálogo DIVIPOLA con su casing
+        // oficial (incluye conectores en minúscula, ej. "San José de la Montaña").
+        city: dto.city ? trimText(dto.city) : dto.city,
         workMode: dto.workMode,
         contractType: dto.contractType,
         description: dto.description ? trimText(dto.description) : dto.description,
@@ -66,7 +68,7 @@ export class ExperiencesService {
       data: {
         ...(dto.company && { company: titleCaseText(dto.company) }),
         ...(dto.position && { position: titleCaseText(dto.position) }),
-        ...(dto.city !== undefined && { city: dto.city ? titleCaseText(dto.city) : dto.city }),
+        ...(dto.city !== undefined && { city: dto.city ? trimText(dto.city) : dto.city }),
         ...(dto.workMode !== undefined && { workMode: dto.workMode }),
         ...(dto.contractType !== undefined && { contractType: dto.contractType }),
         ...(dto.description !== undefined && { description: dto.description ? trimText(dto.description) : dto.description }),

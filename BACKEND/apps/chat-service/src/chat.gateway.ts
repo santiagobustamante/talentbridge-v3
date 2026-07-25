@@ -123,7 +123,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const authClient = client as AuthenticatedSocket;
     if (!authClient.userId || !data?.conversationId) return;
 
-    client.to(`conversation:${data.conversationId}`).emit('chat:typing', {
+    const room = `conversation:${data.conversationId}`;
+    // El socket solo está unido (ver `handleConnection`) a las salas de las
+    // conversaciones donde el usuario autenticado realmente participa —
+    // sin este chequeo, cualquiera podía mandar `chat:typing` con un
+    // conversationId ajeno (adivinando ids) y el evento se reenviaba igual,
+    // suplantando un "escribiendo..." en la conversación de otra persona.
+    if (!client.rooms.has(room)) return;
+
+    client.to(room).emit('chat:typing', {
       conversationId: data.conversationId,
       userId: authClient.userId,
       isTyping: !!data.isTyping,

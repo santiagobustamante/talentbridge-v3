@@ -13,6 +13,28 @@ enum UserRole {
   COMPANY
 }
 
+/**
+ * Catálogo de los 1.122 municipios de Colombia (codificación oficial DIVIPOLA
+ * del DANE, incluye Bogotá D.C.). Poblada una sola vez por `seed-municipalities.ts`
+ * — no se referencia con FK desde Profile/CompanyProfile/Experience/JobOffer
+ * (esos siguen guardando `city` como string "Nombre, Departamento") porque esos
+ * 4 modelos ya tenían datos reales en producción antes de este catálogo; en vez
+ * de forzar una migración de columna con riesgo de romper datos existentes, el
+ * catálogo se usa para VALIDAR (en el backend, contra `label`) y para POBLAR el
+ * selector (en el frontend, vía el JSON espejo en FRONTEND/public/assets/data/)
+ * qué valores de `city` son un municipio colombiano real.
+ */
+model Municipality {
+  codigoDivipola     String @id @map("codigo_divipola")
+  nombre             String
+  departamentoCodigo String @map("departamento_codigo")
+  departamento       String
+  label              String @unique
+
+  @@index([departamento])
+  @@map("municipalities")
+}
+
 model User {
   id             Int             @id @default(autoincrement())
   email          String          @unique

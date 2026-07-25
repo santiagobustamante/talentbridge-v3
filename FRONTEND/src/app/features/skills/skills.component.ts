@@ -16,6 +16,7 @@ import { Skill } from '../../core/auth/auth.models';
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG, SkillCatalogEntry } from '../../core/services/skill-catalog';
 import { normalizeSkillDisplay } from '../../shared/utils/normalize';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 
 const MAX_SEARCH_RESULTS = 60;
 
@@ -60,7 +61,7 @@ export class SkillsComponent implements OnInit {
   addingBatch = false;
 
   // ─── Habilidad personalizada (no está en el catálogo) ───
-  customForm = this.fb.group({ name: ['', Validators.required], level: ['BASIC' as SkillLevel] });
+  customForm = this.fb.group({ name: ['', [Validators.required, notBlank]], level: ['BASIC' as SkillLevel] });
 
   // ─── Edición de nivel inline en una card ya agregada ───
   editingLevelId: number | null = null;
@@ -75,7 +76,12 @@ export class SkillsComponent implements OnInit {
   }
 
   /** Trae la lista de habilidades del candidato desde el backend. */
-  load() { this.service.getAll().subscribe({ next: (d) => (this.skills = d) }); }
+  load() {
+    this.service.getAll().subscribe({
+      next: (d) => (this.skills = d),
+      error: () => this.snackBar.open('No se pudieron cargar tus habilidades — intenta recargar la página', 'Cerrar', { duration: 4000 }),
+    });
+  }
 
   // ─── Catálogo ───
 

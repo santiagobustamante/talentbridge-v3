@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { ApplicationsService } from './applications.service';
@@ -24,8 +24,8 @@ export class ApplicationsController {
    */
   @UseGuards(JwtAuthGuard)
   @Post('jobs/:id/apply')
-  async apply(@CurrentUser() user: { sub: number }, @Param('id') jobId: string, @Body() body: ApplyDto) {
-    return this.applicationsService.apply(user.sub, +jobId, body.coverMessage);
+  async apply(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) jobId: number, @Body() body: ApplyDto) {
+    return this.applicationsService.apply(user.sub, jobId, body.coverMessage);
   }
 
   /**
@@ -53,8 +53,8 @@ export class ApplicationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Get('company/jobs/:id/applications')
-  async getJobApplications(@CurrentUser() user: { sub: number }, @Param('id') jobId: string) {
-    return this.applicationsService.getJobApplications(user.sub, +jobId);
+  async getJobApplications(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) jobId: number) {
+    return this.applicationsService.getJobApplications(user.sub, jobId);
   }
 
   /**
@@ -65,7 +65,7 @@ export class ApplicationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch('company/applications/:id/status')
-  async updateStatus(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() body: UpdateApplicationStatusDto) {
-    return this.applicationsService.updateStatus(user.sub, +id, body.status);
+  async updateStatus(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() body: UpdateApplicationStatusDto) {
+    return this.applicationsService.updateStatus(user.sub, id, body.status);
   }
 }

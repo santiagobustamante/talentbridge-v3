@@ -173,6 +173,10 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
     this.chatService.getConversation(id).subscribe({
       next: (conv) => this.selectConversation(conv),
+      error: (err) => {
+        const msg = err?.error?.message || 'No se pudo abrir la conversación';
+        this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+      },
     });
   }
 
@@ -194,6 +198,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
       finalize(() => this.loadingMessages.set(false)),
     ).subscribe({
       next: (res: any) => {
+        // Si el usuario ya cambió de conversación antes de que esta respuesta
+        // llegue (clic rápido en A y después en B), descartarla — si no,
+        // pisaría los mensajes de B con los de A.
+        if (this.activeConversation()?.id !== conv.id) return;
+
         const rawMessages = Array.isArray(res) ? res
           : Array.isArray(res?.data) ? res.data
           : Array.isArray(res?.messages) ? res.messages
@@ -242,11 +251,16 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.sending.set(true);
     this.chatService.sendMessage(conv.id, body).subscribe({
       next: (msg) => {
-        this.appendMessage(msg);
+        // Mismo resguardo que el handler de socket (línea ~78): si el usuario
+        // ya cambió de conversación mientras esta request estaba en vuelo, no
+        // agregar el mensaje al hilo que está mirando ahora.
+        if (this.activeConversation()?.id === msg.conversationId) {
+          this.appendMessage(msg);
+          setTimeout(() => this.scrollToBottom(), 50);
+        }
         this.inputMessage = '';
         this.sending.set(false);
         this.loadConversations();
-        setTimeout(() => this.scrollToBottom(), 50);
       },
       error: (err) => {
         this.sending.set(false);

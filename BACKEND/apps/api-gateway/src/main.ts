@@ -1,11 +1,21 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Render/Railway ponen exactamente un reverse proxy propio delante de este
+  // gateway, que agrega (no reemplaza) el IP real del cliente al final de
+  // X-Forwarded-For. Sin esto, Express confía ciegamente en cualquier valor
+  // que el cliente ya haya mandado en ese header (spoofeable con curl/Postman),
+  // permitiendo bypassear el rate-limit de login rotando IPs falsas — con
+  // "trust proxy: 1", req.ip pasa a resolver correctamente el último hop
+  // confiable en vez del primero (no confiable) de la cadena.
+  app.set('trust proxy', 1);
 
   app.setGlobalPrefix('api');
 

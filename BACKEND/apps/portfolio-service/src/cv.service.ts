@@ -58,8 +58,16 @@ export class CvService {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    const filename = `${Date.now()}-${Math.floor(Math.random() * 1000000)}-${file.originalname}`;
+    // path.basename() descarta cualquier componente de directorio del nombre
+    // original (incluida una secuencia "../" armada a mano) — sin esto,
+    // file.originalname (controlado 100% por quien sube el archivo) permitía
+    // escribir fuera de uploads/cv/ vía path traversal.
+    const safeOriginalName = path.basename(file.originalname).trim() || 'archivo.pdf';
+    const filename = `${Date.now()}-${Math.floor(Math.random() * 1000000)}-${safeOriginalName}`;
     const filePath = path.join(uploadDir, filename);
+    if (!filePath.startsWith(uploadDir + path.sep) && filePath !== uploadDir) {
+      throw new BadRequestException('Nombre de archivo no válido');
+    }
     fs.writeFileSync(filePath, file.buffer);
 
     const extractedText = await this.extractTextFromBuffer(file.buffer);

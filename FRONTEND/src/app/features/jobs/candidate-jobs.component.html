@@ -27,7 +27,7 @@
         <input type="text" [formControl]="qCtrl" placeholder="Buscar por título, descripción o habilidad..."
           (keydown.enter)="applyFilters()" />
       </div>
-      <input type="text" class="filter-select" [formControl]="cityCtrl" placeholder="Ciudad" />
+      <app-municipio-input class="filter-select" [value]="cityCtrl.value" (valueChange)="cityCtrl.setValue($event)" [allowRemote]="true" placeholder="Municipio" />
       <select class="filter-select" [formControl]="modalityCtrl">
         <option value="">Modalidad</option>
         @for (m of modalities; track m) {
@@ -198,7 +198,7 @@
 
       @if (totalPages > 1) {
         <div class="pagination">
-          <button class="page-btn" [disabled]="page <= 1" (click)="goToPage(page - 1)">
+          <button class="page-btn" aria-label="Página anterior" [disabled]="page <= 1" (click)="goToPage(page - 1)">
             <mat-icon>chevron_left</mat-icon>
           </button>
           @for (p of pagesArray; track p) {
@@ -208,7 +208,7 @@
               <button class="page-btn" [class.active]="p === page" (click)="goToPage(+p)">{{ p }}</button>
             }
           }
-          <button class="page-btn" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
+          <button class="page-btn" aria-label="Página siguiente" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
@@ -310,7 +310,7 @@
         <div class="pagination">
           <div class="pagination-info">Página {{ appPage }} de {{ appTotalPages }} · {{ appTotal }} postulaciones</div>
           <div class="pagination-btns">
-            <button class="page-btn" [disabled]="appPage <= 1" (click)="goToAppPage(appPage - 1)">
+            <button class="page-btn" aria-label="Página anterior" [disabled]="appPage <= 1" (click)="goToAppPage(appPage - 1)">
               <mat-icon>chevron_left</mat-icon>
             </button>
             @for (p of appPagesArray; track p) {
@@ -320,7 +320,7 @@
                 <button class="page-btn" [class.active]="p === appPage" (click)="goToAppPage(+p)">{{ p }}</button>
               }
             }
-            <button class="page-btn" [disabled]="appPage >= appTotalPages" (click)="goToAppPage(appPage + 1)">
+            <button class="page-btn" aria-label="Página siguiente" [disabled]="appPage >= appTotalPages" (click)="goToAppPage(appPage + 1)">
               <mat-icon>chevron_right</mat-icon>
             </button>
           </div>

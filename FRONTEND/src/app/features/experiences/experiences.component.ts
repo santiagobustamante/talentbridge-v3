@@ -24,6 +24,9 @@ import { Experience } from '../../core/auth/auth.models';
 import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/services/skill-catalog';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { titleCaseText, trimText } from '../../shared/utils/normalize';
+import { toLocalDateString } from '../../shared/utils/format-date.util';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 
 /**
  * Gestion de experiencia laboral del candidato (ruta "/app/experience").
@@ -39,7 +42,7 @@ import { titleCaseText, trimText } from '../../shared/utils/normalize';
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule, MatChipsModule, MatAutocompleteModule,
     MatSnackBarModule, MatCheckboxModule, MatDatepickerModule, MatNativeDateModule,
-    MatSelectModule, MatSlideToggleModule, AppDatePipe,
+    MatSelectModule, MatSlideToggleModule, AppDatePipe, MunicipioInputComponent,
   ],
   styleUrl: './experiences.component.scss',
   template: `
@@ -81,10 +84,10 @@ import { titleCaseText, trimText } from '../../shared/utils/normalize';
                   <mat-label>Empresa <span class="req">*</span></mat-label>
                   <input matInput formControlName="company" placeholder="Ej. Google" />
                 </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Ciudad</mat-label>
-                  <input matInput formControlName="city" placeholder="Ej. Madrid, España" />
-                </mat-form-field>
+                <div class="municipio-field">
+                  <label class="municipio-field__label">Municipio</label>
+                  <app-municipio-input [value]="form.value.city ?? null" [allowRemote]="true" (valueChange)="form.patchValue({ city: $event })" />
+                </div>
                 <mat-form-field appearance="outline">
                   <mat-label>Modalidad de trabajo</mat-label>
                   <mat-select formControlName="workMode">
@@ -122,7 +125,7 @@ import { titleCaseText, trimText } from '../../shared/utils/normalize';
                 </mat-form-field>
                 <mat-form-field appearance="outline" *ngIf="!form.get('isCurrent')?.value">
                   <mat-label>Fecha Fin</mat-label>
-                  <input matInput [matDatepicker]="ePicker" formControlName="endDate" />
+                  <input matInput [matDatepicker]="ePicker" [max]="today" formControlName="endDate" />
                   <mat-datepicker-toggle matSuffix [for]="ePicker"/>
                   <mat-datepicker #ePicker/>
                 </mat-form-field>
@@ -243,13 +246,14 @@ export class ExperiencesComponent implements OnInit {
   showForm = false;
   showExperience = true;
   profileLoaded = false;
+  readonly today = new Date();
   selectedSkills: string[] = [];
   skillInputCtrl = this.fb.control('');
   filteredSkillSuggestions: SkillCatalogEntry[] = [];
 
   form = this.fb.group({
-    company: ['', Validators.required],
-    position: ['', Validators.required],
+    company: ['', [Validators.required, notBlank]],
+    position: ['', [Validators.required, notBlank]],
     startDate: [null as Date | null, Validators.required],
     endDate: [null as Date | null],
     isCurrent: [false],
@@ -278,7 +282,12 @@ export class ExperiencesComponent implements OnInit {
   }
 
   /** Trae la lista de experiencias laborales del candidato desde el backend. */
-  load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
+  load() {
+    this.service.getAll().subscribe({
+      next: (d) => (this.items = d),
+      error: () => this.snackBar.open('No se pudo cargar tu experiencia laboral — intenta recargar la página', 'Cerrar', { duration: 4000 }),
+    });
+  }
 
   /** Actualiza si la seccion de experiencia se muestra en el portafolio publico; revierte el cambio si falla el guardado. */
   toggleVisibility(event: any) {
@@ -309,10 +318,10 @@ export class ExperiencesComponent implements OnInit {
     const data = {
       company: titleCaseText(v.company!),
       position: titleCaseText(v.position!),
-      startDate: v.startDate?.toISOString().split('T')[0] || '',
-      endDate: v.isCurrent ? undefined : (v.endDate?.toISOString().split('T')[0] || undefined),
+      startDate: v.startDate ? toLocalDateString(v.startDate) : '',
+      endDate: v.isCurrent ? undefined : (v.endDate ? toLocalDateString(v.endDate) : undefined),
       isCurrent: v.isCurrent || false,
-      city: v.city ? titleCaseText(v.city) : undefined,
+      city: v.city ? trimText(v.city) : undefined,
       workMode: v.workMode || undefined,
       contractType: v.contractType || undefined,
       functions: v.functions ? trimText(v.functions) : undefined,

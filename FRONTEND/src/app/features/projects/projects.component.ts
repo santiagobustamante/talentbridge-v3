@@ -14,7 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOption } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ProjectsService } from '../../core/services/projects.service';
 import { ProfileService } from '../../core/services/profile.service';
@@ -22,8 +22,9 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
 import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
 import { Project } from '../../core/auth/auth.models';
 import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/services/skill-catalog';
-
-const URL_PATTERN = /^https?:\/\/.+/i;
+import { toLocalDateString } from '../../shared/utils/format-date.util';
+import { normalizeUrl } from '../../shared/utils/normalize/url.util';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 
 /**
  * Gestión de proyectos del portafolio del candidato (ruta "/app/projects").
@@ -110,8 +111,9 @@ const URL_PATTERN = /^https?:\/\/.+/i;
               <div class="section-label">Tecnolog&iacute;as y enlaces</div>
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Buscar o agregar tecnolog&iacute;a</mat-label>
-                <input matInput [formControl]="techInputCtrl" [matAutocomplete]="techAuto"
-                       placeholder="Ej. Angular, TypeScript, Docker..." />
+                <input matInput [formControl]="techInputCtrl" [matAutocomplete]="techAuto" #techTrigger="matAutocompleteTrigger"
+                       placeholder="Ej. Angular, TypeScript, Docker... (Enter agrega una que no esté en la lista)"
+                       (keydown.enter)="onTechInputEnter(techTrigger.activeOption, $event)" />
                 <mat-autocomplete #techAuto="matAutocomplete" (optionSelected)="addTechChip($event.option.value)">
                   @for (opt of filteredTechSuggestions; track opt.name) {
                     <mat-option [value]="opt.name">
@@ -167,7 +169,7 @@ const URL_PATTERN = /^https?:\/\/.+/i;
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha fin</mat-label>
-                  <input matInput [matDatepicker]="pePicker" formControlName="endDate" />
+                  <input matInput [matDatepicker]="pePicker" [max]="today" formControlName="endDate" />
                   <mat-datepicker-toggle matSuffix [for]="pePicker"/>
                   <mat-datepicker #pePicker/>
                 </mat-form-field>
@@ -255,9 +257,10 @@ export class ProjectsComponent implements OnInit {
   selectedTechs: string[] = [];
   techInputCtrl = this.fb.control('');
   filteredTechSuggestions: SkillCatalogEntry[] = [];
+  readonly today = new Date();
 
   form = this.fb.group({
-    name: ['', Validators.required],
+    name: ['', [Validators.required, notBlank]],
     description: [''],
     role: [''],
     responsibilities: [''],
@@ -287,7 +290,12 @@ export class ProjectsComponent implements OnInit {
   }
 
   /** Trae la lista de proyectos del candidato desde el backend. */
-  load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
+  load() {
+    this.service.getAll().subscribe({
+      next: (d) => (this.items = d),
+      error: () => this.snackBar.open('No se pudieron cargar tus proyectos — intenta recargar la página', 'Cerrar', { duration: 4000 }),
+    });
+  }
 
   /**
    * Actualiza en el perfil si los proyectos se muestran o no en el
@@ -309,6 +317,20 @@ export class ProjectsComponent implements OnInit {
     this.techInputCtrl.setValue('');
   }
 
+  /**
+   * Agrega como chip libre lo que el usuario haya escrito al presionar Enter,
+   * para tecnologías que no están en `SKILL_CATALOG`. Si hay una sugerencia
+   * resaltada con las flechas (`activeOption`), no hace nada — deja que
+   * Material la seleccione por su cuenta vía `(optionSelected)`, evitando
+   * agregar dos chips distintos (el texto tipeado y la sugerencia elegida).
+   */
+  onTechInputEnter(activeOption: MatOption | null, event: Event) {
+    if (activeOption) return;
+    event.preventDefault();
+    const value = (this.techInputCtrl.value || '').trim();
+    if (value) this.addTechChip(value);
+  }
+
   /** Quita una tecnología del proyecto en edición por su posición en la lista de chips. */
   removeTechChip(index: number) { this.selectedTechs.splice(index, 1); }
 
@@ -321,13 +343,13 @@ export class ProjectsComponent implements OnInit {
       role: v.role || undefined,
       responsibilities: v.responsibilities || undefined,
       technologies: this.selectedTechs.length ? this.selectedTechs : undefined,
-      repositoryUrl: v.repositoryUrl?.trim() || undefined,
-      demoUrl: v.demoUrl?.trim() || undefined,
-      imageUrl: v.imageUrl?.trim() || undefined,
+      repositoryUrl: v.repositoryUrl?.trim() ? normalizeUrl(v.repositoryUrl.trim()) : undefined,
+      demoUrl: v.demoUrl?.trim() ? normalizeUrl(v.demoUrl.trim()) : undefined,
+      imageUrl: v.imageUrl?.trim() ? normalizeUrl(v.imageUrl.trim()) : undefined,
       projectType: v.projectType || undefined,
       status: v.status || undefined,
-      startDate: v.startDate ? v.startDate.toISOString().split('T')[0] : undefined,
-      endDate: v.endDate ? v.endDate.toISOString().split('T')[0] : undefined,
+      startDate: v.startDate ? toLocalDateString(v.startDate) : undefined,
+      endDate: v.endDate ? toLocalDateString(v.endDate) : undefined,
     };
 
     const req = this.editing

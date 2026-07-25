@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { JobsService } from './jobs.service';
-import { CreateJobOfferDto } from './dto/create-job-offer.dto';
+import { CreateJobOfferDto, UpdateJobOfferDto } from './dto/create-job-offer.dto';
 
 @Controller('company/jobs')
 export class CompanyJobsController {
@@ -18,8 +18,8 @@ export class CompanyJobsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Get(':id')
-  async getCompanyJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.getCompanyJob(user.sub, +id);
+  async getCompanyJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.getCompanyJob(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,42 +32,42 @@ export class CompanyJobsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id')
-  async updateJob(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() dto: CreateJobOfferDto) {
-    return this.jobsService.updateJob(user.sub, +id, dto);
+  async updateJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdateJobOfferDto) {
+    return this.jobsService.updateJob(user.sub, id, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Delete(':id')
-  async deleteJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.deleteJob(user.sub, +id);
+  async deleteJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.deleteJob(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id/publish')
-  async publishJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.publishJob(user.sub, +id);
+  async publishJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.publishJob(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id/close')
-  async closeJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.closeJob(user.sub, +id);
+  async closeJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.closeJob(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id/archive')
-  async archiveJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.archiveJob(user.sub, +id);
+  async archiveJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.archiveJob(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Patch(':id/restore')
-  async restoreJob(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.restoreJob(user.sub, +id);
+  async restoreJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.restoreJob(user.sub, id);
   }
 }

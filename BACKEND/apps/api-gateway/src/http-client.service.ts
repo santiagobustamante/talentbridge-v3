@@ -38,7 +38,17 @@ export class HttpClient {
     // del propio gateway (es un fetch() servidor-a-servidor) — cualquier
     // rate limiting por IP del lado del servicio destino (ver auth-service)
     // terminaría agrupando a todos los usuarios reales bajo un mismo balde.
-    headers['X-Forwarded-For'] = (req.headers['x-forwarded-for'] as string) || req.ip || '';
+    //
+    // A propósito NO se reenvía el X-Forwarded-For que ya traía la request
+    // entrante (`req.headers['x-forwarded-for']`) — ese header lo puede mandar
+    // cualquier cliente con el valor que quiera (curl, Postman), y el guard de
+    // auth-service confía en él para el rate-limit de login/registro; hacerlo
+    // así permitía bypassear el límite rotando una IP falsa por intento. Con
+    // "trust proxy" configurado en main.ts, `req.ip` ya resuelve el IP real
+    // del cliente parseando la cadena de forma segura (el último hop, agregado
+    // por el proxy de Render/Railway, no lo primero que haya mandado el
+    // cliente) — es la única fuente confiable acá.
+    headers['X-Forwarded-For'] = req.ip || '';
 
     const contentType = (req.headers['content-type'] || '') as string;
     const isMultipart = contentType.includes('multipart/form-data');

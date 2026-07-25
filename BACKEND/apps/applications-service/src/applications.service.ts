@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
-import { PrismaService, JobOfferStatus, JobApplicationStatus, NotificationType } from '@app/database';
+import { PrismaService, JobOfferStatus, JobApplicationStatus, NotificationType, Prisma } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
-import { NotificationsService } from './notifications.service';
 
 /** Traduce el estado de una postulación al texto que ve el candidato en su notificación. */
 const STATUS_LABELS: Record<string, string> = {
@@ -20,10 +19,7 @@ const STATUS_LABELS: Record<string, string> = {
  */
 @Injectable()
 export class ApplicationsService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly notifications: NotificationsService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Crea una postulación de un candidato a una oferta. Antes de guardar,
@@ -56,23 +52,50 @@ export class ApplicationsService {
       throw new BadRequestException('No tienes al menos una habilidad que coincida con los requisitos de esta oferta');
     }
 
-    const application = await this.prisma.jobApplication.create({
-      data: {
-        jobOfferId: jobId,
-        candidateId: candidateUserId,
-        coverMessage,
-        status: JobApplicationStatus.PENDING,
-      },
-    });
+    // El chequeo de `existing` de arriba es best-effort (dos requests
+    // simultáneas del mismo candidato — doble click, dos pestañas — pueden
+    // pasarlo las dos antes de que cualquiera cree el registro). La
+    // constraint única jobOfferId+candidateId en la base es la que
+    // realmente lo impide; acá solo traducimos su violación (P2002) al
+    // mismo 409 amigable en vez de dejar pasar el error crudo de Prisma.
+    //
+    // La postulación y su notificación a la empresa van en la misma
+    // transacción: sin esto, si `notification.create` fallaba después de
+    // que la postulación ya se hubiera guardado, el candidato veía un error
+    // (y podía reintentar) pero la postulación había quedado creada de
+    // todos modos — un reintento entonces chocaba con "Ya aplicaste" pese a
+    // que, de cara al candidato, la primera vez había "fallado".
+    let application;
+    try {
+      application = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.jobApplication.create({
+          data: {
+            jobOfferId: jobId,
+            candidateId: candidateUserId,
+            coverMessage,
+            status: JobApplicationStatus.PENDING,
+          },
+        });
 
-    const candidateName = profile.fullName || 'Un candidato';
-    await this.notifications.create(
-      job.companyId,
-      NotificationType.NEW_APPLICATION,
-      'Nueva postulación',
-      `${candidateName} se postuló a tu vacante "${job.title}"`,
-      `/company/jobs`,
-    );
+        const candidateName = profile.fullName || 'Un candidato';
+        await tx.notification.create({
+          data: {
+            userId: job.companyId,
+            type: NotificationType.NEW_APPLICATION,
+            title: 'Nueva postulación',
+            body: `${candidateName} se postuló a tu vacante "${job.title}"`,
+            link: `/company/jobs`,
+          },
+        });
+
+        return created;
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException('Ya aplicaste a esta oferta');
+      }
+      throw err;
+    }
 
     return application;
   }
@@ -211,19 +234,29 @@ export class ApplicationsService {
       throw new BadRequestException('Estado no válido');
     }
 
-    const updated = await this.prisma.jobApplication.update({
-      where: { id: applicationId },
-      data: { status: newStatus as JobApplicationStatus },
-    });
-
     const statusLabel = STATUS_LABELS[newStatus] || newStatus;
-    await this.notifications.create(
-      application.candidateId,
-      NotificationType.APPLICATION_STATUS_CHANGED,
-      'Tu postulación cambió de estado',
-      `Tu postulación a "${application.jobOffer.title}" ahora está: ${statusLabel}`,
-      `/app/jobs`,
-    );
+
+    // Mismo motivo que en `apply()`: el cambio de estado y la notificación
+    // al candidato van en una sola transacción para que no quede el estado
+    // actualizado sin avisarle (o viceversa) si una de las dos escrituras falla.
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.jobApplication.update({
+        where: { id: applicationId },
+        data: { status: newStatus as JobApplicationStatus },
+      });
+
+      await tx.notification.create({
+        data: {
+          userId: application.candidateId,
+          type: NotificationType.APPLICATION_STATUS_CHANGED,
+          title: 'Tu postulación cambió de estado',
+          body: `Tu postulación a "${application.jobOffer.title}" ahora está: ${statusLabel}`,
+          link: `/app/jobs`,
+        },
+      });
+
+      return result;
+    });
 
     return updated;
   }

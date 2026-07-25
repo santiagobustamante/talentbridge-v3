@@ -213,3 +213,43 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** Reintento automático cuando la respuesta del servicio destino es 502/503/504 (o falla la conexión) — hasta 2 reintentos con 4s de espera entre cada uno. Limitado a peticiones `GET`, las únicas seguras de repetir sin riesgo de duplicar un efecto (ej. crear una postulación dos veces) si la petición original ya había llegado a procesarse del otro lado y solo se cortó la respuesta.
 **Prueba realizada:** Diagnóstico: pegándole directo a cada servicio (bypaseando el gateway) todos respondían bien — confirmó que el problema estaba en el hop gateway→servicio, no en los servicios en sí. `npm run build:gateway` limpio. `npx jest` → 44/44 (sin tests nuevos — el fix depende de latencia/red real, no se presta a mockear). Verificación en vivo pendiente de confirmar tras el redeploy.
 **Estado:** Corregido, verificación en vivo pendiente.
+
+---
+
+### BUG-019 — El 502 de Railway que motivó abandonarlo por Render (2026-07-18) era config propia, no la plataforma
+
+**Módulo:** Infraestructura — proyecto Railway `renewed-enchantment` (los 10 servicios)
+**Descripción:** El diagnóstico original (ver `DECISIONS.md`, entrada "Backend público: Render... en vez de Railway") atribuyó un 502 persistente y reproducible (hasta con un servidor mínimo de prueba) a la plataforma Railway. Al retomar Railway para reemplazar Render, se volvió a probar 1 servicio primero (`chat-service`) antes de comprometer los 10, y esta vez sí se llegó a la causa real mirando `railway logs --build`.
+**Causa (4 bugs de configuración, no de plataforma):**
+1. Ningún servicio tenía seteada la variable `PORT` — el proxy de borde de Railway la usa para saber a qué puerto interno enrutar, y ninguno de los 10 servicios la lee ni la tenía configurada (solo su propia `<NOMBRE>_SERVICE_PORT`).
+2. `api-gateway` nunca tuvo `DATABASE_URL` configurada (los otros 9 sí).
+3. `DEEPSEEK_MODEL` seguía en el valor deprecado `deepseek-chat` (mismo bug ya corregido en Render, nunca replicado acá).
+4. **La causa raíz real del 502 original:** los 10 servicios tenían persistido `builder: RAILPACK` con `rootDirectory`/`dockerfilePath` vacíos — nunca se guardó la config para que cada uno use su Dockerfile propio. Sin eso, según cómo se subiera el código, Railway fallaba el autodetect o construía el `Dockerfile` genérico multi-stage de `BACKEND/` sin `--target`, lo que arma el último stage del archivo (`dashboard-service`) — los 10 servicios corrían el mismo build bajo nombres distintos, sin error visible en build/deploy.
+**Archivos afectados:** Ninguno en el repo — todo config de Railway (env vars + `rootDirectory`/`dockerfilePath` por servicio, vía CLI y API GraphQL). `FRONTEND/src/environments/environment.prod.ts` sí cambió, para apuntar a Railway.
+**Solución:** Detalle completo del diagnóstico y la corrección en [`CHANGELOG.md`](./CHANGELOG.md#2026-07-25--migración-del-backend-de-render-a-railway) y [`DEPLOYMENT.md`](./DEPLOYMENT.md#7-problemas-conocidos--comportamiento-esperado) (sección de la trampa de `--path-as-root`).
+**Prueba realizada:** Barrido de scripts contra el gateway de Railway (login candidato/empresa, dashboard, portafolio, Joaquín, chat, vacantes, postulaciones, analítica, notificaciones, búsqueda) — todos `200`/`201` con datos reales. Verificado además en el navegador real tras el deploy a Vercel: login, dashboard con datos correctos, tráfico de red confirmado contra `*.up.railway.app`.
+**Estado:** Corregido y en producción. Render queda desplegado intacto como respaldo (ver `DEPLOYMENT.md` sección 5, "Revertir a Render si Railway falla").
+
+---
+
+### BUG-020 — [CRÍTICO] El gateway confiaba en el `X-Forwarded-For` que mandaba el propio cliente, permitiendo saltarse el rate-limit de login rotando un IP falso
+
+**Módulo:** Backend — `api-gateway` (`main.ts`, `http-client.service.ts`)
+**Descripción:** El rate-limit de intentos de login/registro (en `auth-service`) decide a quién limitar mirando el IP del request entrante. El gateway reenviaba ese IP a los servicios internos vía el header `X-Forwarded-For` — pero lo armaba a partir de `req.headers['x-forwarded-for']`, el mismo header que **cualquier cliente puede mandar con el valor que quiera** (trivial con curl/Postman: `curl -H "X-Forwarded-For: 1.2.3.4" ...`). Cualquiera podía rotar un IP inventado en cada intento y saltarse el límite de intentos de login por completo, habilitando fuerza bruta de contraseñas sin fricción.
+**Causa:** Express no confía en `X-Forwarded-For` por defecto (`trust proxy` sin configurar) — pero el gateway tampoco necesitaba esa confianza porque nunca usaba `req.ip`: leía el header entrante directo y lo reenviaba tal cual, sin validar que viniera realmente del proxy de la plataforma (Render/Railway) y no del cliente final.
+**Archivos afectados:** `BACKEND/apps/api-gateway/src/main.ts`, `BACKEND/apps/api-gateway/src/http-client.service.ts`
+**Solución:** `app.set('trust proxy', 1)` en `main.ts` — le dice a Express que hay exactamente un proxy propio (el de Render/Railway) delante del gateway, y que por lo tanto debe confiar solo en el **último** hop de la cadena `X-Forwarded-For` (el que agrega ese proxy) e ignorar cualquier valor que el cliente haya mandado antes. `http-client.service.ts` dejó de reenviar el header entrante crudo y pasó a usar `req.ip` (ya resuelto de forma segura por Express con la config de arriba) como única fuente al armar el header hacia los servicios internos.
+**Prueba realizada:** `npm run build:gateway` limpio. Revisado en conjunto con una auditoría de seguridad independiente (2 fuentes coincidieron en el mismo hallazgo).
+**Estado:** Corregido.
+
+---
+
+### BUG-021 — [CRÍTICO] Path traversal en la subida de CV vía el nombre de archivo original
+
+**Módulo:** Backend — `portfolio-service` (`cv.service.ts`, `cv.controller.ts`)
+**Descripción:** Al subir un CV, el nombre del archivo guardado en disco se armaba concatenando `Date.now()` + un número aleatorio + `file.originalname` — el nombre original que manda el navegador en el `multipart/form-data`, **100% controlado por quien sube el archivo**. Un nombre armado a mano como `../../../etc/passwd` (o el equivalente en el servidor real) podía escribir fuera de `uploads/cv/`, en cualquier ruta que el proceso Node tuviera permiso de escribir.
+**Causa:** Ningún saneamiento del nombre de archivo antes de usarlo para construir la ruta de destino con `path.join()` — `path.join()` respeta `../` en sus argumentos, no protege contra traversal por sí solo.
+**Archivos afectados:** `BACKEND/apps/portfolio-service/src/cv.service.ts`, `BACKEND/apps/portfolio-service/src/cv.controller.ts`
+**Solución:** `path.basename(file.originalname)` descarta cualquier componente de directorio del nombre (incluida una secuencia `../` armada a mano) antes de usarlo para construir la ruta — más una verificación explícita de que la ruta final resuelta siga dentro de `uploads/cv/` antes de escribir, como segunda capa. De paso, `cv.controller.ts` sumó un límite de tamaño a nivel de Multer (`limits: { fileSize }`) para que un archivo por encima del máximo se rechace antes de bufferearse entero en memoria, no después.
+**Prueba realizada:** `npm run build:portfolio` limpio. Revisado en conjunto con una auditoría de seguridad independiente (2 fuentes coincidieron en el mismo hallazgo).
+**Estado:** Corregido.

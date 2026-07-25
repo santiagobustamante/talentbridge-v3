@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { EducationService } from './education.service';
 import { EducationDto } from './dto/education.dto';
@@ -21,13 +21,13 @@ export class EducationController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async updateEducation(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() dto: EducationDto) {
-    return this.educationService.updateEducation(user.sub, +id, dto);
+  async updateEducation(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() dto: EducationDto) {
+    return this.educationService.updateEducation(user.sub, id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async removeEducation(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.educationService.removeEducation(user.sub, +id);
+  async removeEducation(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.educationService.removeEducation(user.sub, id);
   }
 }

@@ -70,7 +70,7 @@ export class CandidateSearchService {
       where.professionalTitle = { contains: profession, mode: 'insensitive' };
     }
 
-    const searchSkills = skills?.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean) || [];
+    const searchSkills = skills?.split(',').map((s) => s.trim().toLocaleLowerCase('es-CO')).filter(Boolean) || [];
 
     if (searchSkills.length > 0) {
       if (mode?.toUpperCase() === 'ALL') {
@@ -117,7 +117,12 @@ export class CandidateSearchService {
     ]);
 
     const data = profiles.map((profile) => {
-      const profileSkillNames = profile.skills.map((s) => s.normalizedName.toLowerCase());
+      const profileSkillNames = profile.skills.map((s) => s.normalizedName.toLocaleLowerCase('es-CO'));
+      // Se calcula siempre sobre los datos reales (independiente de
+      // `showSkills`) porque el filtro modo "ALL" de abajo lo necesita para
+      // decidir qué candidatos calificaron en la búsqueda — el toggle de
+      // privacidad solo determina si esto se expone en la respuesta, no si
+      // el candidato es encontrable por skill.
       const matchedSkills = searchSkills.length
         ? searchSkills.filter((s) => profileSkillNames.includes(s))
         : [];
@@ -127,28 +132,36 @@ export class CandidateSearchService {
         userId: profile.userId,
         fullName: profile.fullName,
         professionalTitle: profile.professionalTitle,
-        city: profile.city,
+        // Respeta los toggles de privacidad del candidato (mismos
+        // `showCity`/`showSkills` que ya aplica el portafolio público) —
+        // sin esto, una empresa veía la ciudad y las habilidades de
+        // cualquier candidato aunque las hubiera marcado como ocultas.
+        city: profile.showCity ? profile.city : '',
         summary: profile.summary,
         slug: profile.slug,
         isPublished: profile.isPublished,
-        skills: profile.skills.map((s) => ({
-          id: s.id,
-          name: s.name,
-          level: s.level,
-          endorsementCount: s.endorsements.length,
-          endorsedByMe: s.endorsements.some((e) => e.companyId === companyUserId),
-        })),
-        matchedSkills,
+        skills: profile.showSkills
+          ? profile.skills.map((s) => ({
+              id: s.id,
+              name: s.name,
+              level: s.level,
+              endorsementCount: s.endorsements.length,
+              endorsedByMe: s.endorsements.some((e) => e.companyId === companyUserId),
+            }))
+          : [],
+        matchedSkills: profile.showSkills ? matchedSkills : [],
         experiencesCount: profile._count.experiences,
         canEndorse: endorsableCandidateIds.has(profile.userId),
+        _matchCount: matchedSkills.length,
       };
     })
-    .filter((candidate): candidate is NonNullable<typeof candidate> => {
+    .filter((candidate) => {
       if (searchSkills.length > 0 && mode?.toUpperCase() === 'ALL') {
-        return candidate.matchedSkills!.length >= searchSkills.length;
+        return candidate._matchCount >= searchSkills.length;
       }
       return true;
-    });
+    })
+    .map(({ _matchCount, ...candidate }) => candidate);
 
     return {
       data,
@@ -163,7 +176,7 @@ export class CandidateSearchService {
     if (!query || query.length < 2) return [];
 
     const skills = await this.prisma.skill.findMany({
-      where: { normalizedName: { contains: query.toLowerCase() } },
+      where: { normalizedName: { contains: query.toLocaleLowerCase('es-CO') } },
       select: { normalizedName: true },
       distinct: ['normalizedName'],
       take: 15,

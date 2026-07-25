@@ -1,0 +1,7856 @@
+[
+  {
+    "codigoDivipola": "05001",
+    "nombre": "Medellín",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Medellín, Antioquia"
+  },
+  {
+    "codigoDivipola": "05002",
+    "nombre": "Abejorral",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Abejorral, Antioquia"
+  },
+  {
+    "codigoDivipola": "05004",
+    "nombre": "Abriaquí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Abriaquí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05021",
+    "nombre": "Alejandría",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Alejandría, Antioquia"
+  },
+  {
+    "codigoDivipola": "05030",
+    "nombre": "Amagá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Amagá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05031",
+    "nombre": "Amalfi",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Amalfi, Antioquia"
+  },
+  {
+    "codigoDivipola": "05034",
+    "nombre": "Andes",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Andes, Antioquia"
+  },
+  {
+    "codigoDivipola": "05036",
+    "nombre": "Angelópolis",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Angelópolis, Antioquia"
+  },
+  {
+    "codigoDivipola": "05038",
+    "nombre": "Angostura",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Angostura, Antioquia"
+  },
+  {
+    "codigoDivipola": "05040",
+    "nombre": "Anorí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Anorí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05042",
+    "nombre": "Santa Fé de Antioquia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Santa Fé de Antioquia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05044",
+    "nombre": "Anzá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Anzá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05045",
+    "nombre": "Apartadó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Apartadó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05051",
+    "nombre": "Arboletes",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Arboletes, Antioquia"
+  },
+  {
+    "codigoDivipola": "05055",
+    "nombre": "Argelia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Argelia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05059",
+    "nombre": "Armenia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Armenia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05079",
+    "nombre": "Barbosa",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Barbosa, Antioquia"
+  },
+  {
+    "codigoDivipola": "05086",
+    "nombre": "Belmira",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Belmira, Antioquia"
+  },
+  {
+    "codigoDivipola": "05088",
+    "nombre": "Bello",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Bello, Antioquia"
+  },
+  {
+    "codigoDivipola": "05091",
+    "nombre": "Betania",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Betania, Antioquia"
+  },
+  {
+    "codigoDivipola": "05093",
+    "nombre": "Betulia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Betulia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05101",
+    "nombre": "Ciudad Bolívar",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Ciudad Bolívar, Antioquia"
+  },
+  {
+    "codigoDivipola": "05107",
+    "nombre": "Briceño",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Briceño, Antioquia"
+  },
+  {
+    "codigoDivipola": "05113",
+    "nombre": "Buriticá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Buriticá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05120",
+    "nombre": "Cáceres",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Cáceres, Antioquia"
+  },
+  {
+    "codigoDivipola": "05125",
+    "nombre": "Caicedo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Caicedo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05129",
+    "nombre": "Caldas",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Caldas, Antioquia"
+  },
+  {
+    "codigoDivipola": "05134",
+    "nombre": "Campamento",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Campamento, Antioquia"
+  },
+  {
+    "codigoDivipola": "05138",
+    "nombre": "Cañasgordas",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Cañasgordas, Antioquia"
+  },
+  {
+    "codigoDivipola": "05142",
+    "nombre": "Caracolí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Caracolí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05145",
+    "nombre": "Caramanta",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Caramanta, Antioquia"
+  },
+  {
+    "codigoDivipola": "05147",
+    "nombre": "Carepa",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Carepa, Antioquia"
+  },
+  {
+    "codigoDivipola": "05148",
+    "nombre": "El Carmen de Viboral",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "El Carmen de Viboral, Antioquia"
+  },
+  {
+    "codigoDivipola": "05150",
+    "nombre": "Carolina",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Carolina, Antioquia"
+  },
+  {
+    "codigoDivipola": "05154",
+    "nombre": "Caucasia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Caucasia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05172",
+    "nombre": "Chigorodó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Chigorodó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05190",
+    "nombre": "Cisneros",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Cisneros, Antioquia"
+  },
+  {
+    "codigoDivipola": "05197",
+    "nombre": "Cocorná",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Cocorná, Antioquia"
+  },
+  {
+    "codigoDivipola": "05206",
+    "nombre": "Concepción",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Concepción, Antioquia"
+  },
+  {
+    "codigoDivipola": "05209",
+    "nombre": "Concordia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Concordia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05212",
+    "nombre": "Copacabana",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Copacabana, Antioquia"
+  },
+  {
+    "codigoDivipola": "05234",
+    "nombre": "Dabeiba",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Dabeiba, Antioquia"
+  },
+  {
+    "codigoDivipola": "05237",
+    "nombre": "Donmatías",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Donmatías, Antioquia"
+  },
+  {
+    "codigoDivipola": "05240",
+    "nombre": "Ebéjico",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Ebéjico, Antioquia"
+  },
+  {
+    "codigoDivipola": "05250",
+    "nombre": "El Bagre",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "El Bagre, Antioquia"
+  },
+  {
+    "codigoDivipola": "05264",
+    "nombre": "Entrerríos",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Entrerríos, Antioquia"
+  },
+  {
+    "codigoDivipola": "05266",
+    "nombre": "Envigado",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Envigado, Antioquia"
+  },
+  {
+    "codigoDivipola": "05282",
+    "nombre": "Fredonia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Fredonia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05284",
+    "nombre": "Frontino",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Frontino, Antioquia"
+  },
+  {
+    "codigoDivipola": "05306",
+    "nombre": "Giraldo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Giraldo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05308",
+    "nombre": "Girardota",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Girardota, Antioquia"
+  },
+  {
+    "codigoDivipola": "05310",
+    "nombre": "Gómez Plata",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Gómez Plata, Antioquia"
+  },
+  {
+    "codigoDivipola": "05313",
+    "nombre": "Granada",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Granada, Antioquia"
+  },
+  {
+    "codigoDivipola": "05315",
+    "nombre": "Guadalupe",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Guadalupe, Antioquia"
+  },
+  {
+    "codigoDivipola": "05318",
+    "nombre": "Guarne",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Guarne, Antioquia"
+  },
+  {
+    "codigoDivipola": "05321",
+    "nombre": "Guatapé",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Guatapé, Antioquia"
+  },
+  {
+    "codigoDivipola": "05347",
+    "nombre": "Heliconia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Heliconia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05353",
+    "nombre": "Hispania",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Hispania, Antioquia"
+  },
+  {
+    "codigoDivipola": "05360",
+    "nombre": "Itagüí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Itagüí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05361",
+    "nombre": "Ituango",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Ituango, Antioquia"
+  },
+  {
+    "codigoDivipola": "05364",
+    "nombre": "Jardín",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Jardín, Antioquia"
+  },
+  {
+    "codigoDivipola": "05368",
+    "nombre": "Jericó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Jericó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05376",
+    "nombre": "La Ceja",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "La Ceja, Antioquia"
+  },
+  {
+    "codigoDivipola": "05380",
+    "nombre": "La Estrella",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "La Estrella, Antioquia"
+  },
+  {
+    "codigoDivipola": "05390",
+    "nombre": "La Pintada",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "La Pintada, Antioquia"
+  },
+  {
+    "codigoDivipola": "05400",
+    "nombre": "La Unión",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "La Unión, Antioquia"
+  },
+  {
+    "codigoDivipola": "05411",
+    "nombre": "Liborina",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Liborina, Antioquia"
+  },
+  {
+    "codigoDivipola": "05425",
+    "nombre": "Maceo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Maceo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05440",
+    "nombre": "Marinilla",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Marinilla, Antioquia"
+  },
+  {
+    "codigoDivipola": "05467",
+    "nombre": "Montebello",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Montebello, Antioquia"
+  },
+  {
+    "codigoDivipola": "05475",
+    "nombre": "Murindó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Murindó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05480",
+    "nombre": "Mutatá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Mutatá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05483",
+    "nombre": "Nariño",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Nariño, Antioquia"
+  },
+  {
+    "codigoDivipola": "05490",
+    "nombre": "Necoclí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Necoclí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05495",
+    "nombre": "Nechí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Nechí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05501",
+    "nombre": "Olaya",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Olaya, Antioquia"
+  },
+  {
+    "codigoDivipola": "05541",
+    "nombre": "Peñol",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Peñol, Antioquia"
+  },
+  {
+    "codigoDivipola": "05543",
+    "nombre": "Peque",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Peque, Antioquia"
+  },
+  {
+    "codigoDivipola": "05576",
+    "nombre": "Pueblorrico",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Pueblorrico, Antioquia"
+  },
+  {
+    "codigoDivipola": "05579",
+    "nombre": "Puerto Berrío",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Puerto Berrío, Antioquia"
+  },
+  {
+    "codigoDivipola": "05585",
+    "nombre": "Puerto Nare",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Puerto Nare, Antioquia"
+  },
+  {
+    "codigoDivipola": "05591",
+    "nombre": "Puerto Triunfo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Puerto Triunfo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05604",
+    "nombre": "Remedios",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Remedios, Antioquia"
+  },
+  {
+    "codigoDivipola": "05607",
+    "nombre": "Retiro",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Retiro, Antioquia"
+  },
+  {
+    "codigoDivipola": "05615",
+    "nombre": "Rionegro",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Rionegro, Antioquia"
+  },
+  {
+    "codigoDivipola": "05628",
+    "nombre": "Sabanalarga",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Sabanalarga, Antioquia"
+  },
+  {
+    "codigoDivipola": "05631",
+    "nombre": "Sabaneta",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Sabaneta, Antioquia"
+  },
+  {
+    "codigoDivipola": "05642",
+    "nombre": "Salgar",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Salgar, Antioquia"
+  },
+  {
+    "codigoDivipola": "05647",
+    "nombre": "San Andrés de Cuerquía",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Andrés de Cuerquía, Antioquia"
+  },
+  {
+    "codigoDivipola": "05649",
+    "nombre": "San Carlos",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Carlos, Antioquia"
+  },
+  {
+    "codigoDivipola": "05652",
+    "nombre": "San Francisco",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Francisco, Antioquia"
+  },
+  {
+    "codigoDivipola": "05656",
+    "nombre": "San Jerónimo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Jerónimo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05658",
+    "nombre": "San José de la montaña",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San José de la montaña, Antioquia"
+  },
+  {
+    "codigoDivipola": "05659",
+    "nombre": "San Juan de Urabá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Juan de Urabá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05660",
+    "nombre": "San Luis",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Luis, Antioquia"
+  },
+  {
+    "codigoDivipola": "05664",
+    "nombre": "San Pedro de los Milagros",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Pedro de los Milagros, Antioquia"
+  },
+  {
+    "codigoDivipola": "05665",
+    "nombre": "San Pedro de Urabá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Pedro de Urabá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05667",
+    "nombre": "San Rafael",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Rafael, Antioquia"
+  },
+  {
+    "codigoDivipola": "05670",
+    "nombre": "San Roque",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Roque, Antioquia"
+  },
+  {
+    "codigoDivipola": "05674",
+    "nombre": "San Vicente Ferrer",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "San Vicente Ferrer, Antioquia"
+  },
+  {
+    "codigoDivipola": "05679",
+    "nombre": "Santa Bárbara",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Santa Bárbara, Antioquia"
+  },
+  {
+    "codigoDivipola": "05686",
+    "nombre": "Santa Rosa de Osos",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Santa Rosa de Osos, Antioquia"
+  },
+  {
+    "codigoDivipola": "05690",
+    "nombre": "Santo Domingo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Santo Domingo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05697",
+    "nombre": "El Santuario",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "El Santuario, Antioquia"
+  },
+  {
+    "codigoDivipola": "05736",
+    "nombre": "Segovia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Segovia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05756",
+    "nombre": "Sonsón",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Sonsón, Antioquia"
+  },
+  {
+    "codigoDivipola": "05761",
+    "nombre": "Sopetrán",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Sopetrán, Antioquia"
+  },
+  {
+    "codigoDivipola": "05789",
+    "nombre": "Támesis",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Támesis, Antioquia"
+  },
+  {
+    "codigoDivipola": "05790",
+    "nombre": "Tarazá",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Tarazá, Antioquia"
+  },
+  {
+    "codigoDivipola": "05792",
+    "nombre": "Tarso",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Tarso, Antioquia"
+  },
+  {
+    "codigoDivipola": "05809",
+    "nombre": "Titiribí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Titiribí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05819",
+    "nombre": "Toledo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Toledo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05837",
+    "nombre": "Turbo",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Turbo, Antioquia"
+  },
+  {
+    "codigoDivipola": "05842",
+    "nombre": "Uramita",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Uramita, Antioquia"
+  },
+  {
+    "codigoDivipola": "05847",
+    "nombre": "Urrao",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Urrao, Antioquia"
+  },
+  {
+    "codigoDivipola": "05854",
+    "nombre": "Valdivia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Valdivia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05856",
+    "nombre": "Valparaíso",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Valparaíso, Antioquia"
+  },
+  {
+    "codigoDivipola": "05858",
+    "nombre": "Vegachí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Vegachí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05861",
+    "nombre": "Venecia",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Venecia, Antioquia"
+  },
+  {
+    "codigoDivipola": "05873",
+    "nombre": "Vigía del Fuerte",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Vigía del Fuerte, Antioquia"
+  },
+  {
+    "codigoDivipola": "05885",
+    "nombre": "Yalí",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Yalí, Antioquia"
+  },
+  {
+    "codigoDivipola": "05887",
+    "nombre": "Yarumal",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Yarumal, Antioquia"
+  },
+  {
+    "codigoDivipola": "05890",
+    "nombre": "Yolombó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Yolombó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05893",
+    "nombre": "Yondó",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Yondó, Antioquia"
+  },
+  {
+    "codigoDivipola": "05895",
+    "nombre": "Zaragoza",
+    "departamentoCodigo": "05",
+    "departamento": "Antioquia",
+    "label": "Zaragoza, Antioquia"
+  },
+  {
+    "codigoDivipola": "08001",
+    "nombre": "Barranquilla",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Barranquilla, Atlántico"
+  },
+  {
+    "codigoDivipola": "08078",
+    "nombre": "Baranoa",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Baranoa, Atlántico"
+  },
+  {
+    "codigoDivipola": "08137",
+    "nombre": "Campo de la Cruz",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Campo de la Cruz, Atlántico"
+  },
+  {
+    "codigoDivipola": "08141",
+    "nombre": "Candelaria",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Candelaria, Atlántico"
+  },
+  {
+    "codigoDivipola": "08296",
+    "nombre": "Galapa",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Galapa, Atlántico"
+  },
+  {
+    "codigoDivipola": "08372",
+    "nombre": "Juan de Acosta",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Juan de Acosta, Atlántico"
+  },
+  {
+    "codigoDivipola": "08421",
+    "nombre": "Luruaco",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Luruaco, Atlántico"
+  },
+  {
+    "codigoDivipola": "08433",
+    "nombre": "Malambo",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Malambo, Atlántico"
+  },
+  {
+    "codigoDivipola": "08436",
+    "nombre": "Manatí",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Manatí, Atlántico"
+  },
+  {
+    "codigoDivipola": "08520",
+    "nombre": "Palmar de Varela",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Palmar de Varela, Atlántico"
+  },
+  {
+    "codigoDivipola": "08549",
+    "nombre": "Piojó",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Piojó, Atlántico"
+  },
+  {
+    "codigoDivipola": "08558",
+    "nombre": "Polonuevo",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Polonuevo, Atlántico"
+  },
+  {
+    "codigoDivipola": "08560",
+    "nombre": "Ponedera",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Ponedera, Atlántico"
+  },
+  {
+    "codigoDivipola": "08573",
+    "nombre": "Puerto Colombia",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Puerto Colombia, Atlántico"
+  },
+  {
+    "codigoDivipola": "08606",
+    "nombre": "Repelón",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Repelón, Atlántico"
+  },
+  {
+    "codigoDivipola": "08634",
+    "nombre": "Sabanagrande",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Sabanagrande, Atlántico"
+  },
+  {
+    "codigoDivipola": "08638",
+    "nombre": "Sabanalarga",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Sabanalarga, Atlántico"
+  },
+  {
+    "codigoDivipola": "08675",
+    "nombre": "Santa Lucía",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Santa Lucía, Atlántico"
+  },
+  {
+    "codigoDivipola": "08685",
+    "nombre": "Santo Tomás",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Santo Tomás, Atlántico"
+  },
+  {
+    "codigoDivipola": "08758",
+    "nombre": "Soledad",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Soledad, Atlántico"
+  },
+  {
+    "codigoDivipola": "08770",
+    "nombre": "Suan",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Suan, Atlántico"
+  },
+  {
+    "codigoDivipola": "08832",
+    "nombre": "Tubará",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Tubará, Atlántico"
+  },
+  {
+    "codigoDivipola": "08849",
+    "nombre": "Usiacurí",
+    "departamentoCodigo": "08",
+    "departamento": "Atlántico",
+    "label": "Usiacurí, Atlántico"
+  },
+  {
+    "codigoDivipola": "11001",
+    "nombre": "Bogotá, D.C.",
+    "departamentoCodigo": "11",
+    "departamento": "Bogotá, D.C.",
+    "label": "Bogotá, D.C."
+  },
+  {
+    "codigoDivipola": "13001",
+    "nombre": "Cartagena de Indias",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Cartagena de Indias, Bolívar"
+  },
+  {
+    "codigoDivipola": "13006",
+    "nombre": "Achí",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Achí, Bolívar"
+  },
+  {
+    "codigoDivipola": "13030",
+    "nombre": "Altos del Rosario",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Altos del Rosario, Bolívar"
+  },
+  {
+    "codigoDivipola": "13042",
+    "nombre": "Arenal",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Arenal, Bolívar"
+  },
+  {
+    "codigoDivipola": "13052",
+    "nombre": "Arjona",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Arjona, Bolívar"
+  },
+  {
+    "codigoDivipola": "13062",
+    "nombre": "Arroyohondo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Arroyohondo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13074",
+    "nombre": "Barranco de Loba",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Barranco de Loba, Bolívar"
+  },
+  {
+    "codigoDivipola": "13140",
+    "nombre": "Calamar",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Calamar, Bolívar"
+  },
+  {
+    "codigoDivipola": "13160",
+    "nombre": "Cantagallo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Cantagallo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13188",
+    "nombre": "Cicuco",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Cicuco, Bolívar"
+  },
+  {
+    "codigoDivipola": "13212",
+    "nombre": "Córdoba",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Córdoba, Bolívar"
+  },
+  {
+    "codigoDivipola": "13222",
+    "nombre": "Clemencia",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Clemencia, Bolívar"
+  },
+  {
+    "codigoDivipola": "13244",
+    "nombre": "El Carmen de Bolívar",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "El Carmen de Bolívar, Bolívar"
+  },
+  {
+    "codigoDivipola": "13248",
+    "nombre": "El Guamo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "El Guamo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13268",
+    "nombre": "El Peñón",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "El Peñón, Bolívar"
+  },
+  {
+    "codigoDivipola": "13300",
+    "nombre": "Hatillo de Loba",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Hatillo de Loba, Bolívar"
+  },
+  {
+    "codigoDivipola": "13430",
+    "nombre": "Magangué",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Magangué, Bolívar"
+  },
+  {
+    "codigoDivipola": "13433",
+    "nombre": "Mahates",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Mahates, Bolívar"
+  },
+  {
+    "codigoDivipola": "13440",
+    "nombre": "Margarita",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Margarita, Bolívar"
+  },
+  {
+    "codigoDivipola": "13442",
+    "nombre": "María la Baja",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "María la Baja, Bolívar"
+  },
+  {
+    "codigoDivipola": "13458",
+    "nombre": "Montecristo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Montecristo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13468",
+    "nombre": "Mompós",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Mompós, Bolívar"
+  },
+  {
+    "codigoDivipola": "13473",
+    "nombre": "Morales",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Morales, Bolívar"
+  },
+  {
+    "codigoDivipola": "13490",
+    "nombre": "Norosí",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Norosí, Bolívar"
+  },
+  {
+    "codigoDivipola": "13549",
+    "nombre": "Pinillos",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Pinillos, Bolívar"
+  },
+  {
+    "codigoDivipola": "13580",
+    "nombre": "Regidor",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Regidor, Bolívar"
+  },
+  {
+    "codigoDivipola": "13600",
+    "nombre": "Río Viejo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Río Viejo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13620",
+    "nombre": "San Cristóbal",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Cristóbal, Bolívar"
+  },
+  {
+    "codigoDivipola": "13647",
+    "nombre": "San Estanislao",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Estanislao, Bolívar"
+  },
+  {
+    "codigoDivipola": "13650",
+    "nombre": "San Fernando",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Fernando, Bolívar"
+  },
+  {
+    "codigoDivipola": "13654",
+    "nombre": "San Jacinto",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Jacinto, Bolívar"
+  },
+  {
+    "codigoDivipola": "13655",
+    "nombre": "San Jacinto del Cauca",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Jacinto del Cauca, Bolívar"
+  },
+  {
+    "codigoDivipola": "13657",
+    "nombre": "San Juan Nepomuceno",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Juan Nepomuceno, Bolívar"
+  },
+  {
+    "codigoDivipola": "13667",
+    "nombre": "San Martín de Loba",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Martín de Loba, Bolívar"
+  },
+  {
+    "codigoDivipola": "13670",
+    "nombre": "San Pablo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "San Pablo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13673",
+    "nombre": "Santa Catalina",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Santa Catalina, Bolívar"
+  },
+  {
+    "codigoDivipola": "13683",
+    "nombre": "Santa Rosa",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Santa Rosa, Bolívar"
+  },
+  {
+    "codigoDivipola": "13688",
+    "nombre": "Santa Rosa del Sur",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Santa Rosa del Sur, Bolívar"
+  },
+  {
+    "codigoDivipola": "13744",
+    "nombre": "Simití",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Simití, Bolívar"
+  },
+  {
+    "codigoDivipola": "13760",
+    "nombre": "Soplaviento",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Soplaviento, Bolívar"
+  },
+  {
+    "codigoDivipola": "13780",
+    "nombre": "Talaigua Nuevo",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Talaigua Nuevo, Bolívar"
+  },
+  {
+    "codigoDivipola": "13810",
+    "nombre": "Tiquisio",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Tiquisio, Bolívar"
+  },
+  {
+    "codigoDivipola": "13836",
+    "nombre": "Turbaco",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Turbaco, Bolívar"
+  },
+  {
+    "codigoDivipola": "13838",
+    "nombre": "Turbaná",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Turbaná, Bolívar"
+  },
+  {
+    "codigoDivipola": "13873",
+    "nombre": "Villanueva",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Villanueva, Bolívar"
+  },
+  {
+    "codigoDivipola": "13894",
+    "nombre": "Zambrano",
+    "departamentoCodigo": "13",
+    "departamento": "Bolívar",
+    "label": "Zambrano, Bolívar"
+  },
+  {
+    "codigoDivipola": "15001",
+    "nombre": "Tunja",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tunja, Boyacá"
+  },
+  {
+    "codigoDivipola": "15022",
+    "nombre": "Almeida",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Almeida, Boyacá"
+  },
+  {
+    "codigoDivipola": "15047",
+    "nombre": "Aquitania",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Aquitania, Boyacá"
+  },
+  {
+    "codigoDivipola": "15051",
+    "nombre": "Arcabuco",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Arcabuco, Boyacá"
+  },
+  {
+    "codigoDivipola": "15087",
+    "nombre": "Belén",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Belén, Boyacá"
+  },
+  {
+    "codigoDivipola": "15090",
+    "nombre": "Berbeo",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Berbeo, Boyacá"
+  },
+  {
+    "codigoDivipola": "15092",
+    "nombre": "Betéitiva",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Betéitiva, Boyacá"
+  },
+  {
+    "codigoDivipola": "15097",
+    "nombre": "Boavita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Boavita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15104",
+    "nombre": "Boyacá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Boyacá"
+  },
+  {
+    "codigoDivipola": "15106",
+    "nombre": "Briceño",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Briceño, Boyacá"
+  },
+  {
+    "codigoDivipola": "15109",
+    "nombre": "Buenavista",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Buenavista, Boyacá"
+  },
+  {
+    "codigoDivipola": "15114",
+    "nombre": "Busbanzá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Busbanzá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15131",
+    "nombre": "Caldas",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Caldas, Boyacá"
+  },
+  {
+    "codigoDivipola": "15135",
+    "nombre": "Campohermoso",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Campohermoso, Boyacá"
+  },
+  {
+    "codigoDivipola": "15162",
+    "nombre": "Cerinza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Cerinza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15172",
+    "nombre": "Chinavita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chinavita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15176",
+    "nombre": "Chiquinquirá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chiquinquirá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15180",
+    "nombre": "Chiscas",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chiscas, Boyacá"
+  },
+  {
+    "codigoDivipola": "15183",
+    "nombre": "Chita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15185",
+    "nombre": "Chitaraque",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chitaraque, Boyacá"
+  },
+  {
+    "codigoDivipola": "15187",
+    "nombre": "Chivatá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chivatá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15189",
+    "nombre": "Ciénega",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Ciénega, Boyacá"
+  },
+  {
+    "codigoDivipola": "15204",
+    "nombre": "Cómbita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Cómbita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15212",
+    "nombre": "Coper",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Coper, Boyacá"
+  },
+  {
+    "codigoDivipola": "15215",
+    "nombre": "Corrales",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Corrales, Boyacá"
+  },
+  {
+    "codigoDivipola": "15218",
+    "nombre": "Covarachía",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Covarachía, Boyacá"
+  },
+  {
+    "codigoDivipola": "15223",
+    "nombre": "Cubará",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Cubará, Boyacá"
+  },
+  {
+    "codigoDivipola": "15224",
+    "nombre": "Cucaita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Cucaita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15226",
+    "nombre": "Cuítiva",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Cuítiva, Boyacá"
+  },
+  {
+    "codigoDivipola": "15232",
+    "nombre": "Chíquiza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chíquiza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15236",
+    "nombre": "Chivor",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Chivor, Boyacá"
+  },
+  {
+    "codigoDivipola": "15238",
+    "nombre": "Duitama",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Duitama, Boyacá"
+  },
+  {
+    "codigoDivipola": "15244",
+    "nombre": "El Cocuy",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "El Cocuy, Boyacá"
+  },
+  {
+    "codigoDivipola": "15248",
+    "nombre": "El Espino",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "El Espino, Boyacá"
+  },
+  {
+    "codigoDivipola": "15272",
+    "nombre": "Firavitoba",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Firavitoba, Boyacá"
+  },
+  {
+    "codigoDivipola": "15276",
+    "nombre": "Floresta",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Floresta, Boyacá"
+  },
+  {
+    "codigoDivipola": "15293",
+    "nombre": "Gachantivá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Gachantivá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15296",
+    "nombre": "Gámeza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Gámeza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15299",
+    "nombre": "Garagoa",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Garagoa, Boyacá"
+  },
+  {
+    "codigoDivipola": "15317",
+    "nombre": "Guacamayas",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Guacamayas, Boyacá"
+  },
+  {
+    "codigoDivipola": "15322",
+    "nombre": "Guateque",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Guateque, Boyacá"
+  },
+  {
+    "codigoDivipola": "15325",
+    "nombre": "Guayatá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Guayatá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15332",
+    "nombre": "Güicán de la Sierra",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Güicán de la Sierra, Boyacá"
+  },
+  {
+    "codigoDivipola": "15362",
+    "nombre": "Iza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Iza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15367",
+    "nombre": "Jenesano",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Jenesano, Boyacá"
+  },
+  {
+    "codigoDivipola": "15368",
+    "nombre": "Jericó",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Jericó, Boyacá"
+  },
+  {
+    "codigoDivipola": "15377",
+    "nombre": "Labranzagrande",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Labranzagrande, Boyacá"
+  },
+  {
+    "codigoDivipola": "15380",
+    "nombre": "La Capilla",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "La Capilla, Boyacá"
+  },
+  {
+    "codigoDivipola": "15401",
+    "nombre": "La Victoria",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "La Victoria, Boyacá"
+  },
+  {
+    "codigoDivipola": "15403",
+    "nombre": "La Uvita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "La Uvita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15407",
+    "nombre": "Villa de Leyva",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Villa de Leyva, Boyacá"
+  },
+  {
+    "codigoDivipola": "15425",
+    "nombre": "Macanal",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Macanal, Boyacá"
+  },
+  {
+    "codigoDivipola": "15442",
+    "nombre": "Maripí",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Maripí, Boyacá"
+  },
+  {
+    "codigoDivipola": "15455",
+    "nombre": "Miraflores",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Miraflores, Boyacá"
+  },
+  {
+    "codigoDivipola": "15464",
+    "nombre": "Mongua",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Mongua, Boyacá"
+  },
+  {
+    "codigoDivipola": "15466",
+    "nombre": "Monguí",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Monguí, Boyacá"
+  },
+  {
+    "codigoDivipola": "15469",
+    "nombre": "Moniquirá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Moniquirá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15476",
+    "nombre": "Motavita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Motavita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15480",
+    "nombre": "Muzo",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Muzo, Boyacá"
+  },
+  {
+    "codigoDivipola": "15491",
+    "nombre": "Nobsa",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Nobsa, Boyacá"
+  },
+  {
+    "codigoDivipola": "15494",
+    "nombre": "Nuevo Colón",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Nuevo Colón, Boyacá"
+  },
+  {
+    "codigoDivipola": "15500",
+    "nombre": "Oicatá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Oicatá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15507",
+    "nombre": "Otanche",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Otanche, Boyacá"
+  },
+  {
+    "codigoDivipola": "15511",
+    "nombre": "Pachavita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Pachavita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15514",
+    "nombre": "Páez",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Páez, Boyacá"
+  },
+  {
+    "codigoDivipola": "15516",
+    "nombre": "Paipa",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Paipa, Boyacá"
+  },
+  {
+    "codigoDivipola": "15518",
+    "nombre": "Pajarito",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Pajarito, Boyacá"
+  },
+  {
+    "codigoDivipola": "15522",
+    "nombre": "Panqueba",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Panqueba, Boyacá"
+  },
+  {
+    "codigoDivipola": "15531",
+    "nombre": "Pauna",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Pauna, Boyacá"
+  },
+  {
+    "codigoDivipola": "15533",
+    "nombre": "Paya",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Paya, Boyacá"
+  },
+  {
+    "codigoDivipola": "15537",
+    "nombre": "Paz de Río",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Paz de Río, Boyacá"
+  },
+  {
+    "codigoDivipola": "15542",
+    "nombre": "Pesca",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Pesca, Boyacá"
+  },
+  {
+    "codigoDivipola": "15550",
+    "nombre": "Pisba",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Pisba, Boyacá"
+  },
+  {
+    "codigoDivipola": "15572",
+    "nombre": "Puerto Boyacá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Puerto Boyacá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15580",
+    "nombre": "Quípama",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Quípama, Boyacá"
+  },
+  {
+    "codigoDivipola": "15599",
+    "nombre": "Ramiriquí",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Ramiriquí, Boyacá"
+  },
+  {
+    "codigoDivipola": "15600",
+    "nombre": "Ráquira",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Ráquira, Boyacá"
+  },
+  {
+    "codigoDivipola": "15621",
+    "nombre": "Rondón",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Rondón, Boyacá"
+  },
+  {
+    "codigoDivipola": "15632",
+    "nombre": "Saboyá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Saboyá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15638",
+    "nombre": "Sáchica",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sáchica, Boyacá"
+  },
+  {
+    "codigoDivipola": "15646",
+    "nombre": "Samacá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Samacá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15660",
+    "nombre": "San Eduardo",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San Eduardo, Boyacá"
+  },
+  {
+    "codigoDivipola": "15664",
+    "nombre": "San José de Pare",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San José de Pare, Boyacá"
+  },
+  {
+    "codigoDivipola": "15667",
+    "nombre": "San Luis de Gaceno",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San Luis de Gaceno, Boyacá"
+  },
+  {
+    "codigoDivipola": "15673",
+    "nombre": "San Mateo",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San Mateo, Boyacá"
+  },
+  {
+    "codigoDivipola": "15676",
+    "nombre": "San Miguel de Sema",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San Miguel de Sema, Boyacá"
+  },
+  {
+    "codigoDivipola": "15681",
+    "nombre": "San Pablo de Borbur",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "San Pablo de Borbur, Boyacá"
+  },
+  {
+    "codigoDivipola": "15686",
+    "nombre": "Santana",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Santana, Boyacá"
+  },
+  {
+    "codigoDivipola": "15690",
+    "nombre": "Santa María",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Santa María, Boyacá"
+  },
+  {
+    "codigoDivipola": "15693",
+    "nombre": "Santa Rosa de Viterbo",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Santa Rosa de Viterbo, Boyacá"
+  },
+  {
+    "codigoDivipola": "15696",
+    "nombre": "Santa Sofía",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Santa Sofía, Boyacá"
+  },
+  {
+    "codigoDivipola": "15720",
+    "nombre": "Sativanorte",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sativanorte, Boyacá"
+  },
+  {
+    "codigoDivipola": "15723",
+    "nombre": "Sativasur",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sativasur, Boyacá"
+  },
+  {
+    "codigoDivipola": "15740",
+    "nombre": "Siachoque",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Siachoque, Boyacá"
+  },
+  {
+    "codigoDivipola": "15753",
+    "nombre": "Soatá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Soatá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15755",
+    "nombre": "Socotá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Socotá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15757",
+    "nombre": "Socha",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Socha, Boyacá"
+  },
+  {
+    "codigoDivipola": "15759",
+    "nombre": "Sogamoso",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sogamoso, Boyacá"
+  },
+  {
+    "codigoDivipola": "15761",
+    "nombre": "Somondoco",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Somondoco, Boyacá"
+  },
+  {
+    "codigoDivipola": "15762",
+    "nombre": "Sora",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sora, Boyacá"
+  },
+  {
+    "codigoDivipola": "15763",
+    "nombre": "Sotaquirá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sotaquirá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15764",
+    "nombre": "Soracá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Soracá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15774",
+    "nombre": "Susacón",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Susacón, Boyacá"
+  },
+  {
+    "codigoDivipola": "15776",
+    "nombre": "Sutamarchán",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sutamarchán, Boyacá"
+  },
+  {
+    "codigoDivipola": "15778",
+    "nombre": "Sutatenza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Sutatenza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15790",
+    "nombre": "Tasco",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tasco, Boyacá"
+  },
+  {
+    "codigoDivipola": "15798",
+    "nombre": "Tenza",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tenza, Boyacá"
+  },
+  {
+    "codigoDivipola": "15804",
+    "nombre": "Tibaná",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tibaná, Boyacá"
+  },
+  {
+    "codigoDivipola": "15806",
+    "nombre": "Tibasosa",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tibasosa, Boyacá"
+  },
+  {
+    "codigoDivipola": "15808",
+    "nombre": "Tinjacá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tinjacá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15810",
+    "nombre": "Tipacoque",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tipacoque, Boyacá"
+  },
+  {
+    "codigoDivipola": "15814",
+    "nombre": "Toca",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Toca, Boyacá"
+  },
+  {
+    "codigoDivipola": "15816",
+    "nombre": "Togüí",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Togüí, Boyacá"
+  },
+  {
+    "codigoDivipola": "15820",
+    "nombre": "Tópaga",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tópaga, Boyacá"
+  },
+  {
+    "codigoDivipola": "15822",
+    "nombre": "Tota",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tota, Boyacá"
+  },
+  {
+    "codigoDivipola": "15832",
+    "nombre": "Tununguá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tununguá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15835",
+    "nombre": "Turmequé",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Turmequé, Boyacá"
+  },
+  {
+    "codigoDivipola": "15837",
+    "nombre": "Tuta",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tuta, Boyacá"
+  },
+  {
+    "codigoDivipola": "15839",
+    "nombre": "Tutazá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Tutazá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15842",
+    "nombre": "Úmbita",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Úmbita, Boyacá"
+  },
+  {
+    "codigoDivipola": "15861",
+    "nombre": "Ventaquemada",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Ventaquemada, Boyacá"
+  },
+  {
+    "codigoDivipola": "15879",
+    "nombre": "Viracachá",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Viracachá, Boyacá"
+  },
+  {
+    "codigoDivipola": "15897",
+    "nombre": "Zetaquira",
+    "departamentoCodigo": "15",
+    "departamento": "Boyacá",
+    "label": "Zetaquira, Boyacá"
+  },
+  {
+    "codigoDivipola": "17001",
+    "nombre": "Manizales",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Manizales, Caldas"
+  },
+  {
+    "codigoDivipola": "17013",
+    "nombre": "Aguadas",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Aguadas, Caldas"
+  },
+  {
+    "codigoDivipola": "17042",
+    "nombre": "Anserma",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Anserma, Caldas"
+  },
+  {
+    "codigoDivipola": "17050",
+    "nombre": "Aranzazu",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Aranzazu, Caldas"
+  },
+  {
+    "codigoDivipola": "17088",
+    "nombre": "Belalcázar",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Belalcázar, Caldas"
+  },
+  {
+    "codigoDivipola": "17174",
+    "nombre": "Chinchiná",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Chinchiná, Caldas"
+  },
+  {
+    "codigoDivipola": "17272",
+    "nombre": "Filadelfia",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Filadelfia, Caldas"
+  },
+  {
+    "codigoDivipola": "17380",
+    "nombre": "La Dorada",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "La Dorada, Caldas"
+  },
+  {
+    "codigoDivipola": "17388",
+    "nombre": "La Merced",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "La Merced, Caldas"
+  },
+  {
+    "codigoDivipola": "17433",
+    "nombre": "Manzanares",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Manzanares, Caldas"
+  },
+  {
+    "codigoDivipola": "17442",
+    "nombre": "Marmato",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Marmato, Caldas"
+  },
+  {
+    "codigoDivipola": "17444",
+    "nombre": "Marquetalia",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Marquetalia, Caldas"
+  },
+  {
+    "codigoDivipola": "17446",
+    "nombre": "Marulanda",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Marulanda, Caldas"
+  },
+  {
+    "codigoDivipola": "17486",
+    "nombre": "Neira",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Neira, Caldas"
+  },
+  {
+    "codigoDivipola": "17495",
+    "nombre": "Norcasia",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Norcasia, Caldas"
+  },
+  {
+    "codigoDivipola": "17513",
+    "nombre": "Pácora",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Pácora, Caldas"
+  },
+  {
+    "codigoDivipola": "17524",
+    "nombre": "Palestina",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Palestina, Caldas"
+  },
+  {
+    "codigoDivipola": "17541",
+    "nombre": "Pensilvania",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Pensilvania, Caldas"
+  },
+  {
+    "codigoDivipola": "17614",
+    "nombre": "Riosucio",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Riosucio, Caldas"
+  },
+  {
+    "codigoDivipola": "17616",
+    "nombre": "Risaralda",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Risaralda, Caldas"
+  },
+  {
+    "codigoDivipola": "17653",
+    "nombre": "Salamina",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Salamina, Caldas"
+  },
+  {
+    "codigoDivipola": "17662",
+    "nombre": "Samaná",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Samaná, Caldas"
+  },
+  {
+    "codigoDivipola": "17665",
+    "nombre": "San José",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "San José, Caldas"
+  },
+  {
+    "codigoDivipola": "17777",
+    "nombre": "Supía",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Supía, Caldas"
+  },
+  {
+    "codigoDivipola": "17867",
+    "nombre": "Victoria",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Victoria, Caldas"
+  },
+  {
+    "codigoDivipola": "17873",
+    "nombre": "Villamaría",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Villamaría, Caldas"
+  },
+  {
+    "codigoDivipola": "17877",
+    "nombre": "Viterbo",
+    "departamentoCodigo": "17",
+    "departamento": "Caldas",
+    "label": "Viterbo, Caldas"
+  },
+  {
+    "codigoDivipola": "18001",
+    "nombre": "Florencia",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Florencia, Caquetá"
+  },
+  {
+    "codigoDivipola": "18029",
+    "nombre": "Albania",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Albania, Caquetá"
+  },
+  {
+    "codigoDivipola": "18094",
+    "nombre": "Belén de los Andaquíes",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Belén de los Andaquíes, Caquetá"
+  },
+  {
+    "codigoDivipola": "18150",
+    "nombre": "Cartagena del Chairá",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Cartagena del Chairá, Caquetá"
+  },
+  {
+    "codigoDivipola": "18205",
+    "nombre": "Curillo",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Curillo, Caquetá"
+  },
+  {
+    "codigoDivipola": "18247",
+    "nombre": "El Doncello",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "El Doncello, Caquetá"
+  },
+  {
+    "codigoDivipola": "18256",
+    "nombre": "El Paujíl",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "El Paujíl, Caquetá"
+  },
+  {
+    "codigoDivipola": "18410",
+    "nombre": "La Montañita",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "La Montañita, Caquetá"
+  },
+  {
+    "codigoDivipola": "18460",
+    "nombre": "Milán",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Milán, Caquetá"
+  },
+  {
+    "codigoDivipola": "18479",
+    "nombre": "Morelia",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Morelia, Caquetá"
+  },
+  {
+    "codigoDivipola": "18592",
+    "nombre": "Puerto Rico",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Puerto Rico, Caquetá"
+  },
+  {
+    "codigoDivipola": "18610",
+    "nombre": "San José del Fragua",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "San José del Fragua, Caquetá"
+  },
+  {
+    "codigoDivipola": "18753",
+    "nombre": "San Vicente del Caguán",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "San Vicente del Caguán, Caquetá"
+  },
+  {
+    "codigoDivipola": "18756",
+    "nombre": "Solano",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Solano, Caquetá"
+  },
+  {
+    "codigoDivipola": "18785",
+    "nombre": "Solita",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Solita, Caquetá"
+  },
+  {
+    "codigoDivipola": "18860",
+    "nombre": "Valparaíso",
+    "departamentoCodigo": "18",
+    "departamento": "Caquetá",
+    "label": "Valparaíso, Caquetá"
+  },
+  {
+    "codigoDivipola": "19001",
+    "nombre": "Popayán",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Popayán, Cauca"
+  },
+  {
+    "codigoDivipola": "19022",
+    "nombre": "Almaguer",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Almaguer, Cauca"
+  },
+  {
+    "codigoDivipola": "19050",
+    "nombre": "Argelia",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Argelia, Cauca"
+  },
+  {
+    "codigoDivipola": "19075",
+    "nombre": "Balboa",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Balboa, Cauca"
+  },
+  {
+    "codigoDivipola": "19100",
+    "nombre": "Bolívar",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Bolívar, Cauca"
+  },
+  {
+    "codigoDivipola": "19110",
+    "nombre": "Buenos Aires",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Buenos Aires, Cauca"
+  },
+  {
+    "codigoDivipola": "19130",
+    "nombre": "Cajibío",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Cajibío, Cauca"
+  },
+  {
+    "codigoDivipola": "19137",
+    "nombre": "Caldono",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Caldono, Cauca"
+  },
+  {
+    "codigoDivipola": "19142",
+    "nombre": "Caloto",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Caloto, Cauca"
+  },
+  {
+    "codigoDivipola": "19212",
+    "nombre": "Corinto",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Corinto, Cauca"
+  },
+  {
+    "codigoDivipola": "19256",
+    "nombre": "El Tambo",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "El Tambo, Cauca"
+  },
+  {
+    "codigoDivipola": "19290",
+    "nombre": "Florencia",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Florencia, Cauca"
+  },
+  {
+    "codigoDivipola": "19300",
+    "nombre": "Guachené",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Guachené, Cauca"
+  },
+  {
+    "codigoDivipola": "19318",
+    "nombre": "Guapí",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Guapí, Cauca"
+  },
+  {
+    "codigoDivipola": "19355",
+    "nombre": "Inzá",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Inzá, Cauca"
+  },
+  {
+    "codigoDivipola": "19364",
+    "nombre": "Jambaló",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Jambaló, Cauca"
+  },
+  {
+    "codigoDivipola": "19392",
+    "nombre": "La Sierra",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "La Sierra, Cauca"
+  },
+  {
+    "codigoDivipola": "19397",
+    "nombre": "La Vega",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "La Vega, Cauca"
+  },
+  {
+    "codigoDivipola": "19418",
+    "nombre": "López de Micay",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "López de Micay, Cauca"
+  },
+  {
+    "codigoDivipola": "19450",
+    "nombre": "Mercaderes",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Mercaderes, Cauca"
+  },
+  {
+    "codigoDivipola": "19455",
+    "nombre": "Miranda",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Miranda, Cauca"
+  },
+  {
+    "codigoDivipola": "19473",
+    "nombre": "Morales",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Morales, Cauca"
+  },
+  {
+    "codigoDivipola": "19513",
+    "nombre": "Padilla",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Padilla, Cauca"
+  },
+  {
+    "codigoDivipola": "19517",
+    "nombre": "Páez",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Páez, Cauca"
+  },
+  {
+    "codigoDivipola": "19532",
+    "nombre": "Patía",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Patía, Cauca"
+  },
+  {
+    "codigoDivipola": "19533",
+    "nombre": "Piamonte",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Piamonte, Cauca"
+  },
+  {
+    "codigoDivipola": "19548",
+    "nombre": "Piendamó - Tunía",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Piendamó - Tunía, Cauca"
+  },
+  {
+    "codigoDivipola": "19573",
+    "nombre": "Puerto Tejada",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Puerto Tejada, Cauca"
+  },
+  {
+    "codigoDivipola": "19585",
+    "nombre": "Puracé",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Puracé, Cauca"
+  },
+  {
+    "codigoDivipola": "19622",
+    "nombre": "Rosas",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Rosas, Cauca"
+  },
+  {
+    "codigoDivipola": "19693",
+    "nombre": "San Sebastián",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "San Sebastián, Cauca"
+  },
+  {
+    "codigoDivipola": "19698",
+    "nombre": "Santander de Quilichao",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Santander de Quilichao, Cauca"
+  },
+  {
+    "codigoDivipola": "19701",
+    "nombre": "Santa Rosa",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Santa Rosa, Cauca"
+  },
+  {
+    "codigoDivipola": "19743",
+    "nombre": "Silvia",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Silvia, Cauca"
+  },
+  {
+    "codigoDivipola": "19760",
+    "nombre": "Sotara",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Sotara, Cauca"
+  },
+  {
+    "codigoDivipola": "19780",
+    "nombre": "Suárez",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Suárez, Cauca"
+  },
+  {
+    "codigoDivipola": "19785",
+    "nombre": "Sucre",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Sucre, Cauca"
+  },
+  {
+    "codigoDivipola": "19807",
+    "nombre": "Timbío",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Timbío, Cauca"
+  },
+  {
+    "codigoDivipola": "19809",
+    "nombre": "Timbiquí",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Timbiquí, Cauca"
+  },
+  {
+    "codigoDivipola": "19821",
+    "nombre": "Toribío",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Toribío, Cauca"
+  },
+  {
+    "codigoDivipola": "19824",
+    "nombre": "Totoró",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Totoró, Cauca"
+  },
+  {
+    "codigoDivipola": "19845",
+    "nombre": "Villa Rica",
+    "departamentoCodigo": "19",
+    "departamento": "Cauca",
+    "label": "Villa Rica, Cauca"
+  },
+  {
+    "codigoDivipola": "20001",
+    "nombre": "Valledupar",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Valledupar, Cesar"
+  },
+  {
+    "codigoDivipola": "20011",
+    "nombre": "Aguachica",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Aguachica, Cesar"
+  },
+  {
+    "codigoDivipola": "20013",
+    "nombre": "Agustín Codazzi",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Agustín Codazzi, Cesar"
+  },
+  {
+    "codigoDivipola": "20032",
+    "nombre": "Astrea",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Astrea, Cesar"
+  },
+  {
+    "codigoDivipola": "20045",
+    "nombre": "Becerril",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Becerril, Cesar"
+  },
+  {
+    "codigoDivipola": "20060",
+    "nombre": "Bosconia",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Bosconia, Cesar"
+  },
+  {
+    "codigoDivipola": "20175",
+    "nombre": "Chimichagua",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Chimichagua, Cesar"
+  },
+  {
+    "codigoDivipola": "20178",
+    "nombre": "Chiriguaná",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Chiriguaná, Cesar"
+  },
+  {
+    "codigoDivipola": "20228",
+    "nombre": "Curumaní",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Curumaní, Cesar"
+  },
+  {
+    "codigoDivipola": "20238",
+    "nombre": "El Copey",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "El Copey, Cesar"
+  },
+  {
+    "codigoDivipola": "20250",
+    "nombre": "El Paso",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "El Paso, Cesar"
+  },
+  {
+    "codigoDivipola": "20295",
+    "nombre": "Gamarra",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Gamarra, Cesar"
+  },
+  {
+    "codigoDivipola": "20310",
+    "nombre": "González",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "González, Cesar"
+  },
+  {
+    "codigoDivipola": "20383",
+    "nombre": "La Gloria",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "La Gloria, Cesar"
+  },
+  {
+    "codigoDivipola": "20400",
+    "nombre": "La Jagua de Ibirico",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "La Jagua de Ibirico, Cesar"
+  },
+  {
+    "codigoDivipola": "20443",
+    "nombre": "Manaure Balcón del Cesar",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Manaure Balcón del Cesar, Cesar"
+  },
+  {
+    "codigoDivipola": "20517",
+    "nombre": "Pailitas",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Pailitas, Cesar"
+  },
+  {
+    "codigoDivipola": "20550",
+    "nombre": "Pelaya",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Pelaya, Cesar"
+  },
+  {
+    "codigoDivipola": "20570",
+    "nombre": "Pueblo Bello",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Pueblo Bello, Cesar"
+  },
+  {
+    "codigoDivipola": "20614",
+    "nombre": "Río de Oro",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Río de Oro, Cesar"
+  },
+  {
+    "codigoDivipola": "20621",
+    "nombre": "La Paz",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "La Paz, Cesar"
+  },
+  {
+    "codigoDivipola": "20710",
+    "nombre": "San Alberto",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "San Alberto, Cesar"
+  },
+  {
+    "codigoDivipola": "20750",
+    "nombre": "San Diego",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "San Diego, Cesar"
+  },
+  {
+    "codigoDivipola": "20770",
+    "nombre": "San Martín",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "San Martín, Cesar"
+  },
+  {
+    "codigoDivipola": "20787",
+    "nombre": "Tamalameque",
+    "departamentoCodigo": "20",
+    "departamento": "Cesar",
+    "label": "Tamalameque, Cesar"
+  },
+  {
+    "codigoDivipola": "23001",
+    "nombre": "Montería",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Montería, Córdoba"
+  },
+  {
+    "codigoDivipola": "23068",
+    "nombre": "Ayapel",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Ayapel, Córdoba"
+  },
+  {
+    "codigoDivipola": "23079",
+    "nombre": "Buenavista",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Buenavista, Córdoba"
+  },
+  {
+    "codigoDivipola": "23090",
+    "nombre": "Canalete",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Canalete, Córdoba"
+  },
+  {
+    "codigoDivipola": "23162",
+    "nombre": "Cereté",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Cereté, Córdoba"
+  },
+  {
+    "codigoDivipola": "23168",
+    "nombre": "Chimá",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Chimá, Córdoba"
+  },
+  {
+    "codigoDivipola": "23182",
+    "nombre": "Chinú",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Chinú, Córdoba"
+  },
+  {
+    "codigoDivipola": "23189",
+    "nombre": "Ciénaga de Oro",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Ciénaga de Oro, Córdoba"
+  },
+  {
+    "codigoDivipola": "23300",
+    "nombre": "Cotorra",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Cotorra, Córdoba"
+  },
+  {
+    "codigoDivipola": "23350",
+    "nombre": "La Apartada",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "La Apartada, Córdoba"
+  },
+  {
+    "codigoDivipola": "23417",
+    "nombre": "Lorica",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Lorica, Córdoba"
+  },
+  {
+    "codigoDivipola": "23419",
+    "nombre": "Los Córdobas",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Los Córdobas, Córdoba"
+  },
+  {
+    "codigoDivipola": "23464",
+    "nombre": "Momil",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Momil, Córdoba"
+  },
+  {
+    "codigoDivipola": "23466",
+    "nombre": "Montelíbano",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Montelíbano, Córdoba"
+  },
+  {
+    "codigoDivipola": "23500",
+    "nombre": "Moñitos",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Moñitos, Córdoba"
+  },
+  {
+    "codigoDivipola": "23555",
+    "nombre": "Planeta Rica",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Planeta Rica, Córdoba"
+  },
+  {
+    "codigoDivipola": "23570",
+    "nombre": "Pueblo Nuevo",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Pueblo Nuevo, Córdoba"
+  },
+  {
+    "codigoDivipola": "23574",
+    "nombre": "Puerto Escondido",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Puerto Escondido, Córdoba"
+  },
+  {
+    "codigoDivipola": "23580",
+    "nombre": "Puerto Libertador",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Puerto Libertador, Córdoba"
+  },
+  {
+    "codigoDivipola": "23586",
+    "nombre": "Purísima de la Concepción",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Purísima de la Concepción, Córdoba"
+  },
+  {
+    "codigoDivipola": "23660",
+    "nombre": "Sahagún",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Sahagún, Córdoba"
+  },
+  {
+    "codigoDivipola": "23670",
+    "nombre": "San Andrés de Sotavento",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San Andrés de Sotavento, Córdoba"
+  },
+  {
+    "codigoDivipola": "23672",
+    "nombre": "San Antero",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San Antero, Córdoba"
+  },
+  {
+    "codigoDivipola": "23675",
+    "nombre": "San Bernardo del Viento",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San Bernardo del Viento, Córdoba"
+  },
+  {
+    "codigoDivipola": "23678",
+    "nombre": "San Carlos",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San Carlos, Córdoba"
+  },
+  {
+    "codigoDivipola": "23682",
+    "nombre": "San José de Uré",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San José de Uré, Córdoba"
+  },
+  {
+    "codigoDivipola": "23686",
+    "nombre": "San Pelayo",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "San Pelayo, Córdoba"
+  },
+  {
+    "codigoDivipola": "23807",
+    "nombre": "Tierralta",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Tierralta, Córdoba"
+  },
+  {
+    "codigoDivipola": "23815",
+    "nombre": "Tuchín",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Tuchín, Córdoba"
+  },
+  {
+    "codigoDivipola": "23855",
+    "nombre": "Valencia",
+    "departamentoCodigo": "23",
+    "departamento": "Córdoba",
+    "label": "Valencia, Córdoba"
+  },
+  {
+    "codigoDivipola": "25001",
+    "nombre": "Agua de Dios",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Agua de Dios, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25019",
+    "nombre": "Albán",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Albán, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25035",
+    "nombre": "Anapoima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Anapoima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25040",
+    "nombre": "Anolaima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Anolaima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25053",
+    "nombre": "Arbeláez",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Arbeláez, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25086",
+    "nombre": "Beltrán",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Beltrán, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25095",
+    "nombre": "Bituima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Bituima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25099",
+    "nombre": "Bojacá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Bojacá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25120",
+    "nombre": "Cabrera",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cabrera, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25123",
+    "nombre": "Cachipay",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cachipay, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25126",
+    "nombre": "Cajicá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cajicá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25148",
+    "nombre": "Caparrapí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Caparrapí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25151",
+    "nombre": "Cáqueza",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cáqueza, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25154",
+    "nombre": "Carmen de Carupa",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Carmen de Carupa, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25168",
+    "nombre": "Chaguaní",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Chaguaní, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25175",
+    "nombre": "Chía",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Chía, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25178",
+    "nombre": "Chipaque",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Chipaque, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25181",
+    "nombre": "Choachí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Choachí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25183",
+    "nombre": "Chocontá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Chocontá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25200",
+    "nombre": "Cogua",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cogua, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25214",
+    "nombre": "Cota",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cota, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25224",
+    "nombre": "Cucunubá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Cucunubá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25245",
+    "nombre": "El Colegio",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "El Colegio, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25258",
+    "nombre": "El Peñón",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "El Peñón, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25260",
+    "nombre": "El Rosal",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "El Rosal, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25269",
+    "nombre": "Facatativá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Facatativá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25279",
+    "nombre": "Fómeque",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Fómeque, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25281",
+    "nombre": "Fosca",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Fosca, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25286",
+    "nombre": "Funza",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Funza, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25288",
+    "nombre": "Fúquene",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Fúquene, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25290",
+    "nombre": "Fusagasugá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Fusagasugá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25293",
+    "nombre": "Gachalá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Gachalá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25295",
+    "nombre": "Gachancipá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Gachancipá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25297",
+    "nombre": "Gachetá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Gachetá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25299",
+    "nombre": "Gama",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Gama, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25307",
+    "nombre": "Girardot",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Girardot, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25312",
+    "nombre": "Granada",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Granada, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25317",
+    "nombre": "Guachetá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guachetá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25320",
+    "nombre": "Guaduas",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guaduas, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25322",
+    "nombre": "Guasca",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guasca, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25324",
+    "nombre": "Guataquí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guataquí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25326",
+    "nombre": "Guatavita",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guatavita, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25328",
+    "nombre": "Guayabal de Síquima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guayabal de Síquima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25335",
+    "nombre": "Guayabetal",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Guayabetal, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25339",
+    "nombre": "Gutiérrez",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Gutiérrez, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25368",
+    "nombre": "Jerusalén",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Jerusalén, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25372",
+    "nombre": "Junín",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Junín, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25377",
+    "nombre": "La Calera",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "La Calera, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25386",
+    "nombre": "La Mesa",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "La Mesa, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25394",
+    "nombre": "La Palma",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "La Palma, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25398",
+    "nombre": "La Peña",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "La Peña, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25402",
+    "nombre": "La Vega",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "La Vega, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25407",
+    "nombre": "Lenguazaque",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Lenguazaque, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25426",
+    "nombre": "Machetá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Machetá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25430",
+    "nombre": "Madrid",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Madrid, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25436",
+    "nombre": "Manta",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Manta, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25438",
+    "nombre": "Medina",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Medina, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25473",
+    "nombre": "Mosquera",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Mosquera, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25483",
+    "nombre": "Nariño",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Nariño, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25486",
+    "nombre": "Nemocón",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Nemocón, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25488",
+    "nombre": "Nilo",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Nilo, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25489",
+    "nombre": "Nimaima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Nimaima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25491",
+    "nombre": "Nocaima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Nocaima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25506",
+    "nombre": "Venecia",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Venecia, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25513",
+    "nombre": "Pacho",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Pacho, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25518",
+    "nombre": "Paime",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Paime, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25524",
+    "nombre": "Pandi",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Pandi, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25530",
+    "nombre": "Paratebueno",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Paratebueno, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25535",
+    "nombre": "Pasca",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Pasca, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25572",
+    "nombre": "Puerto Salgar",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Puerto Salgar, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25580",
+    "nombre": "Pulí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Pulí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25592",
+    "nombre": "Quebradanegra",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Quebradanegra, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25594",
+    "nombre": "Quetame",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Quetame, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25596",
+    "nombre": "Quipile",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Quipile, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25599",
+    "nombre": "Apulo",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Apulo, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25612",
+    "nombre": "Ricaurte",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Ricaurte, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25645",
+    "nombre": "San Antonio del Tequendama",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "San Antonio del Tequendama, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25649",
+    "nombre": "San Bernardo",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "San Bernardo, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25653",
+    "nombre": "San Cayetano",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "San Cayetano, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25658",
+    "nombre": "San Francisco",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "San Francisco, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25662",
+    "nombre": "San Juan de Rioseco",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "San Juan de Rioseco, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25718",
+    "nombre": "Sasaima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Sasaima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25736",
+    "nombre": "Sesquilé",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Sesquilé, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25740",
+    "nombre": "Sibaté",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Sibaté, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25743",
+    "nombre": "Silvania",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Silvania, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25745",
+    "nombre": "Simijaca",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Simijaca, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25754",
+    "nombre": "Soacha",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Soacha, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25758",
+    "nombre": "Sopó",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Sopó, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25769",
+    "nombre": "Subachoque",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Subachoque, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25772",
+    "nombre": "Suesca",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Suesca, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25777",
+    "nombre": "Supatá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Supatá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25779",
+    "nombre": "Susa",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Susa, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25781",
+    "nombre": "Sutatausa",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Sutatausa, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25785",
+    "nombre": "Tabio",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tabio, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25793",
+    "nombre": "Tausa",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tausa, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25797",
+    "nombre": "Tena",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tena, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25799",
+    "nombre": "Tenjo",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tenjo, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25805",
+    "nombre": "Tibacuy",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tibacuy, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25807",
+    "nombre": "Tibirita",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tibirita, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25815",
+    "nombre": "Tocaima",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tocaima, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25817",
+    "nombre": "Tocancipá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Tocancipá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25823",
+    "nombre": "Topaipí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Topaipí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25839",
+    "nombre": "Ubalá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Ubalá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25841",
+    "nombre": "Ubaque",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Ubaque, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25843",
+    "nombre": "Villa de San Diego de Ubaté",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Villa de San Diego de Ubaté, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25845",
+    "nombre": "Une",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Une, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25851",
+    "nombre": "Útica",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Útica, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25862",
+    "nombre": "Vergara",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Vergara, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25867",
+    "nombre": "Vianí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Vianí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25871",
+    "nombre": "Villagómez",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Villagómez, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25873",
+    "nombre": "Villapinzón",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Villapinzón, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25875",
+    "nombre": "Villeta",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Villeta, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25878",
+    "nombre": "Viotá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Viotá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25885",
+    "nombre": "Yacopí",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Yacopí, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25898",
+    "nombre": "Zipacón",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Zipacón, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "25899",
+    "nombre": "Zipaquirá",
+    "departamentoCodigo": "25",
+    "departamento": "Cundinamarca",
+    "label": "Zipaquirá, Cundinamarca"
+  },
+  {
+    "codigoDivipola": "27001",
+    "nombre": "Quibdó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Quibdó, Chocó"
+  },
+  {
+    "codigoDivipola": "27006",
+    "nombre": "Acandí",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Acandí, Chocó"
+  },
+  {
+    "codigoDivipola": "27025",
+    "nombre": "Alto Baudó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Alto Baudó, Chocó"
+  },
+  {
+    "codigoDivipola": "27050",
+    "nombre": "Atrato",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Atrato, Chocó"
+  },
+  {
+    "codigoDivipola": "27073",
+    "nombre": "Bagadó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Bagadó, Chocó"
+  },
+  {
+    "codigoDivipola": "27075",
+    "nombre": "Bahía Solano",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Bahía Solano, Chocó"
+  },
+  {
+    "codigoDivipola": "27077",
+    "nombre": "Bajo Baudó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Bajo Baudó, Chocó"
+  },
+  {
+    "codigoDivipola": "27099",
+    "nombre": "Bojayá",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Bojayá, Chocó"
+  },
+  {
+    "codigoDivipola": "27135",
+    "nombre": "El Cantón del San Pablo",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "El Cantón del San Pablo, Chocó"
+  },
+  {
+    "codigoDivipola": "27150",
+    "nombre": "Carmen del Darién",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Carmen del Darién, Chocó"
+  },
+  {
+    "codigoDivipola": "27160",
+    "nombre": "Cértegui",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Cértegui, Chocó"
+  },
+  {
+    "codigoDivipola": "27205",
+    "nombre": "Condoto",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Condoto, Chocó"
+  },
+  {
+    "codigoDivipola": "27245",
+    "nombre": "El Carmen de Atrato",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "El Carmen de Atrato, Chocó"
+  },
+  {
+    "codigoDivipola": "27250",
+    "nombre": "El Litoral del San Juan",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "El Litoral del San Juan, Chocó"
+  },
+  {
+    "codigoDivipola": "27361",
+    "nombre": "Istmina",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Istmina, Chocó"
+  },
+  {
+    "codigoDivipola": "27372",
+    "nombre": "Juradó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Juradó, Chocó"
+  },
+  {
+    "codigoDivipola": "27413",
+    "nombre": "Lloró",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Lloró, Chocó"
+  },
+  {
+    "codigoDivipola": "27425",
+    "nombre": "Medio Atrato",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Medio Atrato, Chocó"
+  },
+  {
+    "codigoDivipola": "27430",
+    "nombre": "Medio Baudó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Medio Baudó, Chocó"
+  },
+  {
+    "codigoDivipola": "27450",
+    "nombre": "Medio San Juan",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Medio San Juan, Chocó"
+  },
+  {
+    "codigoDivipola": "27491",
+    "nombre": "Nóvita",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Nóvita, Chocó"
+  },
+  {
+    "codigoDivipola": "27495",
+    "nombre": "Nuquí",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Nuquí, Chocó"
+  },
+  {
+    "codigoDivipola": "27580",
+    "nombre": "Río Iró",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Río Iró, Chocó"
+  },
+  {
+    "codigoDivipola": "27600",
+    "nombre": "Río Quito",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Río Quito, Chocó"
+  },
+  {
+    "codigoDivipola": "27615",
+    "nombre": "Riosucio",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Riosucio, Chocó"
+  },
+  {
+    "codigoDivipola": "27660",
+    "nombre": "San José del Palmar",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "San José del Palmar, Chocó"
+  },
+  {
+    "codigoDivipola": "27745",
+    "nombre": "Sipí",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Sipí, Chocó"
+  },
+  {
+    "codigoDivipola": "27787",
+    "nombre": "Tadó",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Tadó, Chocó"
+  },
+  {
+    "codigoDivipola": "27800",
+    "nombre": "Unguía",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Unguía, Chocó"
+  },
+  {
+    "codigoDivipola": "27810",
+    "nombre": "Unión Panamericana",
+    "departamentoCodigo": "27",
+    "departamento": "Chocó",
+    "label": "Unión Panamericana, Chocó"
+  },
+  {
+    "codigoDivipola": "41001",
+    "nombre": "Neiva",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Neiva, Huila"
+  },
+  {
+    "codigoDivipola": "41006",
+    "nombre": "Acevedo",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Acevedo, Huila"
+  },
+  {
+    "codigoDivipola": "41013",
+    "nombre": "Agrado",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Agrado, Huila"
+  },
+  {
+    "codigoDivipola": "41016",
+    "nombre": "Aipe",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Aipe, Huila"
+  },
+  {
+    "codigoDivipola": "41020",
+    "nombre": "Algeciras",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Algeciras, Huila"
+  },
+  {
+    "codigoDivipola": "41026",
+    "nombre": "Altamira",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Altamira, Huila"
+  },
+  {
+    "codigoDivipola": "41078",
+    "nombre": "Baraya",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Baraya, Huila"
+  },
+  {
+    "codigoDivipola": "41132",
+    "nombre": "Campoalegre",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Campoalegre, Huila"
+  },
+  {
+    "codigoDivipola": "41206",
+    "nombre": "Colombia",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Colombia, Huila"
+  },
+  {
+    "codigoDivipola": "41244",
+    "nombre": "Elías",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Elías, Huila"
+  },
+  {
+    "codigoDivipola": "41298",
+    "nombre": "Garzón",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Garzón, Huila"
+  },
+  {
+    "codigoDivipola": "41306",
+    "nombre": "Gigante",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Gigante, Huila"
+  },
+  {
+    "codigoDivipola": "41319",
+    "nombre": "Guadalupe",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Guadalupe, Huila"
+  },
+  {
+    "codigoDivipola": "41349",
+    "nombre": "Hobo",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Hobo, Huila"
+  },
+  {
+    "codigoDivipola": "41357",
+    "nombre": "Íquira",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Íquira, Huila"
+  },
+  {
+    "codigoDivipola": "41359",
+    "nombre": "Isnos",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Isnos, Huila"
+  },
+  {
+    "codigoDivipola": "41378",
+    "nombre": "La Argentina",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "La Argentina, Huila"
+  },
+  {
+    "codigoDivipola": "41396",
+    "nombre": "La Plata",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "La Plata, Huila"
+  },
+  {
+    "codigoDivipola": "41483",
+    "nombre": "Nátaga",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Nátaga, Huila"
+  },
+  {
+    "codigoDivipola": "41503",
+    "nombre": "Oporapa",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Oporapa, Huila"
+  },
+  {
+    "codigoDivipola": "41518",
+    "nombre": "Paicol",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Paicol, Huila"
+  },
+  {
+    "codigoDivipola": "41524",
+    "nombre": "Palermo",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Palermo, Huila"
+  },
+  {
+    "codigoDivipola": "41530",
+    "nombre": "Palestina",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Palestina, Huila"
+  },
+  {
+    "codigoDivipola": "41548",
+    "nombre": "Pital",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Pital, Huila"
+  },
+  {
+    "codigoDivipola": "41551",
+    "nombre": "Pitalito",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Pitalito, Huila"
+  },
+  {
+    "codigoDivipola": "41615",
+    "nombre": "Rivera",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Rivera, Huila"
+  },
+  {
+    "codigoDivipola": "41660",
+    "nombre": "Saladoblanco",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Saladoblanco, Huila"
+  },
+  {
+    "codigoDivipola": "41668",
+    "nombre": "San Agustín",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "San Agustín, Huila"
+  },
+  {
+    "codigoDivipola": "41676",
+    "nombre": "Santa María",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Santa María, Huila"
+  },
+  {
+    "codigoDivipola": "41770",
+    "nombre": "Suaza",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Suaza, Huila"
+  },
+  {
+    "codigoDivipola": "41791",
+    "nombre": "Tarqui",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Tarqui, Huila"
+  },
+  {
+    "codigoDivipola": "41797",
+    "nombre": "Tesalia",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Tesalia, Huila"
+  },
+  {
+    "codigoDivipola": "41799",
+    "nombre": "Tello",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Tello, Huila"
+  },
+  {
+    "codigoDivipola": "41801",
+    "nombre": "Teruel",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Teruel, Huila"
+  },
+  {
+    "codigoDivipola": "41807",
+    "nombre": "Timaná",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Timaná, Huila"
+  },
+  {
+    "codigoDivipola": "41872",
+    "nombre": "Villavieja",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Villavieja, Huila"
+  },
+  {
+    "codigoDivipola": "41885",
+    "nombre": "Yaguará",
+    "departamentoCodigo": "41",
+    "departamento": "Huila",
+    "label": "Yaguará, Huila"
+  },
+  {
+    "codigoDivipola": "44001",
+    "nombre": "Riohacha",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Riohacha, La Guajira"
+  },
+  {
+    "codigoDivipola": "44035",
+    "nombre": "Albania",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Albania, La Guajira"
+  },
+  {
+    "codigoDivipola": "44078",
+    "nombre": "Barrancas",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Barrancas, La Guajira"
+  },
+  {
+    "codigoDivipola": "44090",
+    "nombre": "Dibulla",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Dibulla, La Guajira"
+  },
+  {
+    "codigoDivipola": "44098",
+    "nombre": "Distracción",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Distracción, La Guajira"
+  },
+  {
+    "codigoDivipola": "44110",
+    "nombre": "El Molino",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "El Molino, La Guajira"
+  },
+  {
+    "codigoDivipola": "44279",
+    "nombre": "Fonseca",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Fonseca, La Guajira"
+  },
+  {
+    "codigoDivipola": "44378",
+    "nombre": "Hatonuevo",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Hatonuevo, La Guajira"
+  },
+  {
+    "codigoDivipola": "44420",
+    "nombre": "La Jagua del Pilar",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "La Jagua del Pilar, La Guajira"
+  },
+  {
+    "codigoDivipola": "44430",
+    "nombre": "Maicao",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Maicao, La Guajira"
+  },
+  {
+    "codigoDivipola": "44560",
+    "nombre": "Manaure",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Manaure, La Guajira"
+  },
+  {
+    "codigoDivipola": "44650",
+    "nombre": "San Juan del Cesar",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "San Juan del Cesar, La Guajira"
+  },
+  {
+    "codigoDivipola": "44847",
+    "nombre": "Uribia",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Uribia, La Guajira"
+  },
+  {
+    "codigoDivipola": "44855",
+    "nombre": "Urumita",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Urumita, La Guajira"
+  },
+  {
+    "codigoDivipola": "44874",
+    "nombre": "Villanueva",
+    "departamentoCodigo": "44",
+    "departamento": "La Guajira",
+    "label": "Villanueva, La Guajira"
+  },
+  {
+    "codigoDivipola": "47001",
+    "nombre": "Santa Marta",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Santa Marta, Magdalena"
+  },
+  {
+    "codigoDivipola": "47030",
+    "nombre": "Algarrobo",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Algarrobo, Magdalena"
+  },
+  {
+    "codigoDivipola": "47053",
+    "nombre": "Aracataca",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Aracataca, Magdalena"
+  },
+  {
+    "codigoDivipola": "47058",
+    "nombre": "Ariguaní",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Ariguaní, Magdalena"
+  },
+  {
+    "codigoDivipola": "47161",
+    "nombre": "Cerro de San Antonio",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Cerro de San Antonio, Magdalena"
+  },
+  {
+    "codigoDivipola": "47170",
+    "nombre": "Chivolo",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Chivolo, Magdalena"
+  },
+  {
+    "codigoDivipola": "47189",
+    "nombre": "Ciénaga",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Ciénaga, Magdalena"
+  },
+  {
+    "codigoDivipola": "47205",
+    "nombre": "Concordia",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Concordia, Magdalena"
+  },
+  {
+    "codigoDivipola": "47245",
+    "nombre": "El Banco",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "El Banco, Magdalena"
+  },
+  {
+    "codigoDivipola": "47258",
+    "nombre": "El Piñón",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "El Piñón, Magdalena"
+  },
+  {
+    "codigoDivipola": "47268",
+    "nombre": "El Retén",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "El Retén, Magdalena"
+  },
+  {
+    "codigoDivipola": "47288",
+    "nombre": "Fundación",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Fundación, Magdalena"
+  },
+  {
+    "codigoDivipola": "47318",
+    "nombre": "Guamal",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Guamal, Magdalena"
+  },
+  {
+    "codigoDivipola": "47460",
+    "nombre": "Nueva Granada",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Nueva Granada, Magdalena"
+  },
+  {
+    "codigoDivipola": "47541",
+    "nombre": "Pedraza",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Pedraza, Magdalena"
+  },
+  {
+    "codigoDivipola": "47545",
+    "nombre": "Pijiño del Carmen",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Pijiño del Carmen, Magdalena"
+  },
+  {
+    "codigoDivipola": "47551",
+    "nombre": "Pivijay",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Pivijay, Magdalena"
+  },
+  {
+    "codigoDivipola": "47555",
+    "nombre": "Plato",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Plato, Magdalena"
+  },
+  {
+    "codigoDivipola": "47570",
+    "nombre": "Puebloviejo",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Puebloviejo, Magdalena"
+  },
+  {
+    "codigoDivipola": "47605",
+    "nombre": "Remolino",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Remolino, Magdalena"
+  },
+  {
+    "codigoDivipola": "47660",
+    "nombre": "Sabanas de San Ángel",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Sabanas de San Ángel, Magdalena"
+  },
+  {
+    "codigoDivipola": "47675",
+    "nombre": "Salamina",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Salamina, Magdalena"
+  },
+  {
+    "codigoDivipola": "47692",
+    "nombre": "San Sebastián de Buenavista",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "San Sebastián de Buenavista, Magdalena"
+  },
+  {
+    "codigoDivipola": "47703",
+    "nombre": "San Zenón",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "San Zenón, Magdalena"
+  },
+  {
+    "codigoDivipola": "47707",
+    "nombre": "Santa Ana",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Santa Ana, Magdalena"
+  },
+  {
+    "codigoDivipola": "47720",
+    "nombre": "Santa Bárbara de Pinto",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Santa Bárbara de Pinto, Magdalena"
+  },
+  {
+    "codigoDivipola": "47745",
+    "nombre": "Sitionuevo",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Sitionuevo, Magdalena"
+  },
+  {
+    "codigoDivipola": "47798",
+    "nombre": "Tenerife",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Tenerife, Magdalena"
+  },
+  {
+    "codigoDivipola": "47960",
+    "nombre": "Zapayán",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Zapayán, Magdalena"
+  },
+  {
+    "codigoDivipola": "47980",
+    "nombre": "Zona Bananera",
+    "departamentoCodigo": "47",
+    "departamento": "Magdalena",
+    "label": "Zona Bananera, Magdalena"
+  },
+  {
+    "codigoDivipola": "50001",
+    "nombre": "Villavicencio",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Villavicencio, Meta"
+  },
+  {
+    "codigoDivipola": "50006",
+    "nombre": "Acacías",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Acacías, Meta"
+  },
+  {
+    "codigoDivipola": "50110",
+    "nombre": "Barranca de Upía",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Barranca de Upía, Meta"
+  },
+  {
+    "codigoDivipola": "50124",
+    "nombre": "Cabuyaro",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Cabuyaro, Meta"
+  },
+  {
+    "codigoDivipola": "50150",
+    "nombre": "Castilla la Nueva",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Castilla la Nueva, Meta"
+  },
+  {
+    "codigoDivipola": "50223",
+    "nombre": "Cubarral",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Cubarral, Meta"
+  },
+  {
+    "codigoDivipola": "50226",
+    "nombre": "Cumaral",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Cumaral, Meta"
+  },
+  {
+    "codigoDivipola": "50245",
+    "nombre": "El Calvario",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "El Calvario, Meta"
+  },
+  {
+    "codigoDivipola": "50251",
+    "nombre": "El Castillo",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "El Castillo, Meta"
+  },
+  {
+    "codigoDivipola": "50270",
+    "nombre": "El Dorado",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "El Dorado, Meta"
+  },
+  {
+    "codigoDivipola": "50287",
+    "nombre": "Fuentedeoro",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Fuentedeoro, Meta"
+  },
+  {
+    "codigoDivipola": "50313",
+    "nombre": "Granada",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Granada, Meta"
+  },
+  {
+    "codigoDivipola": "50318",
+    "nombre": "Guamal",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Guamal, Meta"
+  },
+  {
+    "codigoDivipola": "50325",
+    "nombre": "Mapiripán",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Mapiripán, Meta"
+  },
+  {
+    "codigoDivipola": "50330",
+    "nombre": "Mesetas",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Mesetas, Meta"
+  },
+  {
+    "codigoDivipola": "50350",
+    "nombre": "La Macarena",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "La Macarena, Meta"
+  },
+  {
+    "codigoDivipola": "50370",
+    "nombre": "Uribe",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Uribe, Meta"
+  },
+  {
+    "codigoDivipola": "50400",
+    "nombre": "Lejanías",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Lejanías, Meta"
+  },
+  {
+    "codigoDivipola": "50450",
+    "nombre": "Puerto Concordia",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Puerto Concordia, Meta"
+  },
+  {
+    "codigoDivipola": "50568",
+    "nombre": "Puerto Gaitán",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Puerto Gaitán, Meta"
+  },
+  {
+    "codigoDivipola": "50573",
+    "nombre": "Puerto López",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Puerto López, Meta"
+  },
+  {
+    "codigoDivipola": "50577",
+    "nombre": "Puerto Lleras",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Puerto Lleras, Meta"
+  },
+  {
+    "codigoDivipola": "50590",
+    "nombre": "Puerto Rico",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Puerto Rico, Meta"
+  },
+  {
+    "codigoDivipola": "50606",
+    "nombre": "Restrepo",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Restrepo, Meta"
+  },
+  {
+    "codigoDivipola": "50680",
+    "nombre": "San Carlos de Guaroa",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "San Carlos de Guaroa, Meta"
+  },
+  {
+    "codigoDivipola": "50683",
+    "nombre": "San Juan de Arama",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "San Juan de Arama, Meta"
+  },
+  {
+    "codigoDivipola": "50686",
+    "nombre": "San Juanito",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "San Juanito, Meta"
+  },
+  {
+    "codigoDivipola": "50689",
+    "nombre": "San Martín",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "San Martín, Meta"
+  },
+  {
+    "codigoDivipola": "50711",
+    "nombre": "Vistahermosa",
+    "departamentoCodigo": "50",
+    "departamento": "Meta",
+    "label": "Vistahermosa, Meta"
+  },
+  {
+    "codigoDivipola": "52001",
+    "nombre": "Pasto",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Pasto, Nariño"
+  },
+  {
+    "codigoDivipola": "52019",
+    "nombre": "Albán",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Albán, Nariño"
+  },
+  {
+    "codigoDivipola": "52022",
+    "nombre": "Aldana",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Aldana, Nariño"
+  },
+  {
+    "codigoDivipola": "52036",
+    "nombre": "Ancuyá",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Ancuyá, Nariño"
+  },
+  {
+    "codigoDivipola": "52051",
+    "nombre": "Arboleda",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Arboleda, Nariño"
+  },
+  {
+    "codigoDivipola": "52079",
+    "nombre": "Barbacoas",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Barbacoas, Nariño"
+  },
+  {
+    "codigoDivipola": "52083",
+    "nombre": "Belén",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Belén, Nariño"
+  },
+  {
+    "codigoDivipola": "52110",
+    "nombre": "Buesaco",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Buesaco, Nariño"
+  },
+  {
+    "codigoDivipola": "52203",
+    "nombre": "Colón",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Colón, Nariño"
+  },
+  {
+    "codigoDivipola": "52207",
+    "nombre": "Consacá",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Consacá, Nariño"
+  },
+  {
+    "codigoDivipola": "52210",
+    "nombre": "Contadero",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Contadero, Nariño"
+  },
+  {
+    "codigoDivipola": "52215",
+    "nombre": "Córdoba",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Córdoba, Nariño"
+  },
+  {
+    "codigoDivipola": "52224",
+    "nombre": "Cuaspúd",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Cuaspúd, Nariño"
+  },
+  {
+    "codigoDivipola": "52227",
+    "nombre": "Cumbal",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Cumbal, Nariño"
+  },
+  {
+    "codigoDivipola": "52233",
+    "nombre": "Cumbitara",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Cumbitara, Nariño"
+  },
+  {
+    "codigoDivipola": "52240",
+    "nombre": "Chachagüí",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Chachagüí, Nariño"
+  },
+  {
+    "codigoDivipola": "52250",
+    "nombre": "El Charco",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "El Charco, Nariño"
+  },
+  {
+    "codigoDivipola": "52254",
+    "nombre": "El Peñol",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "El Peñol, Nariño"
+  },
+  {
+    "codigoDivipola": "52256",
+    "nombre": "El Rosario",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "El Rosario, Nariño"
+  },
+  {
+    "codigoDivipola": "52258",
+    "nombre": "El Tablón de Gómez",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "El Tablón de Gómez, Nariño"
+  },
+  {
+    "codigoDivipola": "52260",
+    "nombre": "El Tambo",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "El Tambo, Nariño"
+  },
+  {
+    "codigoDivipola": "52287",
+    "nombre": "Funes",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Funes, Nariño"
+  },
+  {
+    "codigoDivipola": "52317",
+    "nombre": "Guachucal",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Guachucal, Nariño"
+  },
+  {
+    "codigoDivipola": "52320",
+    "nombre": "Guaitarilla",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Guaitarilla, Nariño"
+  },
+  {
+    "codigoDivipola": "52323",
+    "nombre": "Gualmatán",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Gualmatán, Nariño"
+  },
+  {
+    "codigoDivipola": "52352",
+    "nombre": "Iles",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Iles, Nariño"
+  },
+  {
+    "codigoDivipola": "52354",
+    "nombre": "Imués",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Imués, Nariño"
+  },
+  {
+    "codigoDivipola": "52356",
+    "nombre": "Ipiales",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Ipiales, Nariño"
+  },
+  {
+    "codigoDivipola": "52378",
+    "nombre": "La Cruz",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "La Cruz, Nariño"
+  },
+  {
+    "codigoDivipola": "52381",
+    "nombre": "La Florida",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "La Florida, Nariño"
+  },
+  {
+    "codigoDivipola": "52385",
+    "nombre": "La Llanada",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "La Llanada, Nariño"
+  },
+  {
+    "codigoDivipola": "52390",
+    "nombre": "La Tola",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "La Tola, Nariño"
+  },
+  {
+    "codigoDivipola": "52399",
+    "nombre": "La Unión",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "La Unión, Nariño"
+  },
+  {
+    "codigoDivipola": "52405",
+    "nombre": "Leiva",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Leiva, Nariño"
+  },
+  {
+    "codigoDivipola": "52411",
+    "nombre": "Linares",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Linares, Nariño"
+  },
+  {
+    "codigoDivipola": "52418",
+    "nombre": "Los Andes",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Los Andes, Nariño"
+  },
+  {
+    "codigoDivipola": "52427",
+    "nombre": "Magüí",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Magüí, Nariño"
+  },
+  {
+    "codigoDivipola": "52435",
+    "nombre": "Mallama",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Mallama, Nariño"
+  },
+  {
+    "codigoDivipola": "52473",
+    "nombre": "Mosquera",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Mosquera, Nariño"
+  },
+  {
+    "codigoDivipola": "52480",
+    "nombre": "Nariño",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Nariño"
+  },
+  {
+    "codigoDivipola": "52490",
+    "nombre": "Olaya Herrera",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Olaya Herrera, Nariño"
+  },
+  {
+    "codigoDivipola": "52506",
+    "nombre": "Ospina",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Ospina, Nariño"
+  },
+  {
+    "codigoDivipola": "52520",
+    "nombre": "Francisco Pizarro",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Francisco Pizarro, Nariño"
+  },
+  {
+    "codigoDivipola": "52540",
+    "nombre": "Policarpa",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Policarpa, Nariño"
+  },
+  {
+    "codigoDivipola": "52560",
+    "nombre": "Potosí",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Potosí, Nariño"
+  },
+  {
+    "codigoDivipola": "52565",
+    "nombre": "Providencia",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Providencia, Nariño"
+  },
+  {
+    "codigoDivipola": "52573",
+    "nombre": "Puerres",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Puerres, Nariño"
+  },
+  {
+    "codigoDivipola": "52585",
+    "nombre": "Pupiales",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Pupiales, Nariño"
+  },
+  {
+    "codigoDivipola": "52612",
+    "nombre": "Ricaurte",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Ricaurte, Nariño"
+  },
+  {
+    "codigoDivipola": "52621",
+    "nombre": "Roberto Payán",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Roberto Payán, Nariño"
+  },
+  {
+    "codigoDivipola": "52678",
+    "nombre": "Samaniego",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Samaniego, Nariño"
+  },
+  {
+    "codigoDivipola": "52683",
+    "nombre": "Sandoná",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Sandoná, Nariño"
+  },
+  {
+    "codigoDivipola": "52685",
+    "nombre": "San Bernardo",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "San Bernardo, Nariño"
+  },
+  {
+    "codigoDivipola": "52687",
+    "nombre": "San Lorenzo",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "San Lorenzo, Nariño"
+  },
+  {
+    "codigoDivipola": "52693",
+    "nombre": "San Pablo",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "San Pablo, Nariño"
+  },
+  {
+    "codigoDivipola": "52694",
+    "nombre": "San Pedro de Cartago",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "San Pedro de Cartago, Nariño"
+  },
+  {
+    "codigoDivipola": "52696",
+    "nombre": "Santa Bárbara",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Santa Bárbara, Nariño"
+  },
+  {
+    "codigoDivipola": "52699",
+    "nombre": "Santacruz",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Santacruz, Nariño"
+  },
+  {
+    "codigoDivipola": "52720",
+    "nombre": "Sapuyes",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Sapuyes, Nariño"
+  },
+  {
+    "codigoDivipola": "52786",
+    "nombre": "Taminango",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Taminango, Nariño"
+  },
+  {
+    "codigoDivipola": "52788",
+    "nombre": "Tangua",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Tangua, Nariño"
+  },
+  {
+    "codigoDivipola": "52835",
+    "nombre": "San Andrés de Tumaco",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "San Andrés de Tumaco, Nariño"
+  },
+  {
+    "codigoDivipola": "52838",
+    "nombre": "Túquerres",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Túquerres, Nariño"
+  },
+  {
+    "codigoDivipola": "52885",
+    "nombre": "Yacuanquer",
+    "departamentoCodigo": "52",
+    "departamento": "Nariño",
+    "label": "Yacuanquer, Nariño"
+  },
+  {
+    "codigoDivipola": "54001",
+    "nombre": "Cúcuta",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Cúcuta, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54003",
+    "nombre": "Ábrego",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Ábrego, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54051",
+    "nombre": "Arboledas",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Arboledas, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54099",
+    "nombre": "Bochalema",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Bochalema, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54109",
+    "nombre": "Bucarasica",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Bucarasica, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54125",
+    "nombre": "Cácota",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Cácota, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54128",
+    "nombre": "Cáchira",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Cáchira, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54172",
+    "nombre": "Chinácota",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Chinácota, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54174",
+    "nombre": "Chitagá",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Chitagá, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54206",
+    "nombre": "Convención",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Convención, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54223",
+    "nombre": "Cucutilla",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Cucutilla, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54239",
+    "nombre": "Durania",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Durania, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54245",
+    "nombre": "El Carmen",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "El Carmen, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54250",
+    "nombre": "El Tarra",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "El Tarra, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54261",
+    "nombre": "El Zulia",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "El Zulia, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54313",
+    "nombre": "Gramalote",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Gramalote, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54344",
+    "nombre": "Hacarí",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Hacarí, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54347",
+    "nombre": "Herrán",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Herrán, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54377",
+    "nombre": "Labateca",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Labateca, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54385",
+    "nombre": "La Esperanza",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "La Esperanza, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54398",
+    "nombre": "La Playa",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "La Playa, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54405",
+    "nombre": "Los Patios",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Los Patios, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54418",
+    "nombre": "Lourdes",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Lourdes, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54480",
+    "nombre": "Mutiscua",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Mutiscua, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54498",
+    "nombre": "Ocaña",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Ocaña, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54518",
+    "nombre": "Pamplona",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Pamplona, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54520",
+    "nombre": "Pamplonita",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Pamplonita, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54553",
+    "nombre": "Puerto Santander",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Puerto Santander, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54599",
+    "nombre": "Ragonvalia",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Ragonvalia, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54660",
+    "nombre": "Salazar",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Salazar, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54670",
+    "nombre": "San Calixto",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "San Calixto, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54673",
+    "nombre": "San Cayetano",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "San Cayetano, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54680",
+    "nombre": "Santiago",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Santiago, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54720",
+    "nombre": "Sardinata",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Sardinata, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54743",
+    "nombre": "Silos",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Silos, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54800",
+    "nombre": "Teorama",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Teorama, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54810",
+    "nombre": "Tibú",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Tibú, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54820",
+    "nombre": "Toledo",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Toledo, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54871",
+    "nombre": "Villa Caro",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Villa Caro, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "54874",
+    "nombre": "Villa del Rosario",
+    "departamentoCodigo": "54",
+    "departamento": "Norte de Santander",
+    "label": "Villa del Rosario, Norte de Santander"
+  },
+  {
+    "codigoDivipola": "63001",
+    "nombre": "Armenia",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Armenia, Quindío"
+  },
+  {
+    "codigoDivipola": "63111",
+    "nombre": "Buenavista",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Buenavista, Quindío"
+  },
+  {
+    "codigoDivipola": "63130",
+    "nombre": "Calarcá",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Calarcá, Quindío"
+  },
+  {
+    "codigoDivipola": "63190",
+    "nombre": "Circasia",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Circasia, Quindío"
+  },
+  {
+    "codigoDivipola": "63212",
+    "nombre": "Córdoba",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Córdoba, Quindío"
+  },
+  {
+    "codigoDivipola": "63272",
+    "nombre": "Filandia",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Filandia, Quindío"
+  },
+  {
+    "codigoDivipola": "63302",
+    "nombre": "Génova",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Génova, Quindío"
+  },
+  {
+    "codigoDivipola": "63401",
+    "nombre": "La Tebaida",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "La Tebaida, Quindío"
+  },
+  {
+    "codigoDivipola": "63470",
+    "nombre": "Montenegro",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Montenegro, Quindío"
+  },
+  {
+    "codigoDivipola": "63548",
+    "nombre": "Pijao",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Pijao, Quindío"
+  },
+  {
+    "codigoDivipola": "63594",
+    "nombre": "Quimbaya",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Quimbaya, Quindío"
+  },
+  {
+    "codigoDivipola": "63690",
+    "nombre": "Salento",
+    "departamentoCodigo": "63",
+    "departamento": "Quindío",
+    "label": "Salento, Quindío"
+  },
+  {
+    "codigoDivipola": "66001",
+    "nombre": "Pereira",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Pereira, Risaralda"
+  },
+  {
+    "codigoDivipola": "66045",
+    "nombre": "Apía",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Apía, Risaralda"
+  },
+  {
+    "codigoDivipola": "66075",
+    "nombre": "Balboa",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Balboa, Risaralda"
+  },
+  {
+    "codigoDivipola": "66088",
+    "nombre": "Belén de Umbría",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Belén de Umbría, Risaralda"
+  },
+  {
+    "codigoDivipola": "66170",
+    "nombre": "Dosquebradas",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Dosquebradas, Risaralda"
+  },
+  {
+    "codigoDivipola": "66318",
+    "nombre": "Guática",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Guática, Risaralda"
+  },
+  {
+    "codigoDivipola": "66383",
+    "nombre": "La Celia",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "La Celia, Risaralda"
+  },
+  {
+    "codigoDivipola": "66400",
+    "nombre": "La Virginia",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "La Virginia, Risaralda"
+  },
+  {
+    "codigoDivipola": "66440",
+    "nombre": "Marsella",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Marsella, Risaralda"
+  },
+  {
+    "codigoDivipola": "66456",
+    "nombre": "Mistrató",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Mistrató, Risaralda"
+  },
+  {
+    "codigoDivipola": "66572",
+    "nombre": "Pueblo Rico",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Pueblo Rico, Risaralda"
+  },
+  {
+    "codigoDivipola": "66594",
+    "nombre": "Quinchía",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Quinchía, Risaralda"
+  },
+  {
+    "codigoDivipola": "66682",
+    "nombre": "Santa Rosa de Cabal",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Santa Rosa de Cabal, Risaralda"
+  },
+  {
+    "codigoDivipola": "66687",
+    "nombre": "Santuario",
+    "departamentoCodigo": "66",
+    "departamento": "Risaralda",
+    "label": "Santuario, Risaralda"
+  },
+  {
+    "codigoDivipola": "68001",
+    "nombre": "Bucaramanga",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Bucaramanga, Santander"
+  },
+  {
+    "codigoDivipola": "68013",
+    "nombre": "Aguada",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Aguada, Santander"
+  },
+  {
+    "codigoDivipola": "68020",
+    "nombre": "Albania",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Albania, Santander"
+  },
+  {
+    "codigoDivipola": "68051",
+    "nombre": "Aratoca",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Aratoca, Santander"
+  },
+  {
+    "codigoDivipola": "68077",
+    "nombre": "Barbosa",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Barbosa, Santander"
+  },
+  {
+    "codigoDivipola": "68079",
+    "nombre": "Barichara",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Barichara, Santander"
+  },
+  {
+    "codigoDivipola": "68081",
+    "nombre": "Barrancabermeja",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Barrancabermeja, Santander"
+  },
+  {
+    "codigoDivipola": "68092",
+    "nombre": "Betulia",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Betulia, Santander"
+  },
+  {
+    "codigoDivipola": "68101",
+    "nombre": "Bolívar",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Bolívar, Santander"
+  },
+  {
+    "codigoDivipola": "68121",
+    "nombre": "Cabrera",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Cabrera, Santander"
+  },
+  {
+    "codigoDivipola": "68132",
+    "nombre": "California",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "California, Santander"
+  },
+  {
+    "codigoDivipola": "68147",
+    "nombre": "Capitanejo",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Capitanejo, Santander"
+  },
+  {
+    "codigoDivipola": "68152",
+    "nombre": "Carcasí",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Carcasí, Santander"
+  },
+  {
+    "codigoDivipola": "68160",
+    "nombre": "Cepitá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Cepitá, Santander"
+  },
+  {
+    "codigoDivipola": "68162",
+    "nombre": "Cerrito",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Cerrito, Santander"
+  },
+  {
+    "codigoDivipola": "68167",
+    "nombre": "Charalá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Charalá, Santander"
+  },
+  {
+    "codigoDivipola": "68169",
+    "nombre": "Charta",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Charta, Santander"
+  },
+  {
+    "codigoDivipola": "68176",
+    "nombre": "Chima",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Chima, Santander"
+  },
+  {
+    "codigoDivipola": "68179",
+    "nombre": "Chipatá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Chipatá, Santander"
+  },
+  {
+    "codigoDivipola": "68190",
+    "nombre": "Cimitarra",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Cimitarra, Santander"
+  },
+  {
+    "codigoDivipola": "68207",
+    "nombre": "Concepción",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Concepción, Santander"
+  },
+  {
+    "codigoDivipola": "68209",
+    "nombre": "Confines",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Confines, Santander"
+  },
+  {
+    "codigoDivipola": "68211",
+    "nombre": "Contratación",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Contratación, Santander"
+  },
+  {
+    "codigoDivipola": "68217",
+    "nombre": "Coromoro",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Coromoro, Santander"
+  },
+  {
+    "codigoDivipola": "68229",
+    "nombre": "Curití",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Curití, Santander"
+  },
+  {
+    "codigoDivipola": "68235",
+    "nombre": "El Carmen de Chucurí",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "El Carmen de Chucurí, Santander"
+  },
+  {
+    "codigoDivipola": "68245",
+    "nombre": "El Guacamayo",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "El Guacamayo, Santander"
+  },
+  {
+    "codigoDivipola": "68250",
+    "nombre": "El Peñón",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "El Peñón, Santander"
+  },
+  {
+    "codigoDivipola": "68255",
+    "nombre": "El Playón",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "El Playón, Santander"
+  },
+  {
+    "codigoDivipola": "68264",
+    "nombre": "Encino",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Encino, Santander"
+  },
+  {
+    "codigoDivipola": "68266",
+    "nombre": "Enciso",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Enciso, Santander"
+  },
+  {
+    "codigoDivipola": "68271",
+    "nombre": "Florián",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Florián, Santander"
+  },
+  {
+    "codigoDivipola": "68276",
+    "nombre": "Floridablanca",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Floridablanca, Santander"
+  },
+  {
+    "codigoDivipola": "68296",
+    "nombre": "Galán",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Galán, Santander"
+  },
+  {
+    "codigoDivipola": "68298",
+    "nombre": "Gámbita",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Gámbita, Santander"
+  },
+  {
+    "codigoDivipola": "68307",
+    "nombre": "Girón",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Girón, Santander"
+  },
+  {
+    "codigoDivipola": "68318",
+    "nombre": "Guaca",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Guaca, Santander"
+  },
+  {
+    "codigoDivipola": "68320",
+    "nombre": "Guadalupe",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Guadalupe, Santander"
+  },
+  {
+    "codigoDivipola": "68322",
+    "nombre": "Guapotá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Guapotá, Santander"
+  },
+  {
+    "codigoDivipola": "68324",
+    "nombre": "Guavatá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Guavatá, Santander"
+  },
+  {
+    "codigoDivipola": "68327",
+    "nombre": "Güepsa",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Güepsa, Santander"
+  },
+  {
+    "codigoDivipola": "68344",
+    "nombre": "Hato",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Hato, Santander"
+  },
+  {
+    "codigoDivipola": "68368",
+    "nombre": "Jesús María",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Jesús María, Santander"
+  },
+  {
+    "codigoDivipola": "68370",
+    "nombre": "Jordán",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Jordán, Santander"
+  },
+  {
+    "codigoDivipola": "68377",
+    "nombre": "La Belleza",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "La Belleza, Santander"
+  },
+  {
+    "codigoDivipola": "68385",
+    "nombre": "Landázuri",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Landázuri, Santander"
+  },
+  {
+    "codigoDivipola": "68397",
+    "nombre": "La Paz",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "La Paz, Santander"
+  },
+  {
+    "codigoDivipola": "68406",
+    "nombre": "Lebrija",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Lebrija, Santander"
+  },
+  {
+    "codigoDivipola": "68418",
+    "nombre": "Los Santos",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Los Santos, Santander"
+  },
+  {
+    "codigoDivipola": "68425",
+    "nombre": "Macaravita",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Macaravita, Santander"
+  },
+  {
+    "codigoDivipola": "68432",
+    "nombre": "Málaga",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Málaga, Santander"
+  },
+  {
+    "codigoDivipola": "68444",
+    "nombre": "Matanza",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Matanza, Santander"
+  },
+  {
+    "codigoDivipola": "68464",
+    "nombre": "Mogotes",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Mogotes, Santander"
+  },
+  {
+    "codigoDivipola": "68468",
+    "nombre": "Molagavita",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Molagavita, Santander"
+  },
+  {
+    "codigoDivipola": "68498",
+    "nombre": "Ocamonte",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Ocamonte, Santander"
+  },
+  {
+    "codigoDivipola": "68500",
+    "nombre": "Oiba",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Oiba, Santander"
+  },
+  {
+    "codigoDivipola": "68502",
+    "nombre": "Onzaga",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Onzaga, Santander"
+  },
+  {
+    "codigoDivipola": "68522",
+    "nombre": "Palmar",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Palmar, Santander"
+  },
+  {
+    "codigoDivipola": "68524",
+    "nombre": "Palmas del Socorro",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Palmas del Socorro, Santander"
+  },
+  {
+    "codigoDivipola": "68533",
+    "nombre": "Páramo",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Páramo, Santander"
+  },
+  {
+    "codigoDivipola": "68547",
+    "nombre": "Piedecuesta",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Piedecuesta, Santander"
+  },
+  {
+    "codigoDivipola": "68549",
+    "nombre": "Pinchote",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Pinchote, Santander"
+  },
+  {
+    "codigoDivipola": "68572",
+    "nombre": "Puente Nacional",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Puente Nacional, Santander"
+  },
+  {
+    "codigoDivipola": "68573",
+    "nombre": "Puerto Parra",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Puerto Parra, Santander"
+  },
+  {
+    "codigoDivipola": "68575",
+    "nombre": "Puerto Wilches",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Puerto Wilches, Santander"
+  },
+  {
+    "codigoDivipola": "68615",
+    "nombre": "Rionegro",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Rionegro, Santander"
+  },
+  {
+    "codigoDivipola": "68655",
+    "nombre": "Sabana de Torres",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Sabana de Torres, Santander"
+  },
+  {
+    "codigoDivipola": "68669",
+    "nombre": "San Andrés",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Andrés, Santander"
+  },
+  {
+    "codigoDivipola": "68673",
+    "nombre": "San Benito",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Benito, Santander"
+  },
+  {
+    "codigoDivipola": "68679",
+    "nombre": "San Gil",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Gil, Santander"
+  },
+  {
+    "codigoDivipola": "68682",
+    "nombre": "San Joaquín",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Joaquín, Santander"
+  },
+  {
+    "codigoDivipola": "68684",
+    "nombre": "San José de Miranda",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San José de Miranda, Santander"
+  },
+  {
+    "codigoDivipola": "68686",
+    "nombre": "San Miguel",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Miguel, Santander"
+  },
+  {
+    "codigoDivipola": "68689",
+    "nombre": "San Vicente de Chucurí",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "San Vicente de Chucurí, Santander"
+  },
+  {
+    "codigoDivipola": "68705",
+    "nombre": "Santa Bárbara",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Santa Bárbara, Santander"
+  },
+  {
+    "codigoDivipola": "68720",
+    "nombre": "Santa Helena del Opón",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Santa Helena del Opón, Santander"
+  },
+  {
+    "codigoDivipola": "68745",
+    "nombre": "Simacota",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Simacota, Santander"
+  },
+  {
+    "codigoDivipola": "68755",
+    "nombre": "Socorro",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Socorro, Santander"
+  },
+  {
+    "codigoDivipola": "68770",
+    "nombre": "Suaita",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Suaita, Santander"
+  },
+  {
+    "codigoDivipola": "68773",
+    "nombre": "Sucre",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Sucre, Santander"
+  },
+  {
+    "codigoDivipola": "68780",
+    "nombre": "Suratá",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Suratá, Santander"
+  },
+  {
+    "codigoDivipola": "68820",
+    "nombre": "Tona",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Tona, Santander"
+  },
+  {
+    "codigoDivipola": "68855",
+    "nombre": "Valle de San José",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Valle de San José, Santander"
+  },
+  {
+    "codigoDivipola": "68861",
+    "nombre": "Vélez",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Vélez, Santander"
+  },
+  {
+    "codigoDivipola": "68867",
+    "nombre": "Vetas",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Vetas, Santander"
+  },
+  {
+    "codigoDivipola": "68872",
+    "nombre": "Villanueva",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Villanueva, Santander"
+  },
+  {
+    "codigoDivipola": "68895",
+    "nombre": "Zapatoca",
+    "departamentoCodigo": "68",
+    "departamento": "Santander",
+    "label": "Zapatoca, Santander"
+  },
+  {
+    "codigoDivipola": "70001",
+    "nombre": "Sincelejo",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Sincelejo, Sucre"
+  },
+  {
+    "codigoDivipola": "70110",
+    "nombre": "Buenavista",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Buenavista, Sucre"
+  },
+  {
+    "codigoDivipola": "70124",
+    "nombre": "Caimito",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Caimito, Sucre"
+  },
+  {
+    "codigoDivipola": "70204",
+    "nombre": "Colosó",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Colosó, Sucre"
+  },
+  {
+    "codigoDivipola": "70215",
+    "nombre": "Corozal",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Corozal, Sucre"
+  },
+  {
+    "codigoDivipola": "70221",
+    "nombre": "Coveñas",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Coveñas, Sucre"
+  },
+  {
+    "codigoDivipola": "70230",
+    "nombre": "Chalán",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Chalán, Sucre"
+  },
+  {
+    "codigoDivipola": "70233",
+    "nombre": "El Roble",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "El Roble, Sucre"
+  },
+  {
+    "codigoDivipola": "70235",
+    "nombre": "Galeras",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Galeras, Sucre"
+  },
+  {
+    "codigoDivipola": "70265",
+    "nombre": "Guaranda",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Guaranda, Sucre"
+  },
+  {
+    "codigoDivipola": "70400",
+    "nombre": "La Unión",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "La Unión, Sucre"
+  },
+  {
+    "codigoDivipola": "70418",
+    "nombre": "Los Palmitos",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Los Palmitos, Sucre"
+  },
+  {
+    "codigoDivipola": "70429",
+    "nombre": "Majagual",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Majagual, Sucre"
+  },
+  {
+    "codigoDivipola": "70473",
+    "nombre": "Morroa",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Morroa, Sucre"
+  },
+  {
+    "codigoDivipola": "70508",
+    "nombre": "Ovejas",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Ovejas, Sucre"
+  },
+  {
+    "codigoDivipola": "70523",
+    "nombre": "Palmito",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Palmito, Sucre"
+  },
+  {
+    "codigoDivipola": "70670",
+    "nombre": "Sampués",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Sampués, Sucre"
+  },
+  {
+    "codigoDivipola": "70678",
+    "nombre": "San Benito Abad",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Benito Abad, Sucre"
+  },
+  {
+    "codigoDivipola": "70702",
+    "nombre": "San Juan de Betulia",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Juan de Betulia, Sucre"
+  },
+  {
+    "codigoDivipola": "70708",
+    "nombre": "San Marcos",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Marcos, Sucre"
+  },
+  {
+    "codigoDivipola": "70713",
+    "nombre": "San Onofre",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Onofre, Sucre"
+  },
+  {
+    "codigoDivipola": "70717",
+    "nombre": "San Pedro",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Pedro, Sucre"
+  },
+  {
+    "codigoDivipola": "70742",
+    "nombre": "San Luis de Sincé",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "San Luis de Sincé, Sucre"
+  },
+  {
+    "codigoDivipola": "70771",
+    "nombre": "Sucre",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Sucre"
+  },
+  {
+    "codigoDivipola": "70820",
+    "nombre": "Santiago de Tolú",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Santiago de Tolú, Sucre"
+  },
+  {
+    "codigoDivipola": "70823",
+    "nombre": "Tolú Viejo",
+    "departamentoCodigo": "70",
+    "departamento": "Sucre",
+    "label": "Tolú Viejo, Sucre"
+  },
+  {
+    "codigoDivipola": "73001",
+    "nombre": "Ibagué",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Ibagué, Tolima"
+  },
+  {
+    "codigoDivipola": "73024",
+    "nombre": "Alpujarra",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Alpujarra, Tolima"
+  },
+  {
+    "codigoDivipola": "73026",
+    "nombre": "Alvarado",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Alvarado, Tolima"
+  },
+  {
+    "codigoDivipola": "73030",
+    "nombre": "Ambalema",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Ambalema, Tolima"
+  },
+  {
+    "codigoDivipola": "73043",
+    "nombre": "Anzoátegui",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Anzoátegui, Tolima"
+  },
+  {
+    "codigoDivipola": "73055",
+    "nombre": "Armero",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Armero, Tolima"
+  },
+  {
+    "codigoDivipola": "73067",
+    "nombre": "Ataco",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Ataco, Tolima"
+  },
+  {
+    "codigoDivipola": "73124",
+    "nombre": "Cajamarca",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Cajamarca, Tolima"
+  },
+  {
+    "codigoDivipola": "73148",
+    "nombre": "Carmen de Apicalá",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Carmen de Apicalá, Tolima"
+  },
+  {
+    "codigoDivipola": "73152",
+    "nombre": "Casabianca",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Casabianca, Tolima"
+  },
+  {
+    "codigoDivipola": "73168",
+    "nombre": "Chaparral",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Chaparral, Tolima"
+  },
+  {
+    "codigoDivipola": "73200",
+    "nombre": "Coello",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Coello, Tolima"
+  },
+  {
+    "codigoDivipola": "73217",
+    "nombre": "Coyaima",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Coyaima, Tolima"
+  },
+  {
+    "codigoDivipola": "73226",
+    "nombre": "Cunday",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Cunday, Tolima"
+  },
+  {
+    "codigoDivipola": "73236",
+    "nombre": "Dolores",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Dolores, Tolima"
+  },
+  {
+    "codigoDivipola": "73268",
+    "nombre": "Espinal",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Espinal, Tolima"
+  },
+  {
+    "codigoDivipola": "73270",
+    "nombre": "Falan",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Falan, Tolima"
+  },
+  {
+    "codigoDivipola": "73275",
+    "nombre": "Flandes",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Flandes, Tolima"
+  },
+  {
+    "codigoDivipola": "73283",
+    "nombre": "Fresno",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Fresno, Tolima"
+  },
+  {
+    "codigoDivipola": "73319",
+    "nombre": "Guamo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Guamo, Tolima"
+  },
+  {
+    "codigoDivipola": "73347",
+    "nombre": "Herveo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Herveo, Tolima"
+  },
+  {
+    "codigoDivipola": "73349",
+    "nombre": "Honda",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Honda, Tolima"
+  },
+  {
+    "codigoDivipola": "73352",
+    "nombre": "Icononzo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Icononzo, Tolima"
+  },
+  {
+    "codigoDivipola": "73408",
+    "nombre": "Lérida",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Lérida, Tolima"
+  },
+  {
+    "codigoDivipola": "73411",
+    "nombre": "Líbano",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Líbano, Tolima"
+  },
+  {
+    "codigoDivipola": "73443",
+    "nombre": "San Sebastián de Mariquita",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "San Sebastián de Mariquita, Tolima"
+  },
+  {
+    "codigoDivipola": "73449",
+    "nombre": "Melgar",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Melgar, Tolima"
+  },
+  {
+    "codigoDivipola": "73461",
+    "nombre": "Murillo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Murillo, Tolima"
+  },
+  {
+    "codigoDivipola": "73483",
+    "nombre": "Natagaima",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Natagaima, Tolima"
+  },
+  {
+    "codigoDivipola": "73504",
+    "nombre": "Ortega",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Ortega, Tolima"
+  },
+  {
+    "codigoDivipola": "73520",
+    "nombre": "Palocabildo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Palocabildo, Tolima"
+  },
+  {
+    "codigoDivipola": "73547",
+    "nombre": "Piedras",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Piedras, Tolima"
+  },
+  {
+    "codigoDivipola": "73555",
+    "nombre": "Planadas",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Planadas, Tolima"
+  },
+  {
+    "codigoDivipola": "73563",
+    "nombre": "Prado",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Prado, Tolima"
+  },
+  {
+    "codigoDivipola": "73585",
+    "nombre": "Purificación",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Purificación, Tolima"
+  },
+  {
+    "codigoDivipola": "73616",
+    "nombre": "Rioblanco",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Rioblanco, Tolima"
+  },
+  {
+    "codigoDivipola": "73622",
+    "nombre": "Roncesvalles",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Roncesvalles, Tolima"
+  },
+  {
+    "codigoDivipola": "73624",
+    "nombre": "Rovira",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Rovira, Tolima"
+  },
+  {
+    "codigoDivipola": "73671",
+    "nombre": "Saldaña",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Saldaña, Tolima"
+  },
+  {
+    "codigoDivipola": "73675",
+    "nombre": "San Antonio",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "San Antonio, Tolima"
+  },
+  {
+    "codigoDivipola": "73678",
+    "nombre": "San Luis",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "San Luis, Tolima"
+  },
+  {
+    "codigoDivipola": "73686",
+    "nombre": "Santa Isabel",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Santa Isabel, Tolima"
+  },
+  {
+    "codigoDivipola": "73770",
+    "nombre": "Suárez",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Suárez, Tolima"
+  },
+  {
+    "codigoDivipola": "73854",
+    "nombre": "Valle de San Juan",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Valle de San Juan, Tolima"
+  },
+  {
+    "codigoDivipola": "73861",
+    "nombre": "Venadillo",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Venadillo, Tolima"
+  },
+  {
+    "codigoDivipola": "73870",
+    "nombre": "Villahermosa",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Villahermosa, Tolima"
+  },
+  {
+    "codigoDivipola": "73873",
+    "nombre": "Villarrica",
+    "departamentoCodigo": "73",
+    "departamento": "Tolima",
+    "label": "Villarrica, Tolima"
+  },
+  {
+    "codigoDivipola": "76001",
+    "nombre": "Cali",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Cali, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76020",
+    "nombre": "Alcalá",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Alcalá, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76036",
+    "nombre": "Andalucía",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Andalucía, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76041",
+    "nombre": "Ansermanuevo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Ansermanuevo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76054",
+    "nombre": "Argelia",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Argelia, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76100",
+    "nombre": "Bolívar",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Bolívar, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76109",
+    "nombre": "Buenaventura",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Buenaventura, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76111",
+    "nombre": "Guadalajara de Buga",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Guadalajara de Buga, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76113",
+    "nombre": "Bugalagrande",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Bugalagrande, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76122",
+    "nombre": "Caicedonia",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Caicedonia, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76126",
+    "nombre": "Calima",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Calima, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76130",
+    "nombre": "Candelaria",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Candelaria, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76147",
+    "nombre": "Cartago",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Cartago, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76233",
+    "nombre": "Dagua",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Dagua, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76243",
+    "nombre": "El Águila",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "El Águila, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76246",
+    "nombre": "El Cairo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "El Cairo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76248",
+    "nombre": "El Cerrito",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "El Cerrito, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76250",
+    "nombre": "El Dovio",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "El Dovio, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76275",
+    "nombre": "Florida",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Florida, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76306",
+    "nombre": "Ginebra",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Ginebra, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76318",
+    "nombre": "Guacarí",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Guacarí, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76364",
+    "nombre": "Jamundí",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Jamundí, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76377",
+    "nombre": "La Cumbre",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "La Cumbre, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76400",
+    "nombre": "La Unión",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "La Unión, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76403",
+    "nombre": "La Victoria",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "La Victoria, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76497",
+    "nombre": "Obando",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Obando, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76520",
+    "nombre": "Palmira",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Palmira, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76563",
+    "nombre": "Pradera",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Pradera, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76606",
+    "nombre": "Restrepo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Restrepo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76616",
+    "nombre": "Riofrío",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Riofrío, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76622",
+    "nombre": "Roldanillo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Roldanillo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76670",
+    "nombre": "San Pedro",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "San Pedro, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76736",
+    "nombre": "Sevilla",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Sevilla, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76823",
+    "nombre": "Toro",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Toro, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76828",
+    "nombre": "Trujillo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Trujillo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76834",
+    "nombre": "Tuluá",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Tuluá, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76845",
+    "nombre": "Ulloa",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Ulloa, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76863",
+    "nombre": "Versalles",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Versalles, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76869",
+    "nombre": "Vijes",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Vijes, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76890",
+    "nombre": "Yotoco",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Yotoco, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76892",
+    "nombre": "Yumbo",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Yumbo, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "76895",
+    "nombre": "Zarzal",
+    "departamentoCodigo": "76",
+    "departamento": "Valle del Cauca",
+    "label": "Zarzal, Valle del Cauca"
+  },
+  {
+    "codigoDivipola": "81001",
+    "nombre": "Arauca",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Arauca"
+  },
+  {
+    "codigoDivipola": "81065",
+    "nombre": "Arauquita",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Arauquita, Arauca"
+  },
+  {
+    "codigoDivipola": "81220",
+    "nombre": "Cravo Norte",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Cravo Norte, Arauca"
+  },
+  {
+    "codigoDivipola": "81300",
+    "nombre": "Fortul",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Fortul, Arauca"
+  },
+  {
+    "codigoDivipola": "81591",
+    "nombre": "Puerto Rondón",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Puerto Rondón, Arauca"
+  },
+  {
+    "codigoDivipola": "81736",
+    "nombre": "Saravena",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Saravena, Arauca"
+  },
+  {
+    "codigoDivipola": "81794",
+    "nombre": "Tame",
+    "departamentoCodigo": "81",
+    "departamento": "Arauca",
+    "label": "Tame, Arauca"
+  },
+  {
+    "codigoDivipola": "85001",
+    "nombre": "Yopal",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Yopal, Casanare"
+  },
+  {
+    "codigoDivipola": "85010",
+    "nombre": "Aguazul",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Aguazul, Casanare"
+  },
+  {
+    "codigoDivipola": "85015",
+    "nombre": "Chámeza",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Chámeza, Casanare"
+  },
+  {
+    "codigoDivipola": "85125",
+    "nombre": "Hato Corozal",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Hato Corozal, Casanare"
+  },
+  {
+    "codigoDivipola": "85136",
+    "nombre": "La Salina",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "La Salina, Casanare"
+  },
+  {
+    "codigoDivipola": "85139",
+    "nombre": "Maní",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Maní, Casanare"
+  },
+  {
+    "codigoDivipola": "85162",
+    "nombre": "Monterrey",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Monterrey, Casanare"
+  },
+  {
+    "codigoDivipola": "85225",
+    "nombre": "Nunchía",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Nunchía, Casanare"
+  },
+  {
+    "codigoDivipola": "85230",
+    "nombre": "Orocué",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Orocué, Casanare"
+  },
+  {
+    "codigoDivipola": "85250",
+    "nombre": "Paz de Ariporo",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Paz de Ariporo, Casanare"
+  },
+  {
+    "codigoDivipola": "85263",
+    "nombre": "Pore",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Pore, Casanare"
+  },
+  {
+    "codigoDivipola": "85279",
+    "nombre": "Recetor",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Recetor, Casanare"
+  },
+  {
+    "codigoDivipola": "85300",
+    "nombre": "Sabanalarga",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Sabanalarga, Casanare"
+  },
+  {
+    "codigoDivipola": "85315",
+    "nombre": "Sácama",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Sácama, Casanare"
+  },
+  {
+    "codigoDivipola": "85325",
+    "nombre": "San Luis de Palenque",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "San Luis de Palenque, Casanare"
+  },
+  {
+    "codigoDivipola": "85400",
+    "nombre": "Támara",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Támara, Casanare"
+  },
+  {
+    "codigoDivipola": "85410",
+    "nombre": "Tauramena",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Tauramena, Casanare"
+  },
+  {
+    "codigoDivipola": "85430",
+    "nombre": "Trinidad",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Trinidad, Casanare"
+  },
+  {
+    "codigoDivipola": "85440",
+    "nombre": "Villanueva",
+    "departamentoCodigo": "85",
+    "departamento": "Casanare",
+    "label": "Villanueva, Casanare"
+  },
+  {
+    "codigoDivipola": "86001",
+    "nombre": "Mocoa",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Mocoa, Putumayo"
+  },
+  {
+    "codigoDivipola": "86219",
+    "nombre": "Colón",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Colón, Putumayo"
+  },
+  {
+    "codigoDivipola": "86320",
+    "nombre": "Orito",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Orito, Putumayo"
+  },
+  {
+    "codigoDivipola": "86568",
+    "nombre": "Puerto Asís",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Puerto Asís, Putumayo"
+  },
+  {
+    "codigoDivipola": "86569",
+    "nombre": "Puerto Caicedo",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Puerto Caicedo, Putumayo"
+  },
+  {
+    "codigoDivipola": "86571",
+    "nombre": "Puerto Guzmán",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Puerto Guzmán, Putumayo"
+  },
+  {
+    "codigoDivipola": "86573",
+    "nombre": "Puerto Leguízamo",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Puerto Leguízamo, Putumayo"
+  },
+  {
+    "codigoDivipola": "86749",
+    "nombre": "Sibundoy",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Sibundoy, Putumayo"
+  },
+  {
+    "codigoDivipola": "86755",
+    "nombre": "San Francisco",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "San Francisco, Putumayo"
+  },
+  {
+    "codigoDivipola": "86757",
+    "nombre": "San Miguel",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "San Miguel, Putumayo"
+  },
+  {
+    "codigoDivipola": "86760",
+    "nombre": "Santiago",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Santiago, Putumayo"
+  },
+  {
+    "codigoDivipola": "86865",
+    "nombre": "Valle del Guamuez",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Valle del Guamuez, Putumayo"
+  },
+  {
+    "codigoDivipola": "86885",
+    "nombre": "Villagarzón",
+    "departamentoCodigo": "86",
+    "departamento": "Putumayo",
+    "label": "Villagarzón, Putumayo"
+  },
+  {
+    "codigoDivipola": "88001",
+    "nombre": "San Andrés",
+    "departamentoCodigo": "88",
+    "departamento": "Archipiélago de San Andrés, Providencia y Santa Catalina",
+    "label": "San Andrés, Archipiélago de San Andrés, Providencia y Santa Catalina"
+  },
+  {
+    "codigoDivipola": "88564",
+    "nombre": "Providencia",
+    "departamentoCodigo": "88",
+    "departamento": "Archipiélago de San Andrés, Providencia y Santa Catalina",
+    "label": "Providencia, Archipiélago de San Andrés, Providencia y Santa Catalina"
+  },
+  {
+    "codigoDivipola": "91001",
+    "nombre": "Leticia",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Leticia, Amazonas"
+  },
+  {
+    "codigoDivipola": "91263",
+    "nombre": "El Encanto",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "El Encanto, Amazonas"
+  },
+  {
+    "codigoDivipola": "91405",
+    "nombre": "La Chorrera",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "La Chorrera, Amazonas"
+  },
+  {
+    "codigoDivipola": "91407",
+    "nombre": "La Pedrera",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "La Pedrera, Amazonas"
+  },
+  {
+    "codigoDivipola": "91430",
+    "nombre": "La Victoria",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "La Victoria, Amazonas"
+  },
+  {
+    "codigoDivipola": "91460",
+    "nombre": "Mirití - Paraná",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Mirití - Paraná, Amazonas"
+  },
+  {
+    "codigoDivipola": "91530",
+    "nombre": "Puerto Alegría",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Puerto Alegría, Amazonas"
+  },
+  {
+    "codigoDivipola": "91536",
+    "nombre": "Puerto Arica",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Puerto Arica, Amazonas"
+  },
+  {
+    "codigoDivipola": "91540",
+    "nombre": "Puerto Nariño",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Puerto Nariño, Amazonas"
+  },
+  {
+    "codigoDivipola": "91669",
+    "nombre": "Puerto Santander",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Puerto Santander, Amazonas"
+  },
+  {
+    "codigoDivipola": "91798",
+    "nombre": "Tarapacá",
+    "departamentoCodigo": "91",
+    "departamento": "Amazonas",
+    "label": "Tarapacá, Amazonas"
+  },
+  {
+    "codigoDivipola": "94001",
+    "nombre": "Inírida",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Inírida, Guainía"
+  },
+  {
+    "codigoDivipola": "94343",
+    "nombre": "Barranco Minas",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Barranco Minas, Guainía"
+  },
+  {
+    "codigoDivipola": "94663",
+    "nombre": "Mapiripana",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Mapiripana, Guainía"
+  },
+  {
+    "codigoDivipola": "94883",
+    "nombre": "San Felipe",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "San Felipe, Guainía"
+  },
+  {
+    "codigoDivipola": "94884",
+    "nombre": "Puerto Colombia",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Puerto Colombia, Guainía"
+  },
+  {
+    "codigoDivipola": "94885",
+    "nombre": "La Guadalupe",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "La Guadalupe, Guainía"
+  },
+  {
+    "codigoDivipola": "94886",
+    "nombre": "Cacahual",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Cacahual, Guainía"
+  },
+  {
+    "codigoDivipola": "94887",
+    "nombre": "Pana Pana",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Pana Pana, Guainía"
+  },
+  {
+    "codigoDivipola": "94888",
+    "nombre": "Morichal",
+    "departamentoCodigo": "94",
+    "departamento": "Guainía",
+    "label": "Morichal, Guainía"
+  },
+  {
+    "codigoDivipola": "95001",
+    "nombre": "San José del Guaviare",
+    "departamentoCodigo": "95",
+    "departamento": "Guaviare",
+    "label": "San José del Guaviare, Guaviare"
+  },
+  {
+    "codigoDivipola": "95015",
+    "nombre": "Calamar",
+    "departamentoCodigo": "95",
+    "departamento": "Guaviare",
+    "label": "Calamar, Guaviare"
+  },
+  {
+    "codigoDivipola": "95025",
+    "nombre": "El Retorno",
+    "departamentoCodigo": "95",
+    "departamento": "Guaviare",
+    "label": "El Retorno, Guaviare"
+  },
+  {
+    "codigoDivipola": "95200",
+    "nombre": "Miraflores",
+    "departamentoCodigo": "95",
+    "departamento": "Guaviare",
+    "label": "Miraflores, Guaviare"
+  },
+  {
+    "codigoDivipola": "97001",
+    "nombre": "Mitú",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Mitú, Vaupés"
+  },
+  {
+    "codigoDivipola": "97161",
+    "nombre": "Carurú",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Carurú, Vaupés"
+  },
+  {
+    "codigoDivipola": "97511",
+    "nombre": "Pacoa",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Pacoa, Vaupés"
+  },
+  {
+    "codigoDivipola": "97666",
+    "nombre": "Taraira",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Taraira, Vaupés"
+  },
+  {
+    "codigoDivipola": "97777",
+    "nombre": "Papunahua",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Papunahua, Vaupés"
+  },
+  {
+    "codigoDivipola": "97889",
+    "nombre": "Yavaraté",
+    "departamentoCodigo": "97",
+    "departamento": "Vaupés",
+    "label": "Yavaraté, Vaupés"
+  },
+  {
+    "codigoDivipola": "99001",
+    "nombre": "Puerto Carreño",
+    "departamentoCodigo": "99",
+    "departamento": "Vichada",
+    "label": "Puerto Carreño, Vichada"
+  },
+  {
+    "codigoDivipola": "99524",
+    "nombre": "La Primavera",
+    "departamentoCodigo": "99",
+    "departamento": "Vichada",
+    "label": "La Primavera, Vichada"
+  },
+  {
+    "codigoDivipola": "99624",
+    "nombre": "Santa Rosalía",
+    "departamentoCodigo": "99",
+    "departamento": "Vichada",
+    "label": "Santa Rosalía, Vichada"
+  },
+  {
+    "codigoDivipola": "99773",
+    "nombre": "Cumaribo",
+    "departamentoCodigo": "99",
+    "departamento": "Vichada",
+    "label": "Cumaribo, Vichada"
+  }
+]

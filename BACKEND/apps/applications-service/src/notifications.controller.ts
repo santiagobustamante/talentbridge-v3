@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { NotificationsService } from './notifications.service';
 
@@ -30,8 +30,8 @@ export class NotificationsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/read')
-  async markRead(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.notificationsService.markRead(user.sub, +id);
+  async markRead(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.notificationsService.markRead(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard)

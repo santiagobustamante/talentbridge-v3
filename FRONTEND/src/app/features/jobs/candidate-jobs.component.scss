@@ -239,7 +239,12 @@
   align-items: flex-end;
   gap: 4px;
   flex-shrink: 0;
-  max-width: 140px;
+  // Sin `max-width` fijo: "Preseleccionado" (el más largo de los estados de
+  // postulación) no se achica ni se corta con `white-space: nowrap` en
+  // app-badge — con un tope de 140px el badge se salía del contenedor en
+  // vez de respetarlo. `.job-titles` ya tiene `flex: 1; min-width: 0` y
+  // recorta con line-clamp, así que cede el espacio que haga falta.
+  max-width: 100%;
 }
 
 .modality-badge {
@@ -392,8 +397,8 @@
   }
 
   &[data-status='missing'] {
-    background: var(--danger-soft);
-    color: var(--danger-strong);
+    background: var(--bg-surface-hover);
+    color: var(--text-secondary);
   }
 }
 
@@ -418,12 +423,25 @@
 
 .job-card-actions {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.25rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-soft);
+
+  // Los 3 botones (Ver detalle/Ver empresa/Aplicar, icono+texto) no entran en
+  // una sola fila en el ancho mínimo de tarjeta (340px) — en vez de desbordar
+  // o cortar texto, Aplicar (la acción principal) pasa a su propia fila,
+  // separado de Ver detalle/Ver empresa (secundarios, comparten fila).
+  .app-btn--secondary {
+    flex: 1 1 auto;
+  }
+  .app-btn--primary {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
 }
 
 .pagination {

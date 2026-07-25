@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '@app/database';
+import { PrismaService, Prisma } from '@app/database';
 import { normalizeSkillDisplay, normalizeSkillKey } from '@app/common';
 import { SkillDto } from './dto/skill.dto';
 import { CandidateAccessService } from './candidate-access.service';
@@ -43,14 +43,25 @@ export class SkillsService {
     });
     if (existing) throw new ConflictException('Esta habilidad ya existe en tu perfil');
 
-    return this.prisma.skill.create({
-      data: {
-        profileId: profile.id,
-        name: displayName,
-        normalizedName: normalized,
-        level: dto.level || 'BASIC',
-      },
-    });
+    // El chequeo de `existing` es best-effort: dos requests simultáneas
+    // agregando la misma habilidad pueden pasarlo las dos. La constraint
+    // única profileId+normalizedName en la base es la que realmente lo
+    // impide; acá traducimos su violación (P2002) al mismo 409 amigable.
+    try {
+      return await this.prisma.skill.create({
+        data: {
+          profileId: profile.id,
+          name: displayName,
+          normalizedName: normalized,
+          level: dto.level || 'BASIC',
+        },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException('Esta habilidad ya existe en tu perfil');
+      }
+      throw err;
+    }
   }
 
   async updateSkill(userId: number, skillId: number, dto: SkillDto) {
@@ -61,6 +72,14 @@ export class SkillsService {
       where: { id: skillId, profileId: profile.id },
     });
     if (!skill) throw new NotFoundException('Habilidad no encontrada');
+
+    // `dto.name` truthy no alcanza: un string de solo espacios ("   ") es
+    // truthy pero `normalizeSkillDisplay`/`normalizeSkillKey` lo colapsan a
+    // "" — sin este chequeo, eso vaciaba silenciosamente el nombre de la
+    // habilidad en vez de rechazar el cambio (mismo criterio que `addSkill`).
+    if (dto.name !== undefined && !dto.name.trim()) {
+      throw new BadRequestException('El nombre de la habilidad no puede estar vacío');
+    }
 
     const normalized = dto.name ? normalizeSkillKey(dto.name) : skill.normalizedName;
     return this.prisma.skill.update({

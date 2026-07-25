@@ -10,7 +10,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
 import { normalizeEmail } from '../../shared/utils/normalize';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 
 /**
  * Formulario de registro para empresas (ruta "/company/register"). Crea
@@ -32,6 +34,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
     MatProgressBarModule,
     MatIconModule,
     ButtonDirective,
+    MunicipioInputComponent,
   ],
   styleUrl: './company-register.component.scss',
   template: `
@@ -52,6 +55,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
             <mat-label>Nombre de la empresa</mat-label>
             <input matInput formControlName="companyName" autocomplete="organization" placeholder="Ej. Tech Solutions S.A." />
             <mat-error *ngIf="form.get('companyName')?.hasError('required')">Requerido</mat-error>
+            <mat-error *ngIf="form.get('companyName')?.hasError('notBlank')">No puede ser solo espacios</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -66,10 +70,10 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
             <input matInput formControlName="sector" placeholder="Ej. Tecnología, Salud, Educación" />
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Ciudad</mat-label>
-            <input matInput formControlName="city" autocomplete="address-level2" placeholder="Ej. Bogotá, Colombia" />
-          </mat-form-field>
+          <div class="full-width municipio-field">
+            <label class="municipio-field__label">Municipio</label>
+            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
+          </div>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Contraseña</mat-label>
@@ -122,7 +126,7 @@ export class CompanyRegisterComponent {
   loading = false;
   form = this.fb.group(
     {
-      companyName: ['', [Validators.required]],
+      companyName: ['', [Validators.required, notBlank]],
       email: ['', [Validators.required, Validators.email]],
       sector: [''],
       city: [''],

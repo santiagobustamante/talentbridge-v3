@@ -26,7 +26,14 @@ const LEVELS: LevelDef[] = [
   selector: 'app-level-meter',
   standalone: true,
   template: `
-    <div class="level-meter" [class.interactive]="interactive">
+    <div
+      class="level-meter"
+      [class.interactive]="interactive"
+      [class.level-meter--basic]="displayedLevel.value === 'BASIC'"
+      [class.level-meter--intermediate]="displayedLevel.value === 'INTERMEDIATE'"
+      [class.level-meter--advanced]="displayedLevel.value === 'ADVANCED'"
+      [class.level-meter--expert]="displayedLevel.value === 'EXPERT'"
+    >
       <div class="level-meter__segments">
         @for (l of levels; track l.value; let i = $index) {
           <button

@@ -13,6 +13,7 @@ import { Profile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 import {
   normalizePhoneStorage,
   formatPhoneDisplay,
@@ -38,7 +39,7 @@ type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' 
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule,
     MatIconModule, MatSlideToggleModule, MatSnackBarModule, MatTooltipModule,
-    ButtonDirective, CardComponent, GithubWarningComponent,
+    ButtonDirective, CardComponent, GithubWarningComponent, MunicipioInputComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -102,7 +103,7 @@ export class ProfileComponent implements OnInit {
 
   /** Mismo patrón que el teléfono: solo se reformatea al salir del campo, nunca
    *  mientras se escribe, para no repetir el bug del cursor saltando al final. */
-  onNameLikeBlur(controlName: 'fullName' | 'professionalTitle' | 'city'): void {
+  onNameLikeBlur(controlName: 'fullName' | 'professionalTitle'): void {
     const control = this.form.get(controlName);
     const value = control?.value || '';
     const formatted = titleCaseText(value);
@@ -278,7 +279,7 @@ export class ProfileComponent implements OnInit {
       professionalTitle: this.cleanTitleCase(raw.professionalTitle),
       summary: this.cleanString(raw.summary),
       phone: this.cleanPhone(raw.phone),
-      city: this.cleanTitleCase(raw.city),
+      city: this.cleanString(raw.city),
       linkedinUrl: this.cleanUrl(raw.linkedinUrl),
       githubUrl: this.cleanUrl(raw.githubUrl),
       websiteUrl: this.cleanUrl(raw.websiteUrl),

@@ -48,9 +48,19 @@
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  // flex, no grid: con 5 tarjetas y grid (`repeat(N, ...)`, fijo o
+  // `auto-fit`) la última fila quedaba con una tarjeta sola sin estirarse,
+  // dejando espacio vacío al lado — grid reserva las mismas N columnas en
+  // todas las filas aunque la última tenga menos ítems. flex-wrap sí
+  // redistribuye el espacio sobrante entre lo que realmente cae en cada
+  // fila, así que la tarjeta que quede sola ocupa el ancho completo.
+  display: flex;
+  flex-wrap: wrap;
   gap: 14px;
+
+  > app-card {
+    flex: 1 1 130px;
+  }
 }
 .stat-card {
   text-align: center;
@@ -134,7 +144,7 @@
   strong { display: block; font-size: 0.92rem; font-weight: 600; color: var(--text-main); }
   span { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; }
   .job-meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-  em { font-style: normal; font-size: 0.75rem; color: var(--text-placeholder); background: var(--bg-surface-hover); padding: 1px 8px; border-radius: 6px; }
+  em { font-style: normal; font-size: 0.75rem; color: var(--text-muted); background: var(--bg-surface-hover); padding: 1px 8px; border-radius: 6px; }
 }
 .job-salary { font-weight: 700; font-size: 0.85rem; color: var(--success); white-space: nowrap; flex-shrink: 0; }
 
@@ -144,7 +154,7 @@
   background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 12px; padding: 14px 18px;
   .app-item-info {
     strong { display: block; font-size: 0.9rem; color: var(--text-main); }
-    span { font-size: 0.78rem; color: var(--text-placeholder); }
+    span { font-size: 0.78rem; color: var(--text-muted); }
   }
 }
 
@@ -163,11 +173,10 @@
 .msg-info {
   flex: 1; min-width: 0;
   strong { display: block; font-size: 0.88rem; color: var(--text-main); }
-  span { font-size: 0.8rem; color: var(--text-placeholder); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+  span { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
 }
 
 @include bp.tablet {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .quick-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-card { flex-direction: column; text-align: center; }
   ::ng-deep .hero-card-wrap .app-card { padding: 22px; }
@@ -180,7 +189,7 @@
   ::ng-deep .hero-card-wrap .app-card { padding: 18px; }
   .hero-actions { width: 100%; flex-direction: column; }
   .hero-actions a { width: 100%; justify-content: center; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stats-grid { gap: 10px; > app-card { flex-basis: 100px; } }
   ::ng-deep .stats-grid .app-card { padding: 14px; }
   .quick-grid { grid-template-columns: 1fr; }
   .next-step-card { padding: 16px; }

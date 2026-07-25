@@ -20,9 +20,11 @@
           placeholder="Buscar por nombre, profesión, habilidad o palabra clave..."
           (keydown.enter)="doSearch()" />
       </div>
-      <button type="button" class="btn-search" (click)="doSearch()">
-        <mat-icon>search</mat-icon>Buscar
-      </button>
+      @if (!filtersOpen()) {
+        <button type="button" class="btn-search" (click)="doSearch()">
+          <mat-icon>search</mat-icon>Buscar
+        </button>
+      }
       <button type="button" class="btn-toggle-filters" (click)="toggleFilters()">
         <mat-icon>tune</mat-icon>Filtros
         @if (selectedSkills.length > 0) {
@@ -63,18 +65,8 @@
 
         <div class="filter-row">
           <div class="filter-group">
-            <label>Ciudad</label>
-            <div class="autocomplete-wrap">
-              <input type="text" class="filter-input" [formControl]="cityCtrl"
-                placeholder="Ej. Bogotá" (input)="cityInput = cityCtrl.value || ''" />
-              @if (filteredCitySuggestions.length > 0 && cityInput.trim()) {
-                <div class="suggestions-dropdown">
-                  @for (c of filteredCitySuggestions; track c) {
-                    <button type="button" class="suggestion-item" (click)="selectCity(c)">{{ c }}</button>
-                  }
-                </div>
-              }
-            </div>
+            <label>Municipio</label>
+            <app-municipio-input [value]="cityCtrl.value" (valueChange)="cityCtrl.setValue($event)" placeholder="Ej. Villavicencio, Meta" />
           </div>
 
           <div class="filter-group">
@@ -93,9 +85,14 @@
           </div>
         </div>
 
-        <button type="button" class="btn-clear" (click)="clearFilters()">
-          <mat-icon>clear_all</mat-icon>Limpiar filtros
-        </button>
+        <div class="filters-panel-actions">
+          <button type="button" class="btn-clear" (click)="clearFilters()">
+            <mat-icon>clear_all</mat-icon>Limpiar filtros
+          </button>
+          <button type="button" class="btn-search" (click)="doSearch()">
+            <mat-icon>search</mat-icon>Buscar
+          </button>
+        </div>
       </div>
     }
   </app-card>
@@ -202,7 +199,7 @@
 
   @if (totalPages > 1) {
     <div class="pagination">
-      <button class="page-btn" [disabled]="page <= 1" (click)="goToPage(page - 1)">
+      <button class="page-btn" aria-label="Página anterior" [disabled]="page <= 1" (click)="goToPage(page - 1)">
         <mat-icon>chevron_left</mat-icon>
       </button>
       @for (p of pagesArray; track p) {
@@ -212,7 +209,7 @@
           <button class="page-btn" [class.active]="p === page" (click)="goToPage(+p)">{{ p }}</button>
         }
       }
-      <button class="page-btn" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
+      <button class="page-btn" aria-label="Página siguiente" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>

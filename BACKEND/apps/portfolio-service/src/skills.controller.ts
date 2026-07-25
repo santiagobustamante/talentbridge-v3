@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser, Roles, RolesGuard } from '@app/auth';
 import { UserRole } from '@app/database';
 import { SkillsService } from './skills.service';
@@ -22,27 +22,27 @@ export class SkillsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async updateSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string, @Body() dto: SkillDto) {
-    return this.skillsService.updateSkill(user.sub, +id, dto);
+  async updateSkill(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() dto: SkillDto) {
+    return this.skillsService.updateSkill(user.sub, id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async removeSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.skillsService.removeSkill(user.sub, +id);
+  async removeSkill(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.skillsService.removeSkill(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Post(':id/endorse')
-  async endorseSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.skillsService.endorseSkill(user.sub, +id);
+  async endorseSkill(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.skillsService.endorseSkill(user.sub, id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.COMPANY)
   @Delete(':id/endorse')
-  async unendorseSkill(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.skillsService.unendorseSkill(user.sub, +id);
+  async unendorseSkill(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.skillsService.unendorseSkill(user.sub, id);
   }
 }

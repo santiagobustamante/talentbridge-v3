@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { CompanyProfileService } from './company-profile.service';
 import { CompanyProfileDto } from './dto/company-profile.dto';
@@ -20,7 +20,7 @@ export class CompanyProfileController {
   }
 
   @Get('public/:id')
-  async getPublicProfile(@Param('id') id: string) {
-    return this.companyProfileService.getPublicProfile(+id);
+  async getPublicProfile(@Param('id', ParseIntPipe) id: number) {
+    return this.companyProfileService.getPublicProfile(id);
   }
 }

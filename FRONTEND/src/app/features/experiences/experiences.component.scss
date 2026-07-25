@@ -104,6 +104,18 @@
 
 .full-width { width: 100%; }
 
+.municipio-field {
+  display: flex;
+  flex-direction: column;
+
+  &__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+}
+
 .span-full { @include forms.field-full; }
 
 .period-row { @include forms.period-row; }

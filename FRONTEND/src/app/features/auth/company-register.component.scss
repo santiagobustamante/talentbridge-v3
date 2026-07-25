@@ -81,6 +81,14 @@
   margin-bottom: var(--space-md);
 }
 
+.municipio-field__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
 .auth-progress {
   margin-bottom: var(--space-md);
   height: 4px;

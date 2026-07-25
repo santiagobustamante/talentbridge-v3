@@ -143,7 +143,7 @@
                 {{ unblockLoading ? 'Desbloqueando...' : 'Desbloquear' }}
               </button>
             } @else {
-              <button class="chat-header__block-btn" (click)="blockConversation()">
+              <button class="chat-header__block-btn" aria-label="Bloquear conversación" (click)="blockConversation()">
                 <mat-icon>block</mat-icon>
               </button>
             }

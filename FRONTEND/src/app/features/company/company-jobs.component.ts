@@ -16,9 +16,10 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
-import { formatNumberDisplay, parseNumericInput, titleCaseText, trimText } from '../../shared/utils/normalize';
+import { formatSalaryRange, parseNumericInput, titleCaseText, trimText } from '../../shared/utils/normalize';
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 
 /** Fila del formulario de habilidades requeridas: nombre, si exige un nivel minimo, y cual. */
 interface SkillRow {
@@ -75,7 +76,7 @@ function stringifySkillRows(rows: SkillRow[]): string {
   imports: [
     CommonModule, FormsModule, RouterModule,
     MatIconModule, MatProgressBarModule, MatSnackBarModule,
-    BadgeComponent, ButtonDirective, AppDatePipe, LevelMeterComponent,
+    BadgeComponent, ButtonDirective, AppDatePipe, LevelMeterComponent, MunicipioInputComponent,
   ],
   styleUrl: './company-jobs.component.scss',
   templateUrl: './company-jobs.component.html',
@@ -135,6 +136,76 @@ export class CompanyJobsComponent implements OnInit {
     { value: 'Híbrido', label: 'Híbrido' },
     { value: 'Presencial', label: 'Presencial' },
   ];
+
+  // Filtro/orden/paginación de la tabla de ofertas — client-side: las ofertas
+  // de una sola empresa ya se traen todas de una (getCompanyJobs() no pagina),
+  // así que no hace falta ida y vuelta al backend por cada filtro.
+  searchText = '';
+  statusFilter: '' | 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'ARCHIVED' = '';
+  sortBy: 'recent' | 'oldest' | 'applicants' = 'recent';
+  page = 1;
+  readonly pageSize = 10;
+
+  statusFilterOptions: { value: '' | 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'ARCHIVED'; label: string }[] = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'DRAFT', label: 'Borrador' },
+    { value: 'PUBLISHED', label: 'Publicada' },
+    { value: 'CLOSED', label: 'Cerrada' },
+    { value: 'ARCHIVED', label: 'Archivada' },
+  ];
+
+  /** Ofertas que cumplen el texto buscado (por título) y el filtro de estado, ya ordenadas. */
+  get filteredJobs(): JobOffer[] {
+    const q = this.searchText.trim().toLowerCase();
+    const filtered = this.jobOffers.filter((j) => {
+      if (this.statusFilter && j.status !== this.statusFilter) return false;
+      if (q && !j.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    return [...filtered].sort((a, b) => {
+      if (this.sortBy === 'applicants') return (b._count?.applications ?? 0) - (a._count?.applications ?? 0);
+      const da = new Date(a.createdAt).getTime();
+      const db = new Date(b.createdAt).getTime();
+      return this.sortBy === 'oldest' ? da - db : db - da;
+    });
+  }
+
+  get totalFilteredPages(): number {
+    return Math.max(1, Math.ceil(this.filteredJobs.length / this.pageSize));
+  }
+
+  /**
+   * Página a mostrar, nunca mayor a la última disponible — si `page` quedó
+   * apuntando a una página que dejó de existir (ej. se archivó la última
+   * oferta de esa página), esto la recorta en vez de mostrar una tabla vacía
+   * sin explicación. Es un getter puro (no reescribe `page`) para no mutar
+   * estado desde un getter.
+   */
+  get currentJobsPage(): number {
+    return Math.min(this.page, this.totalFilteredPages);
+  }
+
+  /** Página actual ya recortada, lo que la tabla realmente pinta. */
+  get pagedJobs(): JobOffer[] {
+    const start = (this.currentJobsPage - 1) * this.pageSize;
+    return this.filteredJobs.slice(start, start + this.pageSize);
+  }
+
+  /** Cualquier cambio de filtro/orden vuelve a la página 1 — evita quedar "varado" en una página que ya no tiene resultados. */
+  onJobFilterChange(): void {
+    this.page = 1;
+  }
+
+  clearJobFilters(): void {
+    this.searchText = '';
+    this.statusFilter = '';
+    this.sortBy = 'recent';
+    this.page = 1;
+  }
+
+  goToJobsPage(p: number): void {
+    this.page = Math.min(Math.max(1, p), this.totalFilteredPages);
+  }
 
   ngOnInit(): void {
     this.loadJobs();
@@ -233,6 +304,15 @@ export class CompanyJobsComponent implements OnInit {
     const salaryMin = this.parseMoney(this.formData.salaryMin);
     const salaryMax = this.parseMoney(this.formData.salaryMax);
 
+    // `parseMoney` no descarta el signo "-" (lo necesita para números
+    // negativos válidos en otros contextos) — sin este chequeo, un salario
+    // negativo pasaba el parseo silenciosamente y el error recién aparecía
+    // como un 400 crudo del backend en vez de feedback inmediato acá.
+    if ((salaryMin != null && salaryMin < 0) || (salaryMax != null && salaryMax < 0)) {
+      this.snackBar.open('El salario no puede ser negativo', 'Cerrar', { duration: 4000 });
+      return;
+    }
+
     if (salaryMin != null && salaryMax != null && salaryMax < salaryMin) {
       this.snackBar.open('El salario máximo no puede ser menor que el salario mínimo', 'Cerrar', { duration: 4000 });
       return;
@@ -245,7 +325,7 @@ export class CompanyJobsComponent implements OnInit {
       description: trimText(this.formData.description),
       requirements: this.formData.requirements ? trimText(this.formData.requirements) : this.formData.requirements,
       responsibilities: this.formData.responsibilities ? trimText(this.formData.responsibilities) : this.formData.responsibilities,
-      city: this.formData.city ? titleCaseText(this.formData.city) : this.formData.city,
+      city: this.formData.city || undefined,
       salaryMin,
       salaryMax,
       skillsRequired: stringifySkillRows(this.skillRows),
@@ -463,12 +543,7 @@ export class CompanyJobsComponent implements OnInit {
 
   /** Rango salarial de la oferta en formato legible, o null si no se informo salario. */
   formatSalary(job: JobOffer): string | null {
-    if (!job.salaryMin && !job.salaryMax) return null;
-    const c = job.currency || 'COP';
-    const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
-    const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
-    if (min && max) return `${min} – ${max} ${c}`;
-    return `${min || max} ${c}`;
+    return formatSalaryRange(job.salaryMin, job.salaryMax, job.currency || 'COP');
   }
 
   /** Fecha de publicacion (o de creacion si aun no fue publicada) de la oferta, formateada para mostrar en pantalla. */

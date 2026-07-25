@@ -87,7 +87,11 @@ const professions = [
 const firstNames = ['Carlos', 'María', 'Juan', 'Ana', 'Luis', 'Diana', 'Pedro', 'Sofía', 'Jorge', 'Camila', 'Andrés', 'Laura', 'Diego', 'Valentina', 'Fernando', 'Natalia', 'Ricardo', 'Gabriela', 'Oscar', 'Paola', 'Miguel', 'Daniela', 'Alejandro', 'Carolina', 'Javier', 'Marcela', 'Cristian', 'Andrea', 'Manuel', 'Liliana'];
 const lastNames1 = ['Méndez', 'García', 'Rodríguez', 'López', 'Martínez', 'Hernández', 'González', 'Pérez', 'Sánchez', 'Ramírez', 'Torres', 'Flores', 'Rivera', 'Díaz', 'Ortiz', 'Morales', 'Ruiz', 'Jiménez', 'Castro', 'Rojas'];
 const lastNames2 = ['Vargas', 'Castillo', 'Gutiérrez', 'Romero', 'Medina', 'Herrera', 'Cruz', 'Suárez', 'Guerrero', 'Peña', 'Parra', 'Marín', 'Restrepo', 'Osorio', 'Rincón', 'Arias', 'Navarro', 'Salazar', 'Blanco', 'Cárdenas'];
-const cities = ['Villavicencio', 'Bogotá', 'Medellín', 'Cali', 'Bucaramanga', 'Barranquilla', 'Pereira', 'Cúcuta', 'Ibagué', 'Cartagena'];
+// Formato "Municipio, Departamento" — coincide con el label real del catálogo
+// DIVIPOLA (Municipality, ver docs/DECISIONS.md) contra el que ahora se valida
+// `city` en el backend. No son municipios elegidos al azar: son los mismos que
+// ya usaba este seed, solo con el departamento agregado.
+const cities = ['Villavicencio, Meta', 'Bogotá, D.C.', 'Medellín, Antioquia', 'Cali, Valle del Cauca', 'Bucaramanga, Santander', 'Barranquilla, Atlántico', 'Pereira, Risaralda', 'Cúcuta, Norte de Santander', 'Ibagué, Tolima', 'Cartagena de Indias, Bolívar'];
 
 const institutions = [
   'Universidad Nacional de Colombia', 'Universidad de los Andes',

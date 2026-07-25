@@ -46,6 +46,7 @@
     "clear:santiago-cvs": "ts-node prisma/clear-santiago-cvs.ts",
     "seed:more-companies": "ts-node prisma/seed-more-companies.ts",
     "seed:skills-catalog": "ts-node prisma/seed-skills-catalog.ts",
+    "seed:municipalities": "ts-node prisma/seed-municipalities.ts",
     "update:company-logos": "ts-node prisma/update-company-logos.ts",
     "generate:company-logos": "ts-node prisma/generate-company-logos.ts",
     "backfill:job-workload": "ts-node prisma/backfill-job-workload.ts",

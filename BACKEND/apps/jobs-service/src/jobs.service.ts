@@ -1,23 +1,46 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService, UserRole, NotificationType } from '@app/database';
+import { PrismaService, UserRole, NotificationType, JobOfferStatus } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
 import { titleCaseText, trimText } from '@app/common';
+import { CreateJobOfferDto, UpdateJobOfferDto } from './dto/create-job-offer.dto';
 
 /** Debajo de este % de coincidencia con los requisitos, no vale la pena alertar al candidato — sería ruido. */
 const JOB_MATCH_ALERT_THRESHOLD = 50;
 
-const PUBLISHED = 'PUBLISHED' as any;
-const DRAFT = 'DRAFT' as any;
-const CLOSED = 'CLOSED' as any;
-const ARCHIVED = 'ARCHIVED' as any;
+// Alias del enum real de Prisma (en vez de los `'PUBLISHED' as any` que había
+// antes) — mismos nombres para no tocar el resto del archivo, pero ahora
+// TypeScript sí valida que coincidan con los valores reales del enum.
+const { PUBLISHED, DRAFT, CLOSED, ARCHIVED } = JobOfferStatus;
+// string[] (no JobOfferStatus[]) porque se compara contra un query param
+// arbitrario (string) para decidir si es un status válido, no al revés.
+const ALL_STATUSES: string[] = [PUBLISHED, DRAFT, CLOSED, ARCHIVED];
+
+/** Valida que el salario máximo no sea menor al mínimo cuando se informan los dos — misma regla que ya aplica el formulario del frontend, repetida acá porque el backend no confía solo en esa validación de cliente. */
+function assertValidSalaryRange(salaryMin?: number, salaryMax?: number): void {
+  if (salaryMin != null && salaryMax != null && salaryMax < salaryMin) {
+    throw new BadRequestException('El salario máximo no puede ser menor que el salario mínimo');
+  }
+}
 
 @Injectable()
 export class JobsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** Trae una oferta y valida que pertenezca a la empresa autenticada — chequeo que se repetía al principio de casi todos los métodos de escritura de este service. */
+  private async getOwnedJobOrThrow(companyUserId: number, jobId: number) {
+    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
+    if (!job) throw new NotFoundException('Oferta no encontrada');
+    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    return job;
+  }
+
   async getCompanyJobs(companyUserId: number, status?: string) {
     const where: any = { companyId: companyUserId };
-    if (status) where.status = status;
+    // Un status inválido en el query param antes llegaba tal cual al `where`
+    // de Prisma y explotaba con un error crudo (el campo es un enum en la
+    // base) — se ignora en vez de filtrar, mismo criterio que ya usa
+    // `ApplicationsService.getMyApplications` para su propio filtro de status.
+    if (status && ALL_STATUSES.includes(status)) where.status = status;
 
     return this.prisma.jobOffer.findMany({
       where,
@@ -49,7 +72,8 @@ export class JobsService {
     return job;
   }
 
-  async createJob(companyUserId: number, dto: any) {
+  async createJob(companyUserId: number, dto: CreateJobOfferDto) {
+    assertValidSalaryRange(dto.salaryMin, dto.salaryMax);
     return this.prisma.jobOffer.create({
       data: {
         companyId: companyUserId,
@@ -57,7 +81,9 @@ export class JobsService {
         description: trimText(dto.description),
         requirements: dto.requirements ? trimText(dto.requirements) : dto.requirements,
         responsibilities: dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities,
-        city: dto.city ? titleCaseText(dto.city) : dto.city,
+        // Sin titleCaseText: viene del catálogo DIVIPOLA con su casing
+        // oficial (incluye conectores en minúscula, ej. "San José de la Montaña").
+        city: dto.city ? trimText(dto.city) : dto.city,
         modality: dto.modality,
         contractType: dto.contractType,
         customContractType: dto.customContractType,
@@ -74,17 +100,24 @@ export class JobsService {
     });
   }
 
-  async updateJob(companyUserId: number, jobId: number, dto: any) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+  async updateJob(companyUserId: number, jobId: number, dto: UpdateJobOfferDto) {
+    const job = await this.getOwnedJobOrThrow(companyUserId, jobId);
+
+    // Se valida el rango efectivo (lo que llega en el PATCH combinado con lo
+    // que ya tenía la oferta), no solo los campos presentes en este body —
+    // un PATCH que solo manda `salaryMax` igual debe chocar contra el
+    // `salaryMin` ya guardado si el resultado quedaría invertido.
+    assertValidSalaryRange(
+      dto.salaryMin !== undefined ? dto.salaryMin : (job.salaryMin ?? undefined),
+      dto.salaryMax !== undefined ? dto.salaryMax : (job.salaryMax ?? undefined),
+    );
 
     const updateData: any = {};
     if (dto.title !== undefined) updateData.title = titleCaseText(dto.title);
     if (dto.description !== undefined) updateData.description = trimText(dto.description);
     if (dto.requirements !== undefined) updateData.requirements = dto.requirements ? trimText(dto.requirements) : dto.requirements;
     if (dto.responsibilities !== undefined) updateData.responsibilities = dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities;
-    if (dto.city !== undefined) updateData.city = dto.city ? titleCaseText(dto.city) : dto.city;
+    if (dto.city !== undefined) updateData.city = dto.city ? trimText(dto.city) : dto.city;
     if (dto.modality !== undefined) updateData.modality = dto.modality;
     if (dto.contractType !== undefined) updateData.contractType = dto.contractType;
     if (dto.customContractType !== undefined) updateData.customContractType = dto.customContractType;
@@ -103,23 +136,28 @@ export class JobsService {
   }
 
   async deleteJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    await this.getOwnedJobOrThrow(companyUserId, jobId);
 
     await this.prisma.jobOffer.delete({ where: { id: jobId } });
     return { message: 'Oferta eliminada' };
   }
 
   async publishJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    const job = await this.getOwnedJobOrThrow(companyUserId, jobId);
     if (!job.title || !job.description) throw new BadRequestException('La oferta necesita título y descripción');
+    // Espeja las transiciones que expone la UI (company-jobs.component.html):
+    // el botón "Publicar"/"Republicar" solo aparece en DRAFT o CLOSED. Una
+    // oferta ARCHIVED tiene que pasar por "Restaurar" (→ DRAFT) primero.
+    if (job.status !== DRAFT && job.status !== CLOSED) {
+      throw new BadRequestException('Solo se puede publicar una oferta en borrador o cerrada');
+    }
 
     const published = await this.prisma.jobOffer.update({
       where: { id: jobId },
-      data: { status: PUBLISHED, publishedAt: new Date() },
+      // `closedAt: null` limpia la fecha de cierre de un ciclo anterior —
+      // sin esto, republicar una oferta CLOSED dejaba "closedAt" con la
+      // fecha del cierre viejo aunque la oferta ya estuviera activa de nuevo.
+      data: { status: PUBLISHED, publishedAt: new Date(), closedAt: null },
     });
 
     await this.notifyMatchingCandidates(published);
@@ -164,9 +202,10 @@ export class JobsService {
   }
 
   async closeJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    const job = await this.getOwnedJobOrThrow(companyUserId, jobId);
+    if (job.status !== PUBLISHED) {
+      throw new BadRequestException('Solo se puede cerrar una oferta publicada');
+    }
     return this.prisma.jobOffer.update({
       where: { id: jobId },
       data: { status: CLOSED, closedAt: new Date() },
@@ -174,16 +213,19 @@ export class JobsService {
   }
 
   async archiveJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    const job = await this.getOwnedJobOrThrow(companyUserId, jobId);
+    // La UI solo ofrece "Archivar" para ofertas en DRAFT (company-jobs.component.html) — una PUBLISHED debe cerrarse primero.
+    if (job.status !== DRAFT) {
+      throw new BadRequestException('Solo se puede archivar una oferta en borrador');
+    }
     return this.prisma.jobOffer.update({ where: { id: jobId }, data: { status: ARCHIVED } });
   }
 
   async restoreJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
-    if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
+    const job = await this.getOwnedJobOrThrow(companyUserId, jobId);
+    if (job.status !== ARCHIVED) {
+      throw new BadRequestException('Solo se puede restaurar una oferta archivada');
+    }
     return this.prisma.jobOffer.update({ where: { id: jobId }, data: { status: DRAFT } });
   }
 
@@ -193,8 +235,12 @@ export class JobsService {
       ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
       : [];
 
-    const page = query?.page ? +query.page : 1;
-    const limit = Math.min(query?.limit ? +query.limit : 20, 100);
+    // parseInt(...) || fallback en vez de `+query.page`: un query param no
+    // numérico (ej. "?page=abc") con `+` da NaN y rompía el `skip`/`take`
+    // de Prisma más abajo con un error crudo en vez de simplemente usar la
+    // página por defecto.
+    const page = Math.max(1, parseInt(query?.page, 10) || 1);
+    const limit = Math.min(Math.max(1, parseInt(query?.limit, 10) || 20), 100);
 
     const where: any = { status: PUBLISHED };
     if (query?.q) {
@@ -231,8 +277,8 @@ export class JobsService {
 
       return {
         ...job,
-        requiredSkillsList: match.breakdown.map((b) => b.name.toLowerCase()),
-        matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLowerCase()),
+        requiredSkillsList: match.breakdown.map((b) => b.name.toLocaleLowerCase('es-CO')),
+        matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLocaleLowerCase('es-CO')),
         canApplyBySkills: match.hasAnyMatch,
         skillMatch: match,
         hasApplied,
@@ -265,6 +311,18 @@ export class JobsService {
     });
     if (!job) throw new NotFoundException('Oferta no encontrada');
 
+    // Sin este chequeo, un candidato podía ver el detalle de cualquier
+    // oferta adivinando su id numérico en la URL, incluidas las que la
+    // empresa nunca publicó (DRAFT) o ya cerró/archivó — el listado
+    // (`getCandidateJobs`) ya filtra por PUBLISHED, pero este endpoint de
+    // detalle no lo hacía. Se deja pasar igual si el candidato ya se
+    // postuló (mientras estaba publicada), para no romper el detalle desde
+    // "mis postulaciones" aunque la oferta haya cambiado de estado después.
+    const hasApplied = job.applications.length > 0;
+    if (job.status !== PUBLISHED && !hasApplied) {
+      throw new NotFoundException('Oferta no encontrada');
+    }
+
     const profile = await this.prisma.profile.findUnique({ where: { userId: candidateUserId } });
     const candidateSkills = profile
       ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
@@ -274,8 +332,8 @@ export class JobsService {
 
     return {
       ...job,
-      requiredSkillsList: match.breakdown.map((b) => b.name.toLowerCase()),
-      matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLowerCase()),
+      requiredSkillsList: match.breakdown.map((b) => b.name.toLocaleLowerCase('es-CO')),
+      matchedSkills: match.breakdown.filter((b) => b.status !== 'missing').map((b) => b.name.toLocaleLowerCase('es-CO')),
       canApplyBySkills: match.hasAnyMatch,
       skillMatch: match,
       hasApplied: job.applications.length > 0,

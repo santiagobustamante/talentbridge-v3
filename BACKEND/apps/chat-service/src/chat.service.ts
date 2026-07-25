@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
-import { PrismaService } from '@app/database';
+import { PrismaService, Prisma } from '@app/database';
 import { ChatGateway } from './chat.gateway';
 
 /**
@@ -168,15 +168,16 @@ export class ChatService {
    * sus listas de conversaciones se actualicen en vivo.
    */
   async createOrGetConversation(candidateId: number, companyId: number) {
-    let conversation = await this.prisma.conversation.findUnique({
+    // `upsert` (no find-then-create) para que sea atómico: dos requests
+    // simultáneas creando la misma conversación (ej. la empresa contacta al
+    // candidato justo cuando el candidato también le escribe) no pueden
+    // pasar las dos el chequeo antes de que cualquiera confirme — la
+    // constraint única candidateId+companyId decide en una sola query.
+    const conversation = await this.prisma.conversation.upsert({
       where: { candidateId_companyId: { candidateId, companyId } },
+      update: {},
+      create: { candidateId, companyId, lastMessageAt: new Date() },
     });
-
-    if (!conversation) {
-      conversation = await this.prisma.conversation.create({
-        data: { candidateId, companyId, lastMessageAt: new Date() },
-      });
-    }
 
     await this.chatGateway.notifyConversationUpdated(candidateId);
     await this.chatGateway.notifyConversationUpdated(companyId);
@@ -334,9 +335,21 @@ export class ChatService {
     });
     if (existing) throw new ConflictException('Conversación ya bloqueada');
 
-    await this.prisma.chatBlock.create({
-      data: { conversationId, blockerId: userId, blockedId, reason },
-    });
+    // El chequeo de arriba es best-effort: dos requests simultáneas
+    // bloqueando la misma conversación pueden pasarlo las dos. La
+    // constraint única conversationId+blockerId+blockedId en la base es la
+    // que realmente lo impide; acá traducimos su violación (P2002) al
+    // mismo 409 amigable.
+    try {
+      await this.prisma.chatBlock.create({
+        data: { conversationId, blockerId: userId, blockedId, reason },
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ConflictException('Conversación ya bloqueada');
+      }
+      throw err;
+    }
 
     return { message: 'Conversación bloqueada' };
   }

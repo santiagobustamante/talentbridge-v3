@@ -11,3 +11,7 @@ export * from './normalize/nit.util';
 export * from './normalize/url.util';
 export * from './normalize/currency.util';
 export * from './normalize/skill-tag.util';
+export * from './validators/not-future-date.validator';
+export * from './validators/is-valid-municipio.validator';
+export * from './validators/date-range.validator';
+export * from './data/valid-municipios';

@@ -21,6 +21,8 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
 import { Education } from '../../core/auth/auth.models';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { titleCaseText, trimText } from '../../shared/utils/normalize';
+import { toLocalDateString } from '../../shared/utils/format-date.util';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 
 /**
  * Gestion de formacion academica del candidato (ruta "/app/education").
@@ -116,7 +118,7 @@ import { titleCaseText, trimText } from '../../shared/utils/normalize';
               </mat-form-field>
               <mat-form-field appearance="outline" *ngIf="!form.get('isCurrent')?.value">
                 <mat-label>Fecha Fin</mat-label>
-                <input matInput [matDatepicker]="ePicker" formControlName="endDate" />
+                <input matInput [matDatepicker]="ePicker" [max]="today" formControlName="endDate" />
                 <mat-datepicker-toggle matSuffix [for]="ePicker"/>
                 <mat-datepicker #ePicker/>
               </mat-form-field>
@@ -197,8 +199,9 @@ export class EducationComponent implements OnInit {
   showForm = false;
   showEducation = true;
   profileLoaded = false;
+  readonly today = new Date();
   form = this.fb.group({
-    institution: ['', Validators.required], degree: ['', Validators.required],
+    institution: ['', [Validators.required, notBlank]], degree: ['', [Validators.required, notBlank]],
     fieldOfStudy: [''], startDate: [null as Date | null, Validators.required],
     endDate: [null as Date | null], isCurrent: [false],
     educationType: [''], formationLevel: [''], description: [''],
@@ -213,7 +216,12 @@ export class EducationComponent implements OnInit {
     });
   }
   /** Trae la lista de formacion academica del candidato desde el backend. */
-  load() { this.service.getAll().subscribe({ next: (d) => (this.items = d) }); }
+  load() {
+    this.service.getAll().subscribe({
+      next: (d) => (this.items = d),
+      error: () => this.snackBar.open('No se pudo cargar tu formación académica — intenta recargar la página', 'Cerrar', { duration: 4000 }),
+    });
+  }
 
   /** Actualiza si la seccion de formacion se muestra en el portafolio publico; revierte el cambio si falla el guardado. */
   toggleVisibility(event: any) {
@@ -229,8 +237,8 @@ export class EducationComponent implements OnInit {
     const v = this.form.value;
     const data = {
       institution: titleCaseText(v.institution!), degree: titleCaseText(v.degree!), fieldOfStudy: v.fieldOfStudy ? titleCaseText(v.fieldOfStudy) : undefined,
-      startDate: v.startDate?.toISOString().split('T')[0] || '',
-      endDate: v.endDate?.toISOString().split('T')[0] || undefined,
+      startDate: v.startDate ? toLocalDateString(v.startDate) : '',
+      endDate: v.endDate ? toLocalDateString(v.endDate) : undefined,
       isCurrent: v.isCurrent || false,
       educationType: v.educationType || undefined,
       formationLevel: v.formationLevel || undefined,

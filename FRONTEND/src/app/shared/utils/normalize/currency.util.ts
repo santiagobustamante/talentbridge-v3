@@ -60,6 +60,26 @@ export function formatCurrencyDisplay(
   }).format(value);
 }
 
+/**
+ * Rango salarial legible para tarjetas/detalle de oferta ("$2.500.000 – $4.000.000 COP",
+ * "Desde $2.500.000 COP", "Hasta $4.000.000 COP"). Antes había 4 copias de esta misma
+ * lógica (candidate-jobs y company-jobs en el frontend) — dos de ellas mostraban el
+ * número solo cuando faltaba uno de los dos límites, sin "Desde"/"Hasta", dejando
+ * ambiguo si esa cifra era un piso o un techo. `null` si no hay ningún salario informado.
+ */
+export function formatSalaryRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  currency = 'COP',
+): string | null {
+  if (min == null && max == null) return null;
+  const minStr = min != null ? '$' + formatNumberDisplay(min) : '';
+  const maxStr = max != null ? '$' + formatNumberDisplay(max) : '';
+  if (minStr && maxStr) return `${minStr} – ${maxStr} ${currency}`;
+  if (minStr) return `Desde ${minStr} ${currency}`;
+  return `Hasta ${maxStr} ${currency}`;
+}
+
 /** Porcentajes: se guardan como número (sin "%"), el símbolo solo se agrega al mostrar. */
 export function formatPercentDisplay(value: number | null | undefined, locale = 'es-CO'): string {
   if (value == null || !Number.isFinite(value)) return '';

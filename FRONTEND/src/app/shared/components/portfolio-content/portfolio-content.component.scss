@@ -233,37 +233,42 @@ $max-width: 920px;
     transform: translateY(-1px);
   }
 
+  // Misma escala teal (claro→oscuro = menos→más nivel) que ya usa
+  // `app-level-meter` — antes esta insignia usaba colores de estado
+  // (success/warning) sin relación con el nivel real, y el resultado
+  // quedaba invertido: Básico se veía "success" (verde, como si fuera lo
+  // mejor) y Intermedio se veía "warning" (naranja, como si fuera peor).
   &.level-high {
-    border-color: var(--primary);
-    background: var(--primary-soft);
+    border-color: var(--level-expert);
+    background: color-mix(in srgb, var(--level-expert) 12%, transparent);
 
     &:hover {
       box-shadow: var(--shadow-sm);
     }
 
-    .skill-level { color: var(--primary); }
+    .skill-level { color: var(--level-expert); }
   }
 
   &.level-mid {
-    border-color: var(--border-soft);
-    background: var(--warning-soft);
+    border-color: var(--level-intermediate);
+    background: color-mix(in srgb, var(--level-intermediate) 12%, transparent);
 
     &:hover {
       box-shadow: var(--shadow-sm);
     }
 
-    .skill-level { color: var(--warning-strong); }
+    .skill-level { color: var(--level-intermediate); }
   }
 
   &.level-low {
-    border-color: var(--border-soft);
-    background: var(--success-soft);
+    border-color: var(--level-basic);
+    background: color-mix(in srgb, var(--level-basic) 12%, transparent);
 
     &:hover {
       box-shadow: var(--shadow-sm);
     }
 
-    .skill-level { color: var(--success); }
+    .skill-level { color: var(--level-basic); }
   }
 }
 

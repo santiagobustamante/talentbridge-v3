@@ -104,7 +104,7 @@
 /* Application items */
 .app-list { display: flex; flex-direction: column; gap: 10px; }
 .app-card {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   background: var(--bg-surface); border: 1px solid var(--border-soft); border-radius: 14px; padding: 16px 20px;
 }
 .app-card-avatar {
@@ -115,7 +115,7 @@
 .app-card-info {
   flex: 1; min-width: 0;
   strong { display: block; font-size: 0.9rem; color: var(--text-main); }
-  span { font-size: 0.78rem; color: var(--text-placeholder); display: block; margin-top: 2px; }
+  span { font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 2px; }
 }
 
 /* Search chips */
@@ -151,7 +151,7 @@
 .msg-info {
   flex: 1; min-width: 0;
   strong { display: block; font-size: 0.88rem; color: var(--text-main); }
-  span { font-size: 0.8rem; color: var(--text-placeholder); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
+  span { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px; }
 }
 
 @include bp.tablet {

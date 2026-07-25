@@ -91,6 +91,37 @@
   p { margin: 0 0 1.25rem; color: var(--text-secondary); font-size: 0.9rem; }
 }
 
+// Reusa .form-group/.form-row (definidos más abajo, ya con @include forms.control
+// para input/select) y appButton — sin CSS propia nueva para no seguir
+// engordando el archivo más pesado del proyecto (ver docs/NEXT_STEPS.md,
+// Fase 2.3 sobre bundle size).
+.jobs-filters-bar {
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .form-group { flex: 1; min-width: 160px; }
+}
+
+.jobs-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+
+  .page-info { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+}
+
+.page-btn {
+  width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid var(--border-soft);
+  background: var(--bg-surface); color: var(--text-main);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
 .jobs-table {
   background: var(--bg-surface);
   border: 1px solid var(--border-soft);

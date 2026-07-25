@@ -31,7 +31,43 @@
     </div>
   }
 
-  @if (jobOffers.length > 0) {
+  @if (!loading() && jobOffers.length > 0) {
+    <div class="jobs-filters-bar form-row animate-fade-in-up">
+      <div class="form-group">
+        <input type="text" [(ngModel)]="searchText" (ngModelChange)="onJobFilterChange()" placeholder="Buscar por título..." />
+      </div>
+      <div class="form-group">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onJobFilterChange()">
+          @for (opt of statusFilterOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onJobFilterChange()">
+          <option value="recent">Más recientes primero</option>
+          <option value="oldest">Más antiguas primero</option>
+          <option value="applicants">Más postulantes primero</option>
+        </select>
+      </div>
+      <button type="button" appButton="secondary" (click)="clearJobFilters()">
+        <mat-icon>clear_all</mat-icon>Limpiar filtros
+      </button>
+    </div>
+  }
+
+  @if (!loading() && jobOffers.length > 0 && filteredJobs.length === 0) {
+    <div class="empty-state animate-fade-in-scale">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <h3>Ninguna oferta coincide con estos filtros</h3>
+      <p>Probá con otro texto o quitá el filtro de estado</p>
+      <button type="button" appButton="secondary" (click)="clearJobFilters()">Limpiar filtros</button>
+    </div>
+  }
+
+  @if (!loading() && filteredJobs.length > 0) {
     <div class="jobs-table animate-fade-in-up">
       <div class="table-header">
         <span class="col-offer">Oferta</span>
@@ -44,7 +80,7 @@
         <span class="col-date">Publicación</span>
         <span class="col-actions">Acciones</span>
       </div>
-      @for (job of jobOffers; track job.id) {
+      @for (job of pagedJobs; track job.id) {
         <div class="table-row">
           <span class="col-offer">
             <span class="offer-title">{{ job.title }}</span>
@@ -105,6 +141,18 @@
         </div>
       }
     </div>
+
+    @if (totalFilteredPages > 1) {
+      <div class="jobs-pagination">
+        <button type="button" class="page-btn" aria-label="Página anterior" [disabled]="currentJobsPage <= 1" (click)="goToJobsPage(currentJobsPage - 1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="page-info">Página {{ currentJobsPage }} de {{ totalFilteredPages }}</span>
+        <button type="button" class="page-btn" aria-label="Página siguiente" [disabled]="currentJobsPage >= totalFilteredPages" (click)="goToJobsPage(currentJobsPage + 1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    }
   }
 </div>
 
@@ -126,8 +174,8 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Ciudad</label>
-            <input type="text" [(ngModel)]="formData.city" placeholder="Ej. Villavicencio" />
+            <label>Municipio</label>
+            <app-municipio-input [(value)]="formData.city" [allowRemote]="true" />
           </div>
           <div class="form-group">
             <label>Modalidad</label>

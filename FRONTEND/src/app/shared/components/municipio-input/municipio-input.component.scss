@@ -1,0 +1,84 @@
+@use 'forms';
+
+:host {
+  display: block;
+}
+
+.municipio-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pin-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-placeholder);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.municipio-input {
+  @include forms.control;
+  padding-left: 40px;
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+
+  &:last-child { border-bottom: none; }
+  &:hover, &--active { background: var(--bg-surface-hover); }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-placeholder);
+    flex-shrink: 0;
+  }
+
+  .suggestion-label {
+    font-size: 0.88rem;
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  .suggestion-dept {
+    margin-left: auto;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  &--remote {
+    mat-icon { color: var(--primary); }
+    .suggestion-label { color: var(--primary); }
+  }
+}

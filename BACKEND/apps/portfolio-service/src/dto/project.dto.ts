@@ -1,43 +1,55 @@
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsIn, MaxLength } from 'class-validator';
+import { IsNotFutureDateString, IsAfterOrEqualDateString } from '@app/common';
+
+const PROJECT_TYPES = ['INDIVIDUAL', 'TEAM'] as const;
+const PROJECT_STATUSES = ['PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const;
 
 export class ProjectDto {
   @IsString()
+  @MaxLength(150)
   name: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(3000)
   description?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(150)
   role?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(3000)
   responsibilities?: string;
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   technologies?: string[];
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   repositoryUrl?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   demoUrl?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   imageUrl?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(PROJECT_TYPES)
   projectType?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(PROJECT_STATUSES)
   status?: string;
 
   @IsOptional()
@@ -46,5 +58,7 @@ export class ProjectDto {
 
   @IsOptional()
   @IsString()
+  @IsNotFutureDateString()
+  @IsAfterOrEqualDateString('startDate')
   endDate?: string;
 }

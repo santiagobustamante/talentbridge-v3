@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { JobsService } from './jobs.service';
 
@@ -14,7 +14,7 @@ export class CandidateJobsController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async getJobById(@CurrentUser() user: { sub: number }, @Param('id') id: string) {
-    return this.jobsService.getJobById(user.sub, +id);
+  async getJobById(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
+    return this.jobsService.getJobById(user.sub, id);
   }
 }

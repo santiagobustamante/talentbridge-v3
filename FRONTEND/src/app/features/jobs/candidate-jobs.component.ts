@@ -13,7 +13,8 @@ import { statusToLabel } from '../../shared/components/badge/status-label.util';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
-import { formatNumberDisplay } from '../../shared/utils/normalize';
+import { formatSalaryRange } from '../../shared/utils/normalize';
+import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
 
 /**
  * Bolsa de empleo para candidatos (ruta "/app/jobs"). Tiene dos pestañas:
@@ -30,6 +31,7 @@ import { formatNumberDisplay } from '../../shared/utils/normalize';
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
     MatIconModule, MatProgressBarModule, MatSnackBarModule, BadgeComponent, ButtonDirective, AppDatePipe,
+    MunicipioInputComponent,
   ],
   styleUrl: './candidate-jobs.component.scss',
   templateUrl: './candidate-jobs.component.html',
@@ -68,6 +70,8 @@ export class CandidateJobsComponent implements OnInit {
   showApplyForm = false;
 
   hasSearched = false;
+  private jobsRequestId = 0;
+  private appsRequestId = 0;
 
   readonly modalities = ['Remoto', 'Presencial', 'Híbrido'];
   readonly contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro'];
@@ -97,6 +101,7 @@ export class CandidateJobsComponent implements OnInit {
     this.loading.set(true);
     this.hasSearched = true;
     this.jobOffers = [];
+    const requestId = ++this.jobsRequestId;
 
     const params: any = { page: this.page, limit: this.limit };
     const q = this.qCtrl.value?.trim();
@@ -111,6 +116,7 @@ export class CandidateJobsComponent implements OnInit {
 
     this.jobsService.searchJobs(params).subscribe({
       next: (res) => {
+        if (requestId !== this.jobsRequestId) return;
         const normalized = res.data.map((job) => ({
           ...job,
           requiredSkillsList: job.requiredSkillsList ?? [],
@@ -123,6 +129,7 @@ export class CandidateJobsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
+        if (requestId !== this.jobsRequestId) return;
         this.loading.set(false);
         const msg = err?.error?.message || 'Error al cargar ofertas';
         this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
@@ -133,6 +140,7 @@ export class CandidateJobsComponent implements OnInit {
   /** Trae el historial de postulaciones del candidato, con filtros opcionales por estado y rango de fechas. */
   loadMyApplications(): void {
     this.loadingApps.set(true);
+    const requestId = ++this.appsRequestId;
     const params: any = { page: this.appPage, limit: this.appLimit };
     if (this.appStatusFilter) params.status = this.appStatusFilter;
     if (this.appFromDate) params.fromDate = this.appFromDate;
@@ -140,12 +148,14 @@ export class CandidateJobsComponent implements OnInit {
 
     this.jobsService.getMyApplications(params).subscribe({
       next: (res) => {
+        if (requestId !== this.appsRequestId) return;
         this.applications = res.data;
         this.appTotal = res.meta.total;
         this.appTotalPages = res.meta.totalPages;
         this.loadingApps.set(false);
       },
       error: (err) => {
+        if (requestId !== this.appsRequestId) return;
         this.loadingApps.set(false);
         const msg = err?.error?.message || 'Error al cargar postulaciones';
         this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
@@ -235,7 +245,7 @@ export class CandidateJobsComponent implements OnInit {
     const job = app.jobOffer;
     this.selectedJob.set({
       ...job,
-      companyId: job.company ? 0 : 0,
+      companyId: job.company?.id ?? 0,
       description: (job as any).description || '',
       status: job.status as any,
       hasApplied: true,
@@ -363,15 +373,7 @@ export class CandidateJobsComponent implements OnInit {
 
   /** Rango salarial en formato compacto para la tarjeta de la lista de ofertas. */
   formatSalaryCompact(job: JobOffer): string | null {
-    if (job.salaryMin || job.salaryMax) {
-      const currency = job.currency || 'COP';
-      const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
-      const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
-      if (min && max) return `${min} – ${max} ${currency}`;
-      if (min) return `Desde ${min} ${currency}`;
-      return `Hasta ${max} ${currency}`;
-    }
-    return null;
+    return formatSalaryRange(job.salaryMin, job.salaryMax, job.currency || 'COP');
   }
 
   /** Traduce el estado de una postulacion a una etiqueta legible en español. */
@@ -386,13 +388,7 @@ export class CandidateJobsComponent implements OnInit {
 
   /** Rango salarial en formato detallado para el panel de detalle de la oferta. */
   formatSalary(job: JobOffer): string | null {
-    if (!job.salaryMin && !job.salaryMax) return null;
-    const currency = job.currency || 'COP';
-    const min = job.salaryMin ? formatNumberDisplay(job.salaryMin) : '';
-    const max = job.salaryMax ? formatNumberDisplay(job.salaryMax) : '';
-    if (min && max) return `$${min} - $${max} ${currency}`;
-    if (min) return `Desde $${min} ${currency}`;
-    return `Hasta $${max} ${currency}`;
+    return formatSalaryRange(job.salaryMin, job.salaryMax, job.currency || 'COP');
   }
 
   /** Genera la lista de numeros de pagina para el paginador de ofertas, comprimiendo con "..." cuando hay muchas paginas. */
@@ -494,11 +490,6 @@ export class CandidateJobsComponent implements OnInit {
   /** Rango salarial de la oferta postulada, en formato compacto. */
   appSalary(app: JobApplication): string | null {
     const job = app.jobOffer;
-    if (!job?.salaryMin && !job?.salaryMax) return null;
-    const c = job.currency || 'COP';
-    const min = job.salaryMin ? '$' + formatNumberDisplay(job.salaryMin) : '';
-    const max = job.salaryMax ? '$' + formatNumberDisplay(job.salaryMax) : '';
-    if (min && max) return `${min} – ${max} ${c}`;
-    return `${min || max} ${c}`;
+    return formatSalaryRange(job?.salaryMin, job?.salaryMax, job?.currency || 'COP');
   }
 }

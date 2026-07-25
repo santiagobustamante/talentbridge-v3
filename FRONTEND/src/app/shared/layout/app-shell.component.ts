@@ -52,6 +52,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
   currentRoute = signal('');
 
   private unreadSub: Subscription | null = null;
+  private routerSub: Subscription | null = null;
 
   readonly navItems: NavItem[] = [
     { label: 'Tu centro profesional', subtitle: 'Inicio', icon: 'home', route: '/app/inicio' },
@@ -68,7 +69,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
 
   constructor() {
     // Escucha la navegación para saber qué ítem del menú resaltar como activo (ver `isActive`).
-    this.router.events
+    this.routerSub = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((e) => this.currentRoute.set(e.urlAfterRedirects));
   }
@@ -81,9 +82,10 @@ export class AppShellComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Libera la suscripción al contador de no leídos al destruir el shell, para evitar fugas de memoria. */
+  /** Libera las suscripciones (contador de no leídos y navegación) al destruir el shell, para evitar fugas de memoria. */
   ngOnDestroy(): void {
     this.unreadSub?.unsubscribe();
+    this.routerSub?.unsubscribe();
   }
 
   /** True si la ruta actual pertenece a esa sección del menú (usa `startsWith` para incluir sub-rutas). */

@@ -44,7 +44,7 @@
           <div>
             <h2>{{ displayValue(summaryProfile.companyName, 'Nombre de empresa no agregado') }}</h2>
             <p>{{ displayValue(summaryProfile.sector, 'Sector no agregado') }}</p>
-            <span class="summary-location">{{ displayValue(summaryProfile.city, 'Ciudad no agregada') }}</span>
+            <span class="summary-location">{{ displayValue(summaryProfile.city, 'Municipio no agregado') }}</span>
           </div>
         </div>
       </app-card>
@@ -100,8 +100,8 @@
             <input class="app-input" formControlName="sector" (blur)="onNameLikeBlur('sector')" placeholder="Ej. Tecnología, Salud, Educación" />
           </div>
           <div class="form-field">
-            <label>Ciudad</label>
-            <input class="app-input" formControlName="city" autocomplete="address-level2" (blur)="onNameLikeBlur('city')" placeholder="Ej. Bogotá, Colombia" />
+            <label>Municipio</label>
+            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
           </div>
           <div class="form-field form-field--full">
             <label>Descripción</label>
@@ -141,7 +141,7 @@
       </app-card>
 
       <div class="form-actions">
-        <button type="button" appButton="danger" (click)="cancelEdit()">Cancelar</button>
+        <button type="button" appButton="secondary" (click)="cancelEdit()">Cancelar</button>
         <button type="submit" class="btn-save" [disabled]="saving">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}

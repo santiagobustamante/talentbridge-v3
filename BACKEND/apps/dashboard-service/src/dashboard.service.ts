@@ -1,9 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@app/database';
+import { PrismaService, JobOfferStatus } from '@app/database';
 
-const PUBLISHED = 'PUBLISHED' as any;
-const DRAFT = 'DRAFT' as any;
-const CLOSED = 'CLOSED' as any;
+const { PUBLISHED, DRAFT, CLOSED } = JobOfferStatus;
 
 @Injectable()
 export class DashboardService {
