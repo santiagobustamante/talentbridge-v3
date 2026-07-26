@@ -4,15 +4,17 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 /**
  * `ThrottlerGuard` estándar, pero identificando al cliente por la primera
  * IP de `X-Forwarded-For` en vez de confiar en `req.ip`/`trust proxy` de
- * Express. Todo el tráfico real llega acá vía el proxy del api-gateway
+ * Express. Todo el tráfico real llega vía el proxy del api-gateway
  * (`fetch()` servidor-a-servidor, que reenvía `X-Forwarded-For` con la IP
  * real del cliente — ver `http-client.service.ts`), y en el despliegue real
- * (Render) hay más de un proxy intermedio entre el navegador y este
+ * (Render) hay más de un proxy intermedio entre el navegador y cada
  * servicio, así que la interacción `trust proxy: N` + `req.ip` de Express
- * no daba un resultado confiable (verificado en vivo: pegándole directo al
- * servicio el límite frenaba bien al décimo intento, pero a través del
+ * no da un resultado confiable (verificado en vivo en `auth-service`:
+ * pegándole directo al servicio el límite frenaba bien, pero a través del
  * gateway nunca frenaba — cada request se contaba con una key distinta).
  * Leer el header a mano evita depender de esa cadena de confianza.
+ * Movido acá desde `auth-service` para que los otros 9 servicios lo usen
+ * también, en vez de duplicarlo.
  */
 @Injectable()
 export class IpThrottlerGuard extends ThrottlerGuard {

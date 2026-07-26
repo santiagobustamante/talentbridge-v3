@@ -1,5 +1,6 @@
 export { AllExceptionsFilter } from './http-exception.filter';
 export { CommonModule } from './common.module';
+export { IpThrottlerGuard } from './guards/ip-throttler.guard';
 export { ResponseHelper } from './response.helper';
 export { DeepSeekService } from './ai/deepseek.service';
 export type { DeepSeekChatMessage } from './ai/deepseek.service';
