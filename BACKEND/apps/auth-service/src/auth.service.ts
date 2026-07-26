@@ -34,7 +34,7 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
-    const user = await this.createCandidateWithUniqueSlug(email, passwordHash);
+    const user = await this.createCandidateWithUniqueSlug(email, passwordHash, dto.fullName);
 
     const token = this.generateToken(user.id, user.email, user.role);
     return { user: this.sanitizeUser(user), token };
@@ -50,7 +50,7 @@ export class AuthService {
    * dejar pasar el P2002 crudo. Si lo que chocó fue el email (misma
    * carrera pero en el `existing` check de arriba), se traduce al 409 de siempre.
    */
-  private async createCandidateWithUniqueSlug(email: string, passwordHash: string, attempt = 0): Promise<any> {
+  private async createCandidateWithUniqueSlug(email: string, passwordHash: string, fullName: string, attempt = 0): Promise<any> {
     try {
       return await this.prisma.user.create({
         data: {
@@ -59,6 +59,7 @@ export class AuthService {
           profile: {
             create: {
               slug: await this.generateUniqueSlug(email, attempt),
+              fullName: titleCaseText(fullName),
             },
           },
         },
@@ -69,7 +70,7 @@ export class AuthService {
         const target = err.meta?.target;
         const targetsEmail = Array.isArray(target) ? target.includes('email') : String(target ?? '').includes('email');
         if (targetsEmail) throw new ConflictException('Correo ya registrado');
-        if (attempt < 3) return this.createCandidateWithUniqueSlug(email, passwordHash, attempt + 1);
+        if (attempt < 3) return this.createCandidateWithUniqueSlug(email, passwordHash, fullName, attempt + 1);
       }
       throw err;
     }

@@ -76,9 +76,10 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Contraseña</mat-label>
-            <input matInput type="password" formControlName="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+            <input matInput type="password" formControlName="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letra y número" />
             <mat-error *ngIf="form.get('password')?.hasError('minlength')">Mínimo 8 caracteres</mat-error>
             <mat-error *ngIf="form.get('password')?.hasError('required')">Requerida</mat-error>
+            <mat-error *ngIf="form.get('password')?.hasError('pattern')">Debe incluir al menos una letra y un número</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -129,7 +130,7 @@ export class CompanyRegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       sector: [''],
       city: [''],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/(?=.*[A-Za-z])(?=.*\d)/)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: this.passwordMatch },

@@ -94,6 +94,9 @@
           <div class="form-field">
             <label>NIT</label>
             <input class="app-input" inputmode="numeric" formControlName="nit" (blur)="onNitBlur()" placeholder="Ej. 900.123.456-7" />
+            @if (form.get('nit')?.invalid && form.get('nit')?.touched) {
+              <span class="field-error">Debe tener 9-10 dígitos</span>
+            }
           </div>
           <div class="form-field">
             <label>Sector</label>
@@ -118,6 +121,9 @@
           <div class="form-field form-field--full">
             <label>Teléfono</label>
             <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" (blur)="onPhoneBlur()" placeholder="+57 300 000 0000" />
+            @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+              <span class="field-error">Debe tener 10 dígitos (o con indicativo)</span>
+            }
           </div>
           <div class="form-field form-field--full">
             <label>Sitio web</label>

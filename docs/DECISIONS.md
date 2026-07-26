@@ -313,4 +313,33 @@ Registro de decisiones que no son obvias mirando el código, o que se descartaro
 **Motivo:** La integración de Supabase aplica migraciones en su propio formato (`supabase/migrations/*.sql`, vía Supabase CLI) al mergear a producción. Este repo no tiene ninguna carpeta `supabase/` — las migraciones son 100% Prisma (`BACKEND/prisma/migrations/`), aplicadas a mano contra el pooler de sesión (puerto 5432) exactamente como describe la sección 6 de `DEPLOYMENT.md`, por la limitación conocida del pooler de transacciones con el advisory lock de `prisma migrate deploy`. Conectar la integración no tendría ningún efecto (no hay migraciones en el formato que busca) y además dejaría el dashboard de Supabase sugiriendo un flujo de auto-deploy que no existe en la práctica — más confuso que no tenerla conectada.
 **Impacto:** Los 10 servicios de Railway y el proyecto de Vercel ahora reconstruyen y redespliegan automáticamente en cada `git push` a `master` que toque sus archivos. `DEPLOYMENT.md` sección 5 actualizada para reflejar esto (el método CLI queda documentado como alternativa manual, no como el único camino). Supabase sigue exactamente como estaba — sin integración de GitHub, migraciones manuales.
 **Riesgos:** Un push a `master` con un bug ahora dispara un rebuild+redeploy real en los 10 servicios de Railway y en Vercel sin ningún paso de confirmación intermedio (a diferencia del flujo CLI anterior, que era un comando explícito por servicio) — un `git push` descuidado tiene más alcance ahora que antes. Ninguno de los cambios sin commitear de esta sesión se pusheó como parte de esta tarea (`CLAUDE.md` prohíbe commit/push automático sin pedido explícito puntual), así que el primer auto-deploy real todavía no se ejecutó de punta a punta al momento de escribir esto.
+
+---
+
+## Rigor de validación de teléfono/NIT: solo longitud, sin dígito de verificación DIAN ni indicativo internacional completo
+
+**Fecha:** 2026-07-26
+**Contexto:** El barrido de validadores (`docs/plan-barrido-validaciones-y-datos-2026-07-26.md` ítems 0.1/0.2) encontró que `phone`/`nit` no tenían ningún chequeo de formato. El usuario autorizó ejecutar el barrido completo tomando las decisiones de diseño abiertas de forma autónoma, sin quedar disponible para consultarlas en el momento.
+**Opciones consideradas (teléfono):** (a) exigir exactamente 10 dígitos (solo números locales colombianos sin indicativo); (b) aceptar un rango de 10-12 dígitos (cubre local sin indicativo Y local con "57" antepuesto, que es lo que un usuario real puede llegar a escribir); (c) implementar detección real de indicativos internacionales arbitrarios (librería tipo `libphonenumber`).
+**Decisión tomada (teléfono):** (b).
+**Motivo:** (a) hubiera rechazado un caso legítimo común (usuario que escribe "+57 300 123 4567"); (c) es sobre-ingeniería para un campo de contacto de un portafolio profesional colombiano — no hace falta soportar el mundo entero. El rango 10-12 cubre los casos reales sin agregar una dependencia nueva.
+**Opciones consideradas (NIT):** (a) validar solo longitud (9-10 dígitos: cuerpo + dígito de verificación); (b) implementar el algoritmo real de cálculo del dígito de verificación (módulo 11 con tabla de pesos oficial de la DIAN) y rechazar NITs con el dígito incorrecto.
+**Decisión tomada (NIT):** (a).
+**Motivo:** (b) es la validación "correcta" en un sistema tributario real, pero acá el NIT es un dato de una empresa demo en un proyecto de seminario — el esfuerzo de implementar y probar el algoritmo completo no se justifica frente a lo que se gana (rechazar un NIT de longitud correcta pero dígito verificador inventado, que ya de por sí no es un caso que vaya a aparecer con datos de prueba tipo "5" o "123").
+**Impacto:** `IsValidPhone()`/`IsValidNit()` nuevos en `BACKEND/libs/common/src/validators/`, espejados en frontend. Rechazan los casos obvios (1-8 dígitos) que motivaron el hallazgo, sin bloquear ningún dato real ya guardado (verificado contra las cuentas demo).
+**Riesgos:** Un NIT con longitud correcta pero dígito de verificación matemáticamente inválido pasa la validación igual — aceptado a propósito, ver Motivo.
+**Cómo revertir:** Quitar `@IsValidPhone()`/`@IsValidNit()` de los DTOs y `validPhone`/`validNit` de los formularios — vuelve al estado sin validación de antes.
+
+---
+
+## Password: agregar requisito de complejidad mínima (letra + número) a los registros, no a login
+
+**Fecha:** 2026-07-26
+**Contexto:** Mismo barrido, ítem 0.5 — `RegisterDto`/`RegisterCompanyDto` solo exigían longitud mínima (8 caracteres), sin ningún otro requisito. El plan original marcaba esto explícitamente como "preguntar al usuario, no asumir" (podía ser una decisión consciente de baja fricción para una demo académica), pero el usuario autorizó decidir de forma autónoma sin estar disponible para consultar.
+**Opciones consideradas:** (a) dejarlo como estaba (solo longitud) y documentar como decisión aceptada; (b) agregar un requisito mínimo de complejidad (al menos 1 letra + 1 número); (c) exigir complejidad alta (mayúscula+minúscula+número+símbolo).
+**Decisión tomada:** (b).
+**Motivo:** (a) dejaba pasar contraseñas como "11111111" o "aaaaaaaa", que no cuesta nada evitar y sí mejora la calidad de los datos de la demo sin fricción real de UX. (c) es fricción innecesaria para un proyecto de seminario sin usuarios reales en riesgo — el objetivo es evitar lo obviamente débil, no cumplir un estándar corporativo. Se aplicó solo a `RegisterDto`/`RegisterCompanyDto`, nunca a `LoginDto`, siguiendo el mismo criterio que ya usaba el comentario existente sobre el `@MaxLength` de login (no romper el acceso a cuentas ya creadas con una regla nueva).
+**Impacto:** `@Matches(/(?=.*[A-Za-z])(?=.*\d)/)` en el `password` de ambos DTOs de registro + `Validators.pattern` espejado en `register.component.ts`/`company-register.component.ts`. Las 3 contraseñas demo documentadas en `CLAUDE.md` (`Santiago.123`, `Candidato.123`, `Empresa.123`) ya cumplen la regla — ningún login existente se ve afectado.
+**Riesgos:** Ninguno real — la regla es intencionalmente laxa (cualquier letra + cualquier número, sin exigir posición ni tipo de carácter especial).
+**Cómo revertir:** Quitar el `@Matches()` del DTO y el `Validators.pattern` del formulario — vuelve a exigir solo longitud.
 **Cómo revertir:** Railway: Settings → Source → Disconnect en cada servicio (vuelve a requerir `railway up` manual). Vercel: Settings → Git → Disconnect. Ninguno de los dos borra `Root Directory`/`Dockerfile Path` al desconectar.

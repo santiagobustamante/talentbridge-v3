@@ -19,6 +19,8 @@ import {
   normalizeUrl,
 } from '../../shared/utils/normalize';
 import { validUrl } from '../../shared/utils/validators/valid-url.validator';
+import { validPhone } from '../../shared/utils/validators/valid-phone.validator';
+import { validNit } from '../../shared/utils/validators/valid-nit.validator';
 
 /**
  * Pantalla de edicion del perfil de empresa (ruta "/company/profile").
@@ -48,10 +50,10 @@ export class CompanyProfileComponent implements OnInit {
 
   form = this.fb.group({
     companyName: [''],
-    nit: [''],
+    nit: ['', [validNit]],
     sector: [''],
     city: [''],
-    phone: [''],
+    phone: ['', [validPhone]],
     websiteUrl: ['', [validUrl]],
     description: [''],
     logoUrl: ['', [validUrl]],

@@ -1,7 +1,23 @@
-import { IsEmail, IsString, IsOptional, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsEmail, IsString, IsOptional, IsNotEmpty, MinLength, MaxLength, Matches } from 'class-validator';
 import { IsValidMunicipio } from '@app/common';
 
+/** Al menos una letra y un número — decisión del barrido 2026-07-26 (antes solo se
+ *  exigía longitud mínima). Ver docs/plan-barrido-validaciones-y-datos-2026-07-26.md
+ *  ítem 0.5 y docs/DECISIONS.md. No se aplica a `LoginDto`: no hay que romper el
+ *  login de cuentas ya creadas con una contraseña que no cumpla esta regla nueva. */
+const PASSWORD_COMPLEXITY = /(?=.*[A-Za-z])(?=.*\d)/;
+const PASSWORD_COMPLEXITY_MESSAGE = 'La contraseña debe incluir al menos una letra y un número';
+
 export class RegisterDto {
+  // Sin esto el perfil se crea sin `fullName`, y el saludo del shell
+  // ("Hola, {nombre}") cae a mostrar el correo hasta que el candidato
+  // entre a editar su perfil manualmente — pedirlo en el registro evita
+  // ese estado intermedio.
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre es requerido' })
+  @MaxLength(150)
+  fullName: string;
+
   @IsEmail({}, { message: 'Correo electrónico no válido' })
   @MaxLength(255)
   email: string;
@@ -9,6 +25,7 @@ export class RegisterDto {
   @IsString()
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   @MaxLength(72)
+  @Matches(PASSWORD_COMPLEXITY, { message: PASSWORD_COMPLEXITY_MESSAGE })
   password: string;
 
   @IsString()
@@ -25,6 +42,7 @@ export class RegisterCompanyDto {
   @IsString()
   @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   @MaxLength(72)
+  @Matches(PASSWORD_COMPLEXITY, { message: PASSWORD_COMPLEXITY_MESSAGE })
   password: string;
 
   @IsString()

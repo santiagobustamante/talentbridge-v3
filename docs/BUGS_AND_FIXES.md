@@ -277,3 +277,27 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** Rúbrica explícita de 5 criterios con puntaje fijo cada uno (contacto/estructura 15, experiencia 30, habilidades 25, formación 15, proyectos 15 — suman 100), instruyendo al modelo a sumarlos en vez de dar una impresión general. `temperature: 0` en esa llamada puntual (Joaquín y otros usos conversacionales de `chatJson` quedan con su 0.4 de siempre — acá es una tarea de evaluación, no una conversación).
 **Prueba realizada:** `npm run build:portfolio` limpio.
 **Estado:** Corregido — reduce la varianza esperada entre corridas; con LLMs no hay garantía de determinismo absoluto incluso a `temperature: 0`, pero el margen debería quedar muy por debajo del observado (25 puntos).
+
+---
+
+### BUG-024 — Teléfono, NIT, rango de salario y moneda de ofertas sin ninguna validación de formato real
+
+**Módulo:** Backend — `candidate-service`, `company-service`, `jobs-service`, `libs/common` · Frontend — `profile`, `company-profile`
+**Descripción:** Encontrado durante el barrido de validadores del 2026-07-26 (disparado por el bug de `isValidUrl`, ver entrada de `CHANGELOG.md` del mismo día). `phone`/`nit` solo tenían `@MaxLength(30)` — un teléfono de "1" dígito o un NIT de "5" se guardaban igual que uno real. `salaryMax`/`salaryMin` en ofertas de trabajo no tenían ningún chequeo cruzado (a diferencia de las fechas, que sí lo tenían) — se podía guardar un rango invertido. `currency` aceptaba cualquier string de hasta 10 caracteres en vez de restringirse a las monedas reales que la app soporta.
+**Causa:** Estos campos nunca tuvieron un validador de formato desde que se crearon los DTOs — solo `@IsString()`/`@MaxLength()` genéricos, sin que nadie los cuestionara hasta que el barrido de `isValidUrl` motivó revisar el resto de validadores del proyecto en busca del mismo patrón.
+**Archivos afectados:** `BACKEND/libs/common/src/validators/is-valid-phone.validator.ts` (nuevo), `is-valid-nit.validator.ts` (nuevo), `number-range.validator.ts` (nuevo), `profile.dto.ts`, `company-profile.dto.ts`, `create-job-offer.dto.ts`, `FRONTEND/src/app/shared/utils/validators/valid-phone.validator.ts` (nuevo), `valid-nit.validator.ts` (nuevo), `profile.component.ts/.html`, `company-profile.component.ts/.html`.
+**Solución:** `IsValidPhone()`/`validPhone` (10-12 dígitos), `IsValidNit()`/`validNit` (9-10 dígitos, sin dígito de verificación DIAN — ver `DECISIONS.md`), `IsGreaterOrEqual()` (mismo patrón que `IsAfterOrEqualDateString`) para `salaryMax`, `@IsIn(['COP'])` para `currency`. `company-jobs.component.ts` ya validaba el rango salarial del lado cliente — no hizo falta tocarlo.
+**Prueba realizada:** `npm run build` (backend completo) + `ng build`/`lint:css` limpios. Verificado en vivo contra backend local real: teléfono "123" inválido / "3001234567" válido; NIT "5" inválido / "900123456" válido, en los formularios reales de perfil de candidato y empresa.
+**Estado:** Corregido. Pendiente de alcance mayor (no un bug, una limitación conocida y documentada): no se implementó el algoritmo real de dígito de verificación DIAN para NIT, decisión consciente por el bajo valor frente al esfuerzo en un dato de empresa demo.
+
+---
+
+### BUG-025 — El registro de candidato no pedía nombre, así que el saludo mostraba el correo en vez del nombre real
+
+**Módulo:** Backend — `auth-service` · Frontend — `register.component.ts`
+**Descripción:** El usuario reportó: "al crear un perfil no me pide mi nombre, solo correo y contraseña pero al iniciar quiero que en el saludo de arriba... me dé el nombre real no el correo".
+**Causa:** `RegisterDto` solo tenía `email`/`password`/`confirmPassword` — `auth.service.ts` creaba el `Profile` del candidato nuevo con únicamente el `slug`, sin `fullName`. El saludo del shell (`app-shell.component.ts`) ya tenía el fallback correcto (`profile?.fullName || userEmail`), pero como `fullName` nunca se guardaba en el registro, ese fallback al correo era la única opción hasta que el candidato entrara a editar su perfil manualmente.
+**Archivos afectados:** `BACKEND/apps/auth-service/src/dto/auth.dto.ts`, `auth.service.ts`, `auth.service.spec.ts`, `FRONTEND/src/app/features/auth/register.component.ts`, `FRONTEND/src/app/core/auth/auth.service.ts`.
+**Solución:** `fullName` obligatorio (`@IsNotEmpty() @MaxLength(150)`) en `RegisterDto`; `register.component.ts` lo pide con el mismo patrón de validación que `companyName` en el registro de empresa (`Validators.required` + `notBlank`); `auth.service.ts` guarda `titleCaseText(fullName)` en el `Profile` creado.
+**Prueba realizada:** `npm run build:auth` + `npx jest auth-service` (9/9) limpios. Verificado en vivo end-to-end: registro nuevo con nombre → saludo "Hola, {nombre real}" inmediato, sin pasar por editar el perfil.
+**Estado:** Corregido.

@@ -65,9 +65,9 @@ export class AuthService {
   }
 
   /** Registra un nuevo candidato; el backend responde con la cookie de sesión ya seteada más el token en el body, que se guarda en localStorage como respaldo (ver comentario de la clase). */
-  register(email: string, password: string, confirmPassword: string): Observable<{ user: User; token: string }> {
+  register(fullName: string, email: string, password: string, confirmPassword: string): Observable<{ user: User; token: string }> {
     return this.http
-      .post<{ user: User; token: string }>(`${this.api}/auth/register`, { email, password, confirmPassword }, { withCredentials: true })
+      .post<{ user: User; token: string }>(`${this.api}/auth/register`, { fullName, email, password, confirmPassword }, { withCredentials: true })
       .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 

@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsInt, IsIn, Min, Max, MaxLength, ValidateBy, buildMessage, ValidationOptions } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
-import { IsValidMunicipio } from '@app/common';
+import { IsValidMunicipio, IsGreaterOrEqual } from '@app/common';
 
 const MODALITIES = ['Remoto', 'Híbrido', 'Presencial'] as const;
 const CONTRACT_TYPES = [
@@ -8,6 +8,9 @@ const CONTRACT_TYPES = [
   'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro',
 ] as const;
 const WORKLOADS = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'] as const;
+/** Única moneda que la app maneja hoy (ver `formatSalaryRange` en el frontend) — antes
+ *  `currency` solo tenía `@MaxLength(10)`, así que cualquier string corto pasaba. */
+const CURRENCIES = ['COP'] as const;
 
 /** El frontend siempre manda un string ya serializado ("Angular:ADVANCED,SQL"), pero el
  *  service también acepta un array de strings (una skill por elemento) por flexibilidad
@@ -85,11 +88,11 @@ export class CreateJobOfferDto {
   @IsInt()
   @Min(0)
   @Max(1_000_000_000)
+  @IsGreaterOrEqual('salaryMin')
   salaryMax?: number;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
+  @IsIn(CURRENCIES)
   currency?: string;
 
   @IsOptional()

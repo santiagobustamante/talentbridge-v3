@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsBoolean, MaxLength } from 'class-validator';
-import { IsValidMunicipio, IsValidUrl } from '@app/common';
+import { IsValidMunicipio, IsValidUrl, IsValidPhone } from '@app/common';
 
 export class ProfileDto {
   @IsOptional()
@@ -20,6 +20,7 @@ export class ProfileDto {
   @IsOptional()
   @IsString()
   @MaxLength(30)
+  @IsValidPhone()
   phone?: string;
 
   @IsOptional()

@@ -169,6 +169,9 @@
           <div class="form-field full-width">
             <label>Teléfono</label>
             <input class="app-input" type="tel" formControlName="phone" autocomplete="tel" (blur)="onPhoneBlur()" placeholder="+57 300 000 0000" />
+            @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+              <span class="field-error">Debe tener 10 dígitos (o con indicativo)</span>
+            }
             <div class="inline-visibility-control">
               <span>Mostrar teléfono en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showPhone')?.value" [attr.aria-pressed]="form.get('showPhone')?.value" (click)="toggleLocalVisibility('showPhone')">

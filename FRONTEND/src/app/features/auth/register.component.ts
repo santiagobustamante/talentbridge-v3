@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../core/auth/auth.service';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { normalizeEmail } from '../../shared/utils/normalize';
+import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 
 /**
  * Formulario de registro para candidatos (ruta "/register"). Crea una
@@ -49,6 +50,13 @@ import { normalizeEmail } from '../../shared/utils/normalize';
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
           <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre completo</mat-label>
+            <input matInput formControlName="fullName" autocomplete="name" placeholder="Ej. María García López" />
+            <mat-error *ngIf="form.get('fullName')?.hasError('required')">Requerido</mat-error>
+            <mat-error *ngIf="form.get('fullName')?.hasError('notBlank')">No puede ser solo espacios</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Correo electrónico</mat-label>
             <input matInput type="email" formControlName="email" autocomplete="email" placeholder="tu@correo.com" />
             <mat-error *ngIf="form.get('email')?.hasError('email')">Correo no válido</mat-error>
@@ -57,9 +65,10 @@ import { normalizeEmail } from '../../shared/utils/normalize';
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Contraseña</mat-label>
-            <input matInput type="password" formControlName="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+            <input matInput type="password" formControlName="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, con letra y número" />
             <mat-error *ngIf="form.get('password')?.hasError('minlength')">Mínimo 8 caracteres</mat-error>
             <mat-error *ngIf="form.get('password')?.hasError('required')">Requerida</mat-error>
+            <mat-error *ngIf="form.get('password')?.hasError('pattern')">Debe incluir al menos una letra y un número</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -106,8 +115,9 @@ export class RegisterComponent {
   loading = false;
   form = this.fb.group(
     {
+      fullName: ['', [Validators.required, notBlank]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/(?=.*[A-Za-z])(?=.*\d)/)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: this.passwordMatch },
@@ -124,8 +134,8 @@ export class RegisterComponent {
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;
-    const { email, password, confirmPassword } = this.form.value;
-    this.auth.register(normalizeEmail(email!), password!, confirmPassword!).subscribe({
+    const { fullName, email, password, confirmPassword } = this.form.value;
+    this.auth.register(fullName!, normalizeEmail(email!), password!, confirmPassword!).subscribe({
       next: () => this.router.navigate(['/app/inicio']),
       error: (err) => {
         this.loading = false;

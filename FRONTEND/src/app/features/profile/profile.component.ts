@@ -22,6 +22,7 @@ import {
   normalizeUrl,
 } from '../../shared/utils/normalize';
 import { validUrl } from '../../shared/utils/validators/valid-url.validator';
+import { validPhone } from '../../shared/utils/validators/valid-phone.validator';
 
 /** Campos del perfil que el candidato puede ocultar/mostrar de forma independiente en su portafolio público. */
 type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' | 'showWebsite';
@@ -65,7 +66,7 @@ export class ProfileComponent implements OnInit {
     fullName: [''],
     professionalTitle: [''],
     summary: [''],
-    phone: [''],
+    phone: ['', [validPhone]],
     city: [''],
     linkedinUrl: ['', [validUrl]],
     githubUrl: ['', [validUrl]],

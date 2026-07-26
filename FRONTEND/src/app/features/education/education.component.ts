@@ -273,6 +273,9 @@ export class EducationComponent implements OnInit {
       customFormationLevel: e.customFormationLevel || '',
       description: e.description || '',
     });
+    // Mismo patrón que Proyectos/Perfil/Empresa: si el registro ya tenía un
+    // dato inválido guardado, que se vea marcado de entrada.
+    this.form.markAllAsTouched();
   }
 
   /** Sale del modo edicion/creacion y limpia el formulario a su estado inicial. */

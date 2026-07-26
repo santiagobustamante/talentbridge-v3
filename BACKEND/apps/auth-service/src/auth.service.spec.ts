@@ -108,7 +108,7 @@ describe('AuthService', () => {
   describe('register', () => {
     it('rechaza si las contraseñas no coinciden, sin llegar a tocar la base', async () => {
       await expect(
-        service.register({ email: 'nuevo@demo.com', password: 'a', confirmPassword: 'b' }),
+        service.register({ fullName: 'Nuevo Usuario', email: 'nuevo@demo.com', password: 'a', confirmPassword: 'b' }),
       ).rejects.toBeInstanceOf(ConflictException);
 
       expect(prisma.user.findUnique).not.toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(baseUser);
 
       await expect(
-        service.register({ email: 'candidato@demo.com', password: 'a', confirmPassword: 'a' }),
+        service.register({ fullName: 'Nuevo Usuario', email: 'candidato@demo.com', password: 'a', confirmPassword: 'a' }),
       ).rejects.toBeInstanceOf(ConflictException);
     });
 
@@ -127,7 +127,7 @@ describe('AuthService', () => {
       prisma.profile.findUnique.mockResolvedValue(null);
       prisma.user.create.mockResolvedValue({ ...baseUser, email: 'nuevo@demo.com' });
 
-      await service.register({ email: 'NUEVO@DEMO.COM', password: 'a', confirmPassword: 'a' });
+      await service.register({ fullName: 'Nuevo Usuario', email: 'NUEVO@DEMO.COM', password: 'a', confirmPassword: 'a' });
 
       expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: 'nuevo@demo.com' } });
       expect(prisma.user.create.mock.calls[0][0].data.email).toBe('nuevo@demo.com');
@@ -140,7 +140,7 @@ describe('AuthService', () => {
         .mockResolvedValueOnce(null); // "nuevo-1" está libre
       prisma.user.create.mockResolvedValue({ ...baseUser, email: 'nuevo@demo.com' });
 
-      await service.register({ email: 'nuevo@demo.com', password: 'a', confirmPassword: 'a' });
+      await service.register({ fullName: 'Nuevo Usuario', email: 'nuevo@demo.com', password: 'a', confirmPassword: 'a' });
 
       const createCall = prisma.user.create.mock.calls[0][0];
       expect(createCall.data.profile.create.slug).toBe('nuevo-1');
