@@ -163,6 +163,12 @@
 }
 .full-width { @include forms.field-full; }
 
+.field-error {
+  font-size: 0.78rem;
+  color: var(--danger);
+  margin-top: -2px;
+}
+
 .app-input { @include forms.control; box-sizing: border-box; }
 .app-textarea { @include forms.textarea; box-sizing: border-box; }
 

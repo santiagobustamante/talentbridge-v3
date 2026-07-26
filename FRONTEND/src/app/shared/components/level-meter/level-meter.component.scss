@@ -37,14 +37,13 @@
 }
 
 /*
- * Un color por nivel (no solo la cantidad de segmentos rellenos), en ambos
- * modos — tarjeta de solo lectura y edición interactiva. Progresión dentro
- * de la familia teal de la marca, de más clara (Básico) a más profunda
- * (Experto); nunca rojo, reservado para alertas.
+ * Un color distinto por nivel (no solo la cantidad de segmentos rellenos), en
+ * ambos modos — tarjeta de solo lectura y edición interactiva. Nunca rojo,
+ * reservado para alertas.
  */
 .level-meter--basic .segment.filled { background: var(--level-basic); }
 .level-meter--intermediate .segment.filled { background: var(--level-intermediate); }
-.level-meter--advanced .segment.filled { background: var(--primary); }
+.level-meter--advanced .segment.filled { background: var(--level-advanced); }
 .level-meter--expert .segment.filled { background: var(--level-expert); }
 
 .level-meter__label {

@@ -189,6 +189,9 @@
           <div class="form-field full-width">
             <label>LinkedIn</label>
             <input class="app-input" type="url" formControlName="linkedinUrl" autocomplete="url" (blur)="onUrlBlur('linkedinUrl')" placeholder="https://linkedin.com/in/usuario" />
+            @if (form.get('linkedinUrl')?.invalid && form.get('linkedinUrl')?.touched) {
+              <span class="field-error">Debe ser una URL válida que empiece con http:// o https://</span>
+            }
             <div class="inline-visibility-control">
               <span>Mostrar LinkedIn en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showLinkedin')?.value" [attr.aria-pressed]="form.get('showLinkedin')?.value" (click)="toggleLocalVisibility('showLinkedin')">
@@ -199,6 +202,9 @@
           <div class="form-field full-width">
             <label>GitHub</label>
             <input class="app-input" type="url" formControlName="githubUrl" autocomplete="url" (blur)="onUrlBlur('githubUrl')" placeholder="https://github.com/usuario" />
+            @if (form.get('githubUrl')?.invalid && form.get('githubUrl')?.touched) {
+              <span class="field-error">Debe ser una URL válida que empiece con http:// o https://</span>
+            }
             <div class="inline-visibility-control">
               <span>Mostrar GitHub en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showGithub')?.value" [attr.aria-pressed]="form.get('showGithub')?.value" (click)="toggleLocalVisibility('showGithub')">
@@ -210,6 +216,9 @@
           <div class="form-field full-width">
             <label>Sitio web</label>
             <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" (blur)="onUrlBlur('websiteUrl')" placeholder="https://tusitio.com" />
+            @if (form.get('websiteUrl')?.invalid && form.get('websiteUrl')?.touched) {
+              <span class="field-error">Debe ser una URL válida que empiece con http:// o https://</span>
+            }
             <div class="inline-visibility-control">
               <span>Mostrar sitio web en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showWebsite')?.value" [attr.aria-pressed]="form.get('showWebsite')?.value" (click)="toggleLocalVisibility('showWebsite')">
@@ -257,7 +266,7 @@
 
       <div class="form-actions">
         <button type="button" appButton="secondary" (click)="cancelEdit()">Cancelar</button>
-        <button type="submit" appButton="primary" [disabled]="saving">
+        <button type="submit" appButton="primary" [disabled]="saving || form.invalid">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}
         </button>

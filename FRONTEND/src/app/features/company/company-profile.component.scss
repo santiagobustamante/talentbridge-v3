@@ -88,6 +88,12 @@
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 .form-field label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
 
+.field-error {
+  font-size: 0.78rem;
+  color: var(--danger);
+  margin-top: -2px;
+}
+
 // Identidad "empresa" (violeta) — el mixin trae el focus en --primary (teal de
 // candidato), se pisa acá a propósito para no mezclar las dos marcas.
 .app-input {

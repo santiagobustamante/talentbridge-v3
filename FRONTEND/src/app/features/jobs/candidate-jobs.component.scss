@@ -378,12 +378,15 @@
 }
 
 .match-skill-chip {
+  /* Habilidad que sí tiene: relleno sólido en el teal de marca (no el verde
+     semántico de la tarjeta) — para que resalte claramente sobre el resto de
+     chips "Te falta", que se quedan igual que antes. */
   padding: 1px 8px;
   border-radius: var(--radius-full);
-  background: var(--bg-surface);
-  color: var(--success-strong);
+  background: var(--primary-hover);
+  color: var(--text-on-color);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
 
   em {
     font-style: normal;
@@ -394,11 +397,13 @@
   &[data-status='insufficient'] {
     background: var(--warning-soft);
     color: var(--warning-strong);
+    font-weight: 600;
   }
 
   &[data-status='missing'] {
     background: var(--bg-surface-hover);
     color: var(--text-secondary);
+    font-weight: 600;
   }
 }
 

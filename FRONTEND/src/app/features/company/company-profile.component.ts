@@ -18,6 +18,7 @@ import {
   trimText,
   normalizeUrl,
 } from '../../shared/utils/normalize';
+import { validUrl } from '../../shared/utils/validators/valid-url.validator';
 
 /**
  * Pantalla de edicion del perfil de empresa (ruta "/company/profile").
@@ -51,9 +52,9 @@ export class CompanyProfileComponent implements OnInit {
     sector: [''],
     city: [''],
     phone: [''],
-    websiteUrl: [''],
+    websiteUrl: ['', [validUrl]],
     description: [''],
-    logoUrl: [''],
+    logoUrl: ['', [validUrl]],
   });
 
   /** Perfil a mostrar en la vista de resumen (modo lectura): el actual, o el ultimo guardado como respaldo. */
@@ -110,12 +111,30 @@ export class CompanyProfileComponent implements OnInit {
     }
   }
 
-  /** Normaliza la URL del sitio web de la empresa al salir del campo. */
+  /**
+   * Normaliza la URL del sitio web de la empresa al salir del campo. Si el
+   * texto tiene espacios internos (claramente no es un intento de URL), no
+   * lo toca — dejar que `normalizeUrl` los colapse "arreglaría" en silencio
+   * un texto inválido en algo que sí pasa el validador.
+   */
   onWebsiteBlur(): void {
     const control = this.form.get('websiteUrl');
     const value = control?.value || '';
-    if (!value.trim()) return;
-    const formatted = normalizeUrl(value);
+    const trimmed = value.trim();
+    if (!trimmed || /\s/.test(trimmed)) return;
+    const formatted = normalizeUrl(trimmed);
+    if (formatted !== value) {
+      control?.setValue(formatted);
+    }
+  }
+
+  /** Normaliza la URL del logo al salir del campo (mismo patrón que onWebsiteBlur, ver su comentario). */
+  onLogoUrlBlur(): void {
+    const control = this.form.get('logoUrl');
+    const value = control?.value || '';
+    const trimmed = value.trim();
+    if (!trimmed || /\s/.test(trimmed)) return;
+    const formatted = normalizeUrl(trimmed);
     if (formatted !== value) {
       control?.setValue(formatted);
     }

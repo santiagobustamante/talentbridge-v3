@@ -122,6 +122,9 @@
           <div class="form-field form-field--full">
             <label>Sitio web</label>
             <input class="app-input" type="url" formControlName="websiteUrl" autocomplete="url" (blur)="onWebsiteBlur()" placeholder="https://miempresa.com" />
+            @if (form.get('websiteUrl')?.invalid && form.get('websiteUrl')?.touched) {
+              <span class="field-error">Debe ser una URL válida que empiece con http:// o https://</span>
+            }
           </div>
         </div>
       </app-card>
@@ -134,14 +137,17 @@
         <div class="form-grid">
           <div class="form-field form-field--full">
             <label>URL del logo</label>
-            <input class="app-input" type="url" formControlName="logoUrl" autocomplete="url" placeholder="https://miempresa.com/logo.png" />
+            <input class="app-input" type="url" formControlName="logoUrl" autocomplete="url" (blur)="onLogoUrlBlur()" placeholder="https://miempresa.com/logo.png" />
+            @if (form.get('logoUrl')?.invalid && form.get('logoUrl')?.touched) {
+              <span class="field-error">Debe ser una URL válida que empiece con http:// o https://</span>
+            }
           </div>
         </div>
       </app-card>
 
       <div class="form-actions">
         <button type="button" appButton="secondary" (click)="cancelEdit()">Cancelar</button>
-        <button type="submit" class="btn-save" [disabled]="saving">
+        <button type="submit" class="btn-save" [disabled]="saving || form.invalid">
           <mat-icon>save</mat-icon>
           {{ saving ? 'Guardando...' : 'Guardar cambios' }}
         </button>

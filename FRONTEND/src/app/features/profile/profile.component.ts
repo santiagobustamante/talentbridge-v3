@@ -21,6 +21,7 @@ import {
   trimText,
   normalizeUrl,
 } from '../../shared/utils/normalize';
+import { validUrl } from '../../shared/utils/validators/valid-url.validator';
 
 /** Campos del perfil que el candidato puede ocultar/mostrar de forma independiente en su portafolio público. */
 type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' | 'showWebsite';
@@ -66,9 +67,9 @@ export class ProfileComponent implements OnInit {
     summary: [''],
     phone: [''],
     city: [''],
-    linkedinUrl: [''],
-    githubUrl: [''],
-    websiteUrl: [''],
+    linkedinUrl: ['', [validUrl]],
+    githubUrl: ['', [validUrl]],
+    websiteUrl: ['', [validUrl]],
     slug: [''],
     showPhone: [false],
     showCity: [true],
@@ -122,12 +123,20 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  /** Normaliza una URL (LinkedIn/GitHub/sitio web) al salir del campo, ej. agregando el esquema https:// si falta. */
+  /**
+   * Normaliza una URL (LinkedIn/GitHub/sitio web) al salir del campo, ej.
+   * agregando el esquema https:// si falta. Si el texto tiene espacios
+   * internos (claramente no es un intento de URL, ej. "no es una url"), no
+   * lo toca — `normalizeUrl` los colapsa para tolerar pegado descuidado, y
+   * eso "arreglaría" en silencio un texto inválido en algo que sí pasa el
+   * validador, escondiendo el error en vez de mostrarlo.
+   */
   onUrlBlur(controlName: 'linkedinUrl' | 'githubUrl' | 'websiteUrl'): void {
     const control = this.form.get(controlName);
     const value = control?.value || '';
-    if (!value.trim()) return;
-    const formatted = normalizeUrl(value);
+    const trimmed = value.trim();
+    if (!trimmed || /\s/.test(trimmed)) return;
+    const formatted = normalizeUrl(trimmed);
     if (formatted !== value) {
       control?.setValue(formatted);
     }
