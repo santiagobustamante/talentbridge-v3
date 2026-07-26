@@ -4,7 +4,7 @@ import { IsNotFutureDateString, IsAfterOrEqualDateString } from '@app/common';
 const EDUCATION_TYPES = ['FORMAL', 'NON_FORMAL'] as const;
 const FORMATION_LEVELS = [
   'Curso', 'Certificación', 'Diplomado', 'Seminario', 'Bootcamp',
-  'Bachillerato', 'Técnico', 'Tecnólogo', 'Universidad', 'Posgrado',
+  'Bachillerato', 'Técnico', 'Tecnólogo', 'Universidad', 'Posgrado', 'Otro',
 ] as const;
 
 export class EducationDto {
@@ -28,6 +28,11 @@ export class EducationDto {
   @IsOptional()
   @IsIn(FORMATION_LEVELS)
   formationLevel?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  customFormationLevel?: string;
 
   @IsOptional()
   @IsString()

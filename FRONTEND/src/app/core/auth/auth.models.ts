@@ -119,6 +119,7 @@ export interface Education {
   isCurrent: boolean;
   educationType?: string;
   formationLevel?: string;
+  customFormationLevel?: string;
   description?: string;
 }
 

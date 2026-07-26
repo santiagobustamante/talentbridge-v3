@@ -14,7 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOption } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ExperiencesService } from '../../core/services/experiences.service';
@@ -84,7 +84,7 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
                   <mat-label>Empresa <span class="req">*</span></mat-label>
                   <input matInput formControlName="company" placeholder="Ej. Google" />
                 </mat-form-field>
-                <div class="municipio-field">
+                <div class="municipio-field span-full">
                   <app-departamento-ciudad-input [value]="form.value.city ?? null" [allowRemote]="true" (valueChange)="form.patchValue({ city: $event })" />
                 </div>
                 <mat-form-field appearance="outline">
@@ -96,7 +96,7 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
                     <mat-option value="HYBRID">Híbrido</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <mat-form-field appearance="outline" class="span-full">
+                <mat-form-field appearance="outline">
                   <mat-label>Tipo de contrato</mat-label>
                   <mat-select formControlName="contractType">
                     <mat-option value="">—</mat-option>
@@ -154,8 +154,10 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
               <div class="section-label">Habilidades aprendidas</div>
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Buscar o agregar habilidad</mat-label>
-                <input matInput [formControl]="skillInputCtrl" [matAutocomplete]="skillAuto"
-                       placeholder="Ej. Angular, Liderazgo, Git..." />
+                <input matInput [formControl]="skillInputCtrl" [matAutocomplete]="skillAuto" #skillTrigger="matAutocompleteTrigger"
+                       placeholder="Ej. Angular, Liderazgo, Git... (Enter agrega una que no esté en la lista)"
+                       (keydown.enter)="onSkillInputEnter(skillTrigger.activeOption, $event)"
+                       (blur)="onSkillInputBlur(skillTrigger.activeOption)" />
                 <mat-autocomplete #skillAuto="matAutocomplete" (optionSelected)="addSkillChip($event.option.value)">
                   @for (opt of filteredSkillSuggestions; track opt.name) {
                     <mat-option [value]="opt.name">
@@ -309,6 +311,32 @@ export class ExperiencesComponent implements OnInit {
   /** Quita una habilidad aprendida de la lista de chips por posicion. */
   removeSkillChip(index: number) {
     this.selectedSkills.splice(index, 1);
+  }
+
+  /** Agrega texto libre (no catalogado) como chip de habilidad, con la primera letra en mayúscula aunque el usuario no la haya puesto. */
+  private addFreeTextSkill(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    this.addSkillChip(trimmed.charAt(0).toUpperCase() + trimmed.slice(1));
+  }
+
+  /**
+   * Agrega como chip libre lo que el usuario haya escrito al presionar Enter,
+   * para habilidades que no están en `SKILL_CATALOG` — mismo patrón que las
+   * tecnologías de Proyectos. Si hay una sugerencia resaltada (`activeOption`),
+   * no hace nada — deja que Material la seleccione por su cuenta vía
+   * `(optionSelected)`.
+   */
+  onSkillInputEnter(activeOption: MatOption | null, event: Event) {
+    if (activeOption) return;
+    event.preventDefault();
+    this.addFreeTextSkill(this.skillInputCtrl.value || '');
+  }
+
+  /** Red de seguridad para cuando el usuario escribe una habilidad libre y pasa al siguiente campo sin presionar Enter — mismo patrón que Proyectos. */
+  onSkillInputBlur(activeOption: MatOption | null) {
+    if (activeOption) return;
+    setTimeout(() => this.addFreeTextSkill(this.skillInputCtrl.value || ''), 150);
   }
 
   /** Guarda el formulario: crea una experiencia nueva o actualiza la que esta en edicion, segun `editing`. */

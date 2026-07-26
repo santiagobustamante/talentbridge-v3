@@ -184,6 +184,7 @@ model Education {
   fieldOfStudy   String?   @map("field_of_study")
   educationType  String    @default("FORMAL") @map("education_type")
   formationLevel String?   @map("formation_level")
+  customFormationLevel String? @map("custom_formation_level")
   description    String?
   startDate      DateTime  @map("start_date")
   endDate        DateTime? @map("end_date")

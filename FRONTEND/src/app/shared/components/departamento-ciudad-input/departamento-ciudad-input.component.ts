@@ -31,7 +31,7 @@ const REMOTE_SENTINEL = '__REMOTO__';
           [ngModel]="selectedDepartamentoCodigo"
           (ngModelChange)="onDepartamentoChange($event)"
         >
-          <option value="" disabled>Seleccioná un departamento</option>
+          <option value="" disabled>Selecciona un departamento</option>
           @if (allowRemote) {
             <option [value]="remoteSentinel">Remoto</option>
           }
@@ -50,7 +50,7 @@ const REMOTE_SENTINEL = '__REMOTO__';
             (ngModelChange)="onCiudadChange($event)"
             [disabled]="!selectedDepartamentoCodigo"
           >
-            <option value="" disabled>{{ selectedDepartamentoCodigo ? 'Seleccioná una ciudad' : 'Elegí primero el departamento' }}</option>
+            <option value="" disabled>{{ selectedDepartamentoCodigo ? 'Selecciona una ciudad' : 'Elige primero el departamento' }}</option>
             @for (m of ciudades; track m.label) {
               <option [value]="m.label">{{ m.nombre }}</option>
             }

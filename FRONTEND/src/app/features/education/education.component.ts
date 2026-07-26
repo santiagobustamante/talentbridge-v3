@@ -106,7 +106,12 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
                     <mat-option value="Universidad">Universidad</mat-option>
                     <mat-option value="Posgrado">Posgrado</mat-option>
                   </ng-container>
+                  <mat-option value="Otro">Otro</mat-option>
                 </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="span-full" *ngIf="form.get('formationLevel')?.value === 'Otro'">
+                <mat-label>Especifica el nivel de formación</mat-label>
+                <input matInput formControlName="customFormationLevel" placeholder="Ej. Especialización, Maestría, Doctorado" maxlength="100" />
               </mat-form-field>
             </div>
             <div class="period-row">
@@ -152,7 +157,7 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
             <div class="edu-body">
               <div class="edu-badges">
                 <span class="edu-type-badge" *ngIf="e.educationType">{{ e.educationType === 'FORMAL' ? 'Formal' : 'No formal' }}</span>
-                <span class="edu-level-badge" *ngIf="e.formationLevel">{{ e.formationLevel }}</span>
+                <span class="edu-level-badge" *ngIf="e.formationLevel">{{ formationLevelLabel(e) }}</span>
               </div>
               <h3 class="degree-title">{{ e.degree }}</h3>
               <p class="institution-name">{{ e.institution }}</p>
@@ -204,7 +209,7 @@ export class EducationComponent implements OnInit {
     institution: ['', [Validators.required, notBlank]], degree: ['', [Validators.required, notBlank]],
     fieldOfStudy: [''], startDate: [null as Date | null, Validators.required],
     endDate: [null as Date | null], isCurrent: [false],
-    educationType: [''], formationLevel: [''], description: [''],
+    educationType: [''], formationLevel: [''], customFormationLevel: [''], description: [''],
   });
 
   /** Carga las entradas de formacion existentes y el flag de visibilidad guardado en el perfil. */
@@ -242,6 +247,9 @@ export class EducationComponent implements OnInit {
       isCurrent: v.isCurrent || false,
       educationType: v.educationType || undefined,
       formationLevel: v.formationLevel || undefined,
+      customFormationLevel: v.formationLevel === 'Otro' && v.customFormationLevel?.trim()
+        ? v.customFormationLevel.trim().charAt(0).toUpperCase() + v.customFormationLevel.trim().slice(1)
+        : undefined,
       description: v.description ? trimText(v.description) : undefined,
     };
     const req = this.editing ? this.service.update(this.editing, data) : this.service.create(data);
@@ -262,12 +270,19 @@ export class EducationComponent implements OnInit {
       startDate: new Date(e.startDate), endDate: e.endDate ? new Date(e.endDate) : null,
       isCurrent: e.isCurrent,
       educationType: e.educationType || '', formationLevel: e.formationLevel || '',
+      customFormationLevel: e.customFormationLevel || '',
       description: e.description || '',
     });
   }
 
   /** Sale del modo edicion/creacion y limpia el formulario a su estado inicial. */
-  cancel() { this.editing = null; this.showForm = false; this.form.reset({ institution: '', degree: '', fieldOfStudy: '', startDate: null, endDate: null, isCurrent: false, educationType: '', formationLevel: '', description: '' }); }
+  cancel() { this.editing = null; this.showForm = false; this.form.reset({ institution: '', degree: '', fieldOfStudy: '', startDate: null, endDate: null, isCurrent: false, educationType: '', formationLevel: '', customFormationLevel: '', description: '' }); }
+
+  /** Etiqueta de nivel de formación a mostrar, usando el valor personalizado si aplica (mismo patrón que contractTypeLabel/workloadLabel en ofertas). */
+  formationLevelLabel(e: Education): string {
+    if (e.formationLevel === 'Otro' && e.customFormationLevel) return e.customFormationLevel;
+    return e.formationLevel || '';
+  }
 
   /** Pide confirmacion y, si se acepta, elimina la entrada de formacion del backend y recarga la lista. */
   remove(id: number) {
