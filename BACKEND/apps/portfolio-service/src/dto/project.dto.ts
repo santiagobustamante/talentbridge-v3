@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsArray, IsIn, MaxLength } from 'class-validator';
-import { IsNotFutureDateString, IsAfterOrEqualDateString } from '@app/common';
+import { IsNotFutureDateString, IsAfterOrEqualDateString, IsValidUrl } from '@app/common';
 
 const PROJECT_TYPES = ['INDIVIDUAL', 'TEAM'] as const;
 const PROJECT_STATUSES = ['PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const;
@@ -32,16 +32,19 @@ export class ProjectDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  @IsValidUrl()
   repositoryUrl?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  @IsValidUrl()
   demoUrl?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  @IsValidUrl()
   imageUrl?: string;
 
   @IsOptional()

@@ -11,7 +11,10 @@ export function normalizeUrl(raw: string): string {
 const URL_RE = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
 
 export function isValidUrl(raw: string): boolean {
-  const normalized = normalizeUrl(raw);
+  const trimmed = raw.trim();
+  if (!trimmed || /\s/.test(trimmed)) return false;
+  const normalized = normalizeUrl(trimmed);
   if (!normalized) return false;
+  if (normalized.startsWith('/')) return true;
   return URL_RE.test(normalized);
 }

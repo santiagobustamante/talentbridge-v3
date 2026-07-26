@@ -80,19 +80,31 @@
                 </div>
               }
 
-              <!-- Candidate results -->
+              <!-- Candidate / job match results -->
               @if (msg.results?.length) {
                 <div class="results-list">
-                  @for (r of msg.results; track r.slug) {
-                    <div class="result-mini" (click)="navigate('/portfolio/' + r.slug)">
-                      <span class="result-initial">{{ r.fullName?.charAt(0) }}</span>
-                      <div class="result-detail">
-                        <span class="result-fullname">{{ r.fullName }}</span>
-                        <span class="result-role">{{ r.professionalTitle }}</span>
-                        @if (r.city) { <span class="result-loc">{{ r.city }}</span> }
+                  @for (r of msg.results; track (r.slug || r.id)) {
+                    @if (r.type === 'job') {
+                      <div class="result-mini" (click)="navigate('/app/jobs')">
+                        <span class="result-initial">{{ r.title?.charAt(0) }}</span>
+                        <div class="result-detail">
+                          <span class="result-fullname">{{ r.title }}</span>
+                          <span class="result-role">{{ r.companyName }} · {{ r.matchPercent }}% match</span>
+                          @if (r.city) { <span class="result-loc">{{ r.city }}</span> }
+                        </div>
+                        <mat-icon class="result-arrow">chevron_right</mat-icon>
                       </div>
-                      <mat-icon class="result-arrow">chevron_right</mat-icon>
-                    </div>
+                    } @else {
+                      <div class="result-mini" (click)="navigate('/portfolio/' + r.slug)">
+                        <span class="result-initial">{{ r.fullName?.charAt(0) }}</span>
+                        <div class="result-detail">
+                          <span class="result-fullname">{{ r.fullName }}</span>
+                          <span class="result-role">{{ r.professionalTitle }}</span>
+                          @if (r.city) { <span class="result-loc">{{ r.city }}</span> }
+                        </div>
+                        <mat-icon class="result-arrow">chevron_right</mat-icon>
+                      </div>
+                    }
                   }
                 </div>
               }

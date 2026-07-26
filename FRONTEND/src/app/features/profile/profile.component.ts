@@ -13,7 +13,7 @@ import { Profile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { GithubWarningComponent } from '../../shared/components/github-warning/github-warning.component';
-import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { DepartamentoCiudadInputComponent } from '../../shared/components/departamento-ciudad-input/departamento-ciudad-input.component';
 import {
   normalizePhoneStorage,
   formatPhoneDisplay,
@@ -39,7 +39,7 @@ type VisibilityField = 'showPhone' | 'showCity' | 'showLinkedin' | 'showGithub' 
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule,
     MatIconModule, MatSlideToggleModule, MatSnackBarModule, MatTooltipModule,
-    ButtonDirective, CardComponent, GithubWarningComponent, MunicipioInputComponent,
+    ButtonDirective, CardComponent, GithubWarningComponent, DepartamentoCiudadInputComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',

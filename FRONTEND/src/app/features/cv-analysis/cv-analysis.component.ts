@@ -8,12 +8,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { forkJoin, of, catchError } from 'rxjs';
 import { CvService } from '../../core/services/cv.service';
 import { SkillsService } from '../../core/services/skills.service';
 import { CvDocument, CvAnalysis } from '../../core/auth/auth.models';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 
 /** Sugerencia de habilidad detectada dentro del texto del CV, con su estado de selección en el checklist. */
 interface CvSkillSuggestion {
@@ -115,10 +117,15 @@ interface CvSkillSuggestion {
                 <span class="doc-date">Subido {{ doc.uploadedAt | appDate:'datetime' }}</span>
               </div>
             </div>
-            <button class="analyze-btn" [class.loading]="analyzingId === doc.id" [disabled]="analyzingId === doc.id" (click)="analyze(doc.id); $event.stopPropagation()">
-              <mat-icon>psychology_alt</mat-icon>
-              {{ analyzingId === doc.id ? 'Analizando...' : 'Analizar' }}
-            </button>
+            <div class="doc-actions">
+              <button class="analyze-btn" [class.loading]="analyzingId === doc.id" [disabled]="analyzingId === doc.id" (click)="analyze(doc.id); $event.stopPropagation()">
+                <mat-icon>psychology_alt</mat-icon>
+                {{ analyzingId === doc.id ? 'Analizando...' : 'Analizar' }}
+              </button>
+              <button class="delete-btn" [disabled]="deletingId === doc.id" aria-label="Eliminar CV" (click)="remove(doc.id); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -212,12 +219,15 @@ export class CvAnalysisComponent {
   private cvService = inject(CvService);
   private skillsService = inject(SkillsService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   selectedFile: File | null = null;
   uploading = false;
   analyzingId: number | null = null;
+  deletingId: number | null = null;
   documents: CvDocument[] = [];
   currentAnalysis: CvAnalysis | null = null;
+  private currentAnalysisCvId: number | null = null;
 
   cvSuggestions: CvSkillSuggestion[] = [];
   addingSuggestions = false;
@@ -273,6 +283,7 @@ export class CvAnalysisComponent {
         if (this.analyzingId !== id) return;
         this.analyzingId = null;
         this.currentAnalysis = analysis;
+        this.currentAnalysisCvId = id;
         this.computeSuggestions(id);
         this.snackBar.open('Análisis completado', 'Cerrar', { duration: 3000 });
       },
@@ -280,6 +291,33 @@ export class CvAnalysisComponent {
         if (this.analyzingId === id) this.analyzingId = null;
         this.snackBar.open(err.error?.message || 'Error al analizar', 'Cerrar', { duration: 5000 });
       },
+    });
+  }
+
+  /** Pide confirmación y, si se acepta, elimina el CV del backend — si era el que estaba mostrando análisis, lo limpia también. */
+  remove(id: number) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: { title: 'Eliminar', message: '¿Eliminar este CV? También se borra su historial de análisis.' },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.deletingId = id;
+      this.cvService.delete(id).subscribe({
+        next: () => {
+          this.deletingId = null;
+          if (this.currentAnalysisCvId === id) {
+            this.currentAnalysis = null;
+            this.currentAnalysisCvId = null;
+            this.cvSuggestions = [];
+          }
+          this.loadDocuments();
+          this.snackBar.open('CV eliminado', 'Cerrar', { duration: 2500 });
+        },
+        error: (err) => {
+          this.deletingId = null;
+          this.snackBar.open(err.error?.message || 'Error al eliminar el CV', 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 

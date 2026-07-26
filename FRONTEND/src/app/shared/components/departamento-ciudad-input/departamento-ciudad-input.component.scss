@@ -1,0 +1,35 @@
+@use 'forms';
+
+:host {
+  display: block;
+}
+
+.depto-ciudad-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.depto-ciudad-field {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.depto-ciudad-field__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.depto-ciudad-select {
+  @include forms.control;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

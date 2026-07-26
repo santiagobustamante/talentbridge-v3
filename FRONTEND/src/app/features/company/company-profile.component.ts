@@ -8,7 +8,7 @@ import { CompanyService } from '../../core/services/company.service';
 import { CompanyProfile } from '../../core/auth/auth.models';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
 import { CardComponent } from '../../shared/components/card/card.component';
-import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { DepartamentoCiudadInputComponent } from '../../shared/components/departamento-ciudad-input/departamento-ciudad-input.component';
 import {
   normalizePhoneStorage,
   formatPhoneDisplay,
@@ -29,7 +29,7 @@ import {
 @Component({
   selector: 'app-company-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, CardComponent, MunicipioInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatIconModule, MatSnackBarModule, ButtonDirective, CardComponent, DepartamentoCiudadInputComponent],
   templateUrl: './company-profile.component.html',
   styleUrl: './company-profile.component.scss',
 })

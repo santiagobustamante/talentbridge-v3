@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 
 export interface Municipio {
   codigoDivipola: string;
@@ -9,6 +9,11 @@ export interface Municipio {
   departamento: string;
   /** "Nombre, Departamento" — es el valor exacto que se guarda en `city` en el backend. */
   label: string;
+}
+
+export interface Departamento {
+  codigo: string;
+  nombre: string;
 }
 
 export const REMOTE_LABEL = 'Remoto';
@@ -45,6 +50,37 @@ export class MunicipioCatalogService {
   /** Lista completa (para armar el listado de departamentos u otros usos puntuales). */
   getAll(): Observable<Municipio[]> {
     return this.load();
+  }
+
+  /** Los 33 departamentos (derivados del catálogo, sin duplicados), ordenados alfabéticamente. */
+  getDepartamentos(): Observable<Departamento[]> {
+    return this.load().pipe(
+      map((all) => {
+        const seen = new Map<string, string>();
+        for (const m of all) {
+          if (!seen.has(m.departamentoCodigo)) seen.set(m.departamentoCodigo, m.departamento);
+        }
+        return Array.from(seen, ([codigo, nombre]) => ({ codigo, nombre })).sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, 'es'),
+        );
+      }),
+    );
+  }
+
+  /** Municipios de un departamento puntual, ordenados alfabéticamente por nombre. */
+  getMunicipiosByDepartamento(departamentoCodigo: string): Observable<Municipio[]> {
+    return this.load().pipe(
+      map((all) =>
+        all
+          .filter((m) => m.departamentoCodigo === departamentoCodigo)
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')),
+      ),
+    );
+  }
+
+  /** Resuelve un `label` ("Nombre, Departamento") al municipio completo — para saber a qué departamento pertenece un value inicial. */
+  findByLabel(label: string): Observable<Municipio | undefined> {
+    return this.load().pipe(map((all) => all.find((m) => m.label === label)));
   }
 
   /**

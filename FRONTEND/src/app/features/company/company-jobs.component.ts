@@ -19,7 +19,7 @@ import { formatAppDate } from '../../shared/utils/format-date.util';
 import { formatSalaryRange, parseNumericInput, titleCaseText, trimText } from '../../shared/utils/normalize';
 import { LevelMeterComponent, SkillLevel } from '../../shared/components/level-meter/level-meter.component';
 import { SKILL_CATALOG } from '../../core/services/skill-catalog';
-import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { DepartamentoCiudadInputComponent } from '../../shared/components/departamento-ciudad-input/departamento-ciudad-input.component';
 
 /** Fila del formulario de habilidades requeridas: nombre, si exige un nivel minimo, y cual. */
 interface SkillRow {
@@ -76,7 +76,7 @@ function stringifySkillRows(rows: SkillRow[]): string {
   imports: [
     CommonModule, FormsModule, RouterModule,
     MatIconModule, MatProgressBarModule, MatSnackBarModule,
-    BadgeComponent, ButtonDirective, AppDatePipe, LevelMeterComponent, MunicipioInputComponent,
+    BadgeComponent, ButtonDirective, AppDatePipe, LevelMeterComponent, DepartamentoCiudadInputComponent,
   ],
   styleUrl: './company-jobs.component.scss',
   templateUrl: './company-jobs.component.html',

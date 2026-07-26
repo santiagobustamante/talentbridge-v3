@@ -31,15 +31,27 @@ interface AssistantLlmOutput {
   actions?: { label: string; route: string }[];
   showProfileCard?: boolean;
   showCandidateMatches?: boolean;
+  showJobMatches?: boolean;
 }
 
 /** Datos mínimos de un candidato para renderizar una tarjeta en el chat. */
 interface CandidateCardData {
+  type: 'candidate';
   fullName: string | null;
   professionalTitle: string | null;
   city: string | null;
   slug: string;
   skills?: string[];
+}
+
+/** Datos mínimos de una oferta para renderizar una tarjeta en el chat (equivalente a `CandidateCardData` pero del lado candidato→ofertas). */
+interface JobMatchCardData {
+  type: 'job';
+  id: number;
+  title: string;
+  companyName: string;
+  city: string | null;
+  matchPercent: number;
 }
 
 /**
@@ -129,9 +141,8 @@ export class AssistantService {
     // agregados y no podía responder preguntas concretas de matching ("¿qué
     // oferta me conviene más?", "¿qué candidato le sirve a esta vacante?").
     const companyMatches = isCandidate ? null : await this.getCompanyCandidateMatches(userId);
-    const matchContext = isCandidate
-      ? await this.getCandidateJobMatchesText(profile?.skills || [])
-      : companyMatches!.text;
+    const candidateMatches = isCandidate ? await this.getCandidateJobMatches(profile?.skills || []) : null;
+    const matchContext = isCandidate ? candidateMatches!.text : companyMatches!.text;
 
     const system = this.buildSystemPrompt(isCandidate, userName, stats, routes, matchContext);
 
@@ -157,6 +168,7 @@ export class AssistantService {
     if (isCandidate && llmOutput.showProfileCard && profile) {
       results = [
         {
+          type: 'candidate' as const,
           fullName: profile.fullName,
           professionalTitle: profile.professionalTitle,
           city: profile.city,
@@ -164,6 +176,8 @@ export class AssistantService {
           skills: profile.skills?.map((s) => s.name),
         },
       ];
+    } else if (isCandidate && llmOutput.showJobMatches && candidateMatches) {
+      results = candidateMatches.topJobs;
     } else if (!isCandidate && llmOutput.showCandidateMatches && companyMatches) {
       results = companyMatches.topCandidates;
     }
@@ -231,17 +245,23 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
   "reply": "tu respuesta en lenguaje natural",
   "actions": [{"label": "texto corto del botón", "route": "una de las rutas válidas de arriba"}],
   "showProfileCard": boolean,
-  "showCandidateMatches": boolean
+  "showCandidateMatches": boolean,
+  "showJobMatches": boolean
 }
 
-"actions" es opcional, máximo 2, solo si de verdad ayuda a la conversación (no lo agregues en cada respuesta). "showProfileCard" (solo para candidatos) solo debe ser true si tiene sentido mostrarle un resumen de su propio perfil. "showCandidateMatches" (solo para empresas) solo debe ser true si el usuario pregunta por candidatos compatibles/recomendados y tiene sentido mostrarle tarjetas de esos candidatos.`;
+"actions" es opcional, máximo 2, solo si de verdad ayuda a la conversación (no lo agregues en cada respuesta). "showProfileCard" (solo para candidatos) solo debe ser true si tiene sentido mostrarle un resumen de su propio perfil. "showCandidateMatches" (solo para empresas) solo debe ser true si el usuario pregunta por candidatos compatibles/recomendados y tiene sentido mostrarle tarjetas de esos candidatos. "showJobMatches" (solo para candidatos) debe ser true CADA VEZ que el usuario pregunte por ofertas/vacantes compatibles con su perfil, pida verlas, o pida más detalle sobre las que ya mencionaste — la lista de arriba ya trae las ofertas reales con mejor match: en vez de solo describirlas en el texto y mandarlo a revisar la app por su cuenta, activá esta bandera para que las vea como tarjetas directamente en el chat.`;
   }
 
-  /** Compatibilidad real candidato→ofertas, reusando la misma lógica de matching
-   *  que ya usa la pantalla de ofertas (`computeSkillMatch`) — nunca un número inventado. */
-  private async getCandidateJobMatchesText(
+  /**
+   * Compatibilidad real candidato→ofertas, reusando la misma lógica de matching
+   * que ya usa la pantalla de ofertas (`computeSkillMatch`) — nunca un número
+   * inventado. Devuelve tanto el texto para el prompt (`text`) como los datos
+   * estructurados (`topJobs`) que el frontend puede renderizar como tarjetas
+   * clicables cuando el modelo activa `showJobMatches`.
+   */
+  private async getCandidateJobMatches(
     candidateSkills: { normalizedName: string; level: string }[],
-  ): Promise<string> {
+  ): Promise<{ text: string; topJobs: JobMatchCardData[] }> {
     const jobs = await this.prisma.jobOffer.findMany({
       where: { status: 'PUBLISHED' },
       include: { company: { select: { companyProfile: { select: { companyName: true } } } } },
@@ -249,19 +269,32 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
       take: 40,
     });
 
-    if (jobs.length === 0) return 'No hay ofertas publicadas en este momento.';
+    if (jobs.length === 0) {
+      return { text: 'No hay ofertas publicadas en este momento.', topJobs: [] };
+    }
 
     const scored = jobs
       .map((job) => ({ job, match: computeSkillMatch(job.skillsRequired, candidateSkills) }))
       .sort((a, b) => b.match.matchPercent - a.match.matchPercent)
       .slice(0, 8);
 
-    return scored
+    const text = scored
       .map(
         ({ job, match }) =>
           `- "${job.title}" en ${job.company.companyProfile?.companyName || 'una empresa'} (${job.city || 'ciudad no especificada'}): ${match.matchPercent}% de match (${match.matchedCount}/${match.totalCount} habilidades requeridas que ya tiene)`,
       )
       .join('\n');
+
+    const topJobs: JobMatchCardData[] = scored.slice(0, 5).map(({ job, match }) => ({
+      type: 'job' as const,
+      id: job.id,
+      title: job.title,
+      companyName: job.company.companyProfile?.companyName || 'Empresa',
+      city: job.city,
+      matchPercent: match.matchPercent,
+    }));
+
+    return { text, topJobs };
   }
 
   /** Compatibilidad real empresa→candidatos por cada oferta activa propia. Solo
@@ -307,6 +340,7 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
           `  - ${profile.fullName || 'Candidato'} (${profile.city || 'ciudad no especificada'}): ${match.matchPercent}% de match`,
         );
         topCandidatesByKey.set(profile.slug, {
+          type: 'candidate' as const,
           fullName: profile.fullName,
           professionalTitle: profile.professionalTitle,
           city: profile.city,

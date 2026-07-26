@@ -47,4 +47,9 @@ export class CvService {
   getAnalyses(id: number): Observable<CvAnalysis[]> {
     return this.http.get<CvAnalysis[]>(`${this.api}/${id}/analyses`);
   }
+
+  /** Elimina un CV subido (y sus análisis asociados) del candidato autenticado. */
+  delete(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.api}/${id}`);
+  }
 }

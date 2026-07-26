@@ -25,6 +25,7 @@ import { SKILL_CATALOG, filterCatalog, SkillCatalogEntry } from '../../core/serv
 import { toLocalDateString } from '../../shared/utils/format-date.util';
 import { normalizeUrl } from '../../shared/utils/normalize/url.util';
 import { notBlank } from '../../shared/utils/validators/not-blank.validator';
+import { validUrl } from '../../shared/utils/validators/valid-url.validator';
 
 /**
  * Gestión de proyectos del portafolio del candidato (ruta "/app/projects").
@@ -113,7 +114,8 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
                 <mat-label>Buscar o agregar tecnolog&iacute;a</mat-label>
                 <input matInput [formControl]="techInputCtrl" [matAutocomplete]="techAuto" #techTrigger="matAutocompleteTrigger"
                        placeholder="Ej. Angular, TypeScript, Docker... (Enter agrega una que no esté en la lista)"
-                       (keydown.enter)="onTechInputEnter(techTrigger.activeOption, $event)" />
+                       (keydown.enter)="onTechInputEnter(techTrigger.activeOption, $event)"
+                       (blur)="onTechInputBlur(techTrigger.activeOption)" />
                 <mat-autocomplete #techAuto="matAutocomplete" (optionSelected)="addTechChip($event.option.value)">
                   @for (opt of filteredTechSuggestions; track opt.name) {
                     <mat-option [value]="opt.name">
@@ -136,15 +138,18 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
                 <mat-form-field appearance="outline">
                   <mat-label>URL del repositorio</mat-label>
                   <input matInput formControlName="repositoryUrl" placeholder="https://github.com/usuario/proyecto, https://gitlab.com/usuario/proyecto o enlace similar" />
+                  <mat-error *ngIf="form.get('repositoryUrl')?.hasError('validUrl')">Debe ser una URL válida (http:// o https://)</mat-error>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Demo URL</mat-label>
                   <input matInput formControlName="demoUrl" placeholder="https://demo.example.com" />
+                  <mat-error *ngIf="form.get('demoUrl')?.hasError('validUrl')">Debe ser una URL válida (http:// o https://)</mat-error>
                 </mat-form-field>
               </div>
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>URL de imagen</mat-label>
                 <input matInput formControlName="imageUrl" placeholder="https://example.com/image.png" />
+                <mat-error *ngIf="form.get('imageUrl')?.hasError('validUrl')">Debe ser una URL válida (http:// o https://)</mat-error>
               </mat-form-field>
             </div>
 
@@ -264,9 +269,9 @@ export class ProjectsComponent implements OnInit {
     description: [''],
     role: [''],
     responsibilities: [''],
-    repositoryUrl: [''],
-    demoUrl: [''],
-    imageUrl: [''],
+    repositoryUrl: ['', [validUrl]],
+    demoUrl: ['', [validUrl]],
+    imageUrl: ['', [validUrl]],
     projectType: [''],
     status: [''],
     startDate: [null as Date | null],
@@ -317,6 +322,13 @@ export class ProjectsComponent implements OnInit {
     this.techInputCtrl.setValue('');
   }
 
+  /** Agrega texto libre (no catalogado) como chip, con la primera letra en mayúscula aunque el usuario no la haya puesto — el resto del texto se deja tal cual se escribió. */
+  private addFreeTextTech(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    this.addTechChip(trimmed.charAt(0).toUpperCase() + trimmed.slice(1));
+  }
+
   /**
    * Agrega como chip libre lo que el usuario haya escrito al presionar Enter,
    * para tecnologías que no están en `SKILL_CATALOG`. Si hay una sugerencia
@@ -327,8 +339,22 @@ export class ProjectsComponent implements OnInit {
   onTechInputEnter(activeOption: MatOption | null, event: Event) {
     if (activeOption) return;
     event.preventDefault();
-    const value = (this.techInputCtrl.value || '').trim();
-    if (value) this.addTechChip(value);
+    this.addFreeTextTech(this.techInputCtrl.value || '');
+  }
+
+  /**
+   * Red de seguridad para cuando el usuario escribe una tecnología libre y
+   * pasa al siguiente campo sin presionar Enter — sin esto, el texto tipeado
+   * se perdía en silencio (no quedaba como chip ni se guardaba, aunque
+   * pareciera "escrito"). Mismo criterio que Enter: si hay una sugerencia
+   * resaltada, se deja que `(optionSelected)` la procese. El delay deja
+   * tiempo a que un click sobre una sugerencia del panel se procese antes de
+   * decidir si hay texto libre para agregar (mismo patrón que
+   * `MunicipioInputComponent.onBlur()`).
+   */
+  onTechInputBlur(activeOption: MatOption | null) {
+    if (activeOption) return;
+    setTimeout(() => this.addFreeTextTech(this.techInputCtrl.value || ''), 150);
   }
 
   /** Quita una tecnología del proyecto en edición por su posición en la lista de chips. */

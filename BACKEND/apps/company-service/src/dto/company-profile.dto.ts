@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsNotEmpty, MaxLength } from 'class-validator';
-import { IsValidMunicipio } from '@app/common';
+import { IsValidMunicipio, IsValidUrl } from '@app/common';
 
 export class CompanyProfileDto {
   // `@IsOptional()` porque este DTO también sirve para un PATCH parcial
@@ -36,6 +36,7 @@ export class CompanyProfileDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  @IsValidUrl()
   websiteUrl?: string;
 
   @IsOptional()
@@ -46,5 +47,6 @@ export class CompanyProfileDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  @IsValidUrl()
   logoUrl?: string;
 }

@@ -253,3 +253,27 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** `path.basename(file.originalname)` descarta cualquier componente de directorio del nombre (incluida una secuencia `../` armada a mano) antes de usarlo para construir la ruta — más una verificación explícita de que la ruta final resuelta siga dentro de `uploads/cv/` antes de escribir, como segunda capa. De paso, `cv.controller.ts` sumó un límite de tamaño a nivel de Multer (`limits: { fileSize }`) para que un archivo por encima del máximo se rechace antes de bufferearse entero en memoria, no después.
 **Prueba realizada:** `npm run build:portfolio` limpio. Revisado en conjunto con una auditoría de seguridad independiente (2 fuentes coincidieron en el mismo hallazgo).
 **Estado:** Corregido.
+
+---
+
+### BUG-022 — Joaquín anunciaba ofertas compatibles pero no podía mostrarlas: solo existía el mecanismo de tarjetas para candidatos, nunca para ofertas
+
+**Módulo:** Backend — `assistant-service` (`assistant.service.ts`) · Frontend — `assistant-chat.component.html`
+**Descripción:** El usuario reportó que Joaquín decía tener ofertas con buen match ("Ingeniero de Software Senior... 75% de compatibilidad") pero, al pedirle "muéstramelas", solo respondía derivando a "la sección de empleos de tu cuenta" sin mostrar nada concreto en el chat.
+**Causa:** `AssistantLlmOutput` tenía `showCandidateMatches` (para que una EMPRESA vea tarjetas de candidatos) pero ningún equivalente `showJobMatches` para que un CANDIDATO vea tarjetas de ofertas — el matching candidato→ofertas ya se calculaba con datos reales (`getCandidateJobMatchesText`), pero solo se pasaba como texto plano al prompt del modelo, nunca como datos estructurados (`results`) que el frontend pudiera renderizar. El modelo no tenía ninguna forma de "activar" algo que no existía.
+**Archivos afectados:** `BACKEND/apps/assistant-service/src/assistant.service.ts`, `FRONTEND/src/app/shared/assistant/assistant-chat.component.html`
+**Solución:** Nueva bandera `showJobMatches` (mismo patrón que `showCandidateMatches`), documentada en el system prompt. `getCandidateJobMatchesText` pasó a `getCandidateJobMatches`, devolviendo además `topJobs` (id/título/empresa/ciudad/% match reales, misma lógica `computeSkillMatch` de siempre — nunca un número inventado). El frontend distingue tarjetas de candidato vs. de oferta por un campo `type` nuevo en ambos shapes, reusando el mismo `.result-mini` ya estilado.
+**Prueba realizada:** `npm run build:assistant` limpio. Verificado en vivo contra DeepSeek real: pedirle a Joaquín "muéstrame las ofertas que mejor coinciden con mi perfil" devolvió `showJobMatches: true` y 5 tarjetas reales (`type: "job"`) ordenadas por `matchPercent` descendente, con el `reply` mencionándolas por nombre.
+**Estado:** Corregido.
+
+---
+
+### BUG-023 — Puntaje de análisis de CV muy inconsistente entre corridas (ej. 30 vs 55 sobre el mismo PDF)
+
+**Módulo:** Backend — `portfolio-service` (`cv.service.ts`)
+**Descripción:** Analizar el mismo CV varias veces daba puntajes con hasta 25 puntos de diferencia entre corridas.
+**Causa:** `performAnalysis` llamaba a DeepSeek pidiendo un "score de 0 a 100" como juicio holístico único, sin rúbrica, y sin pasar `temperature` (quedaba en el default de `chatJson`, 0.4) — exactamente el escenario donde un LLM varía más de una llamada a otra: sin criterios concretos que sumar, cada corrida "improvisa" el número desde cero.
+**Archivos afectados:** `BACKEND/apps/portfolio-service/src/cv.service.ts`
+**Solución:** Rúbrica explícita de 5 criterios con puntaje fijo cada uno (contacto/estructura 15, experiencia 30, habilidades 25, formación 15, proyectos 15 — suman 100), instruyendo al modelo a sumarlos en vez de dar una impresión general. `temperature: 0` en esa llamada puntual (Joaquín y otros usos conversacionales de `chatJson` quedan con su 0.4 de siempre — acá es una tarea de evaluación, no una conversación).
+**Prueba realizada:** `npm run build:portfolio` limpio.
+**Estado:** Corregido — reduce la varianza esperada entre corridas; con LLMs no hay garantía de determinismo absoluto incluso a `temperature: 0`, pero el margen debería quedar muy por debajo del observado (25 puntos).

@@ -26,7 +26,7 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { titleCaseText, trimText } from '../../shared/utils/normalize';
 import { toLocalDateString } from '../../shared/utils/format-date.util';
 import { notBlank } from '../../shared/utils/validators/not-blank.validator';
-import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { DepartamentoCiudadInputComponent } from '../../shared/components/departamento-ciudad-input/departamento-ciudad-input.component';
 
 /**
  * Gestion de experiencia laboral del candidato (ruta "/app/experience").
@@ -42,7 +42,7 @@ import { MunicipioInputComponent } from '../../shared/components/municipio-input
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule, MatChipsModule, MatAutocompleteModule,
     MatSnackBarModule, MatCheckboxModule, MatDatepickerModule, MatNativeDateModule,
-    MatSelectModule, MatSlideToggleModule, AppDatePipe, MunicipioInputComponent,
+    MatSelectModule, MatSlideToggleModule, AppDatePipe, DepartamentoCiudadInputComponent,
   ],
   styleUrl: './experiences.component.scss',
   template: `
@@ -85,8 +85,7 @@ import { MunicipioInputComponent } from '../../shared/components/municipio-input
                   <input matInput formControlName="company" placeholder="Ej. Google" />
                 </mat-form-field>
                 <div class="municipio-field">
-                  <label class="municipio-field__label">Municipio</label>
-                  <app-municipio-input [value]="form.value.city ?? null" [allowRemote]="true" (valueChange)="form.patchValue({ city: $event })" />
+                  <app-departamento-ciudad-input [value]="form.value.city ?? null" [allowRemote]="true" (valueChange)="form.patchValue({ city: $event })" />
                 </div>
                 <mat-form-field appearance="outline">
                   <mat-label>Modalidad de trabajo</mat-label>

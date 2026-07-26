@@ -148,8 +148,7 @@
             <textarea class="app-textarea" formControlName="summary" rows="4" (blur)="onSummaryBlur()" placeholder="Breve descripción de tu perfil profesional..."></textarea>
           </div>
           <div class="form-field full-width">
-            <label>Municipio</label>
-            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
+            <app-departamento-ciudad-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
             <div class="inline-visibility-control">
               <span>Mostrar municipio en perfil público</span>
               <button type="button" class="visibility-switch" [class.visibility-switch--active]="form.get('showCity')?.value" [attr.aria-pressed]="form.get('showCity')?.value" (click)="toggleLocalVisibility('showCity')">

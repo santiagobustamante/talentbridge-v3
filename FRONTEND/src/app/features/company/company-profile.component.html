@@ -100,8 +100,7 @@
             <input class="app-input" formControlName="sector" (blur)="onNameLikeBlur('sector')" placeholder="Ej. Tecnología, Salud, Educación" />
           </div>
           <div class="form-field">
-            <label>Municipio</label>
-            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
+            <app-departamento-ciudad-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
           </div>
           <div class="form-field form-field--full">
             <label>Descripción</label>

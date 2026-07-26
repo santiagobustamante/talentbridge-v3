@@ -155,11 +155,24 @@ export class CvService {
   private async performAnalysis(cvId: number, text: string) {
     const truncated = text.slice(0, MAX_CV_TEXT_CHARS);
 
+    // Rúbrica con puntos fijos por sección (en vez de pedir un "puntaje global"
+    // a criterio libre) + temperature muy baja abajo — sin esto, el mismo CV
+    // exacto podía dar puntajes muy distintos entre corridas (ej. 30 vs 55),
+    // porque un juicio holístico sin anclaje concreto es donde más varía un
+    // LLM de una llamada a otra.
     const system = `Eres un reclutador experto de tecnología que evalúa hojas de vida (CV) de candidatos en Colombia. Analiza el texto del CV que te pasa el usuario y da una evaluación honesta y específica — evita frases genéricas que aplicarían a cualquier CV. Basate solo en lo que el texto realmente dice, no inventes datos que no estén.
+
+Calculá "score" como la SUMA de estos 5 criterios (nunca una impresión general — sumá los puntos de cada uno):
+1. Información de contacto y estructura (nombre, datos de contacto, secciones claras y ordenadas): 0 a 15 puntos.
+2. Experiencia laboral (logros concretos y cuantificables, no solo una lista de tareas genéricas): 0 a 30 puntos.
+3. Habilidades técnicas relevantes y bien presentadas: 0 a 25 puntos.
+4. Formación académica y certificaciones: 0 a 15 puntos.
+5. Proyectos o portafolio demostrable: 0 a 15 puntos.
+Si una sección no aparece en el CV, esos puntos son 0 — no asumas nada que el texto no diga.
 
 Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después:
 {
-  "score": number entre 0 y 100 (qué tan completo y bien presentado está el CV para procesos de selección técnica),
+  "score": number entre 0 y 100 (la suma exacta de los 5 criterios de arriba),
   "strengths": array de 3 a 5 strings cortos, cada uno una fortaleza CONCRETA encontrada en este CV puntual,
   "recommendations": array de 3 a 5 strings cortos, cada uno una recomendación ACCIONABLE y específica para mejorar este CV puntual
 }`;
@@ -170,6 +183,10 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
         system,
         messages: [{ role: 'user', content: truncated }],
         maxTokens: 800,
+        // Puntaje = tarea de evaluación consistente, no conversación creativa —
+        // temperatura casi 0 para que el mismo CV dé (casi) siempre el mismo
+        // resultado en vez de variar de una corrida a otra.
+        temperature: 0,
       });
     } catch (err) {
       this.logger.error(`Fallo el análisis de CV con DeepSeek: ${(err as Error).message}`);

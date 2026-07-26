@@ -12,7 +12,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { normalizeEmail } from '../../shared/utils/normalize';
 import { notBlank } from '../../shared/utils/validators/not-blank.validator';
 import { ButtonDirective } from '../../shared/components/button/button.directive';
-import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { DepartamentoCiudadInputComponent } from '../../shared/components/departamento-ciudad-input/departamento-ciudad-input.component';
 
 /**
  * Formulario de registro para empresas (ruta "/company/register"). Crea
@@ -34,7 +34,7 @@ import { MunicipioInputComponent } from '../../shared/components/municipio-input
     MatProgressBarModule,
     MatIconModule,
     ButtonDirective,
-    MunicipioInputComponent,
+    DepartamentoCiudadInputComponent,
   ],
   styleUrl: './company-register.component.scss',
   template: `
@@ -71,8 +71,7 @@ import { MunicipioInputComponent } from '../../shared/components/municipio-input
           </mat-form-field>
 
           <div class="full-width municipio-field">
-            <label class="municipio-field__label">Municipio</label>
-            <app-municipio-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
+            <app-departamento-ciudad-input [value]="form.value.city ?? null" (valueChange)="form.patchValue({ city: $event })" />
           </div>
 
           <mat-form-field appearance="outline" class="full-width">

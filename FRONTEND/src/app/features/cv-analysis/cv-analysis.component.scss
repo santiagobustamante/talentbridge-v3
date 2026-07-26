@@ -354,6 +354,44 @@ $ring-circumference: 326.7px;
   }
 }
 
+.doc-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 .analyze-btn {
   display: flex;
   align-items: center;
