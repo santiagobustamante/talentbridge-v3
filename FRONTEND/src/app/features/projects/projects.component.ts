@@ -404,6 +404,11 @@ export class ProjectsComponent implements OnInit {
       startDate: p.startDate ? new Date(p.startDate) : null,
       endDate: p.endDate ? new Date(p.endDate) : null,
     });
+    // Si el proyecto ya tenía una URL inválida guardada (de antes de esta
+    // validación), que se vea marcada de entrada — sin esto, `mat-error` solo
+    // se muestra en el campo que el usuario llegue a tocar, dejando el resto
+    // con datos igual de inválidos pero sin ningún aviso visible.
+    this.form.markAllAsTouched();
   }
 
   /** Sale del modo edición/creación y limpia el formulario a su estado inicial. */

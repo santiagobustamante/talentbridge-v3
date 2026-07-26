@@ -241,10 +241,17 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  /** Entra en modo edición del perfil. */
+  /**
+   * Entra en modo edición del perfil. Marca todo el formulario como "touched"
+   * de entrada — si el perfil ya tenía guardada una URL inválida (de antes de
+   * la validación, o cargada por otro medio), que se vea marcada apenas se
+   * abre el formulario en vez de solo en el campo que el usuario llegue a
+   * tocar, dejando el resto con el mismo problema pero sin ningún aviso.
+   */
   editProfile(): void {
     this.isEditing = true;
     this.saved = false;
+    this.form.markAllAsTouched();
   }
 
   /** Descarta los cambios sin guardar y vuelve al formulario a los últimos datos guardados. */

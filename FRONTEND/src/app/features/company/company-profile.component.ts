@@ -185,9 +185,16 @@ export class CompanyProfileComponent implements OnInit {
     });
   }
 
-  /** Entra en modo edicion del perfil de empresa. */
+  /**
+   * Entra en modo edicion del perfil de empresa. Marca todo el formulario como
+   * "touched" de entrada -- si el perfil ya tenia guardada una URL invalida (de
+   * antes de la validacion, o cargada por otro medio), que se vea marcada apenas
+   * se abre el formulario en vez de solo en el campo que el usuario llegue a
+   * tocar, dejando el resto con el mismo problema pero sin ningun aviso.
+   */
   editProfile(): void {
     this.isEditing = true;
+    this.form.markAllAsTouched();
   }
 
   /** Descarta los cambios sin guardar y vuelve al formulario a los ultimos datos guardados. */
