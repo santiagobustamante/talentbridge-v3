@@ -130,6 +130,20 @@
   cursor: pointer;
 }
 
+// app-municipio-input ya trae su propio <input> con forms.control adentro --
+// aplicarle la misma mixin al host (vía .filter-select) duplicaba el
+// borde/padding/alto, dejando el campo visto apretado/cortado dentro de la
+// barra de filtros (reportado por el usuario). Acá solo se controla cuánto
+// espacio ocupa dentro del flex, sin agregarle una segunda caja.
+app-municipio-input.filter-select {
+  border: none;
+  background: none;
+  padding: 0;
+  height: auto;
+  flex: 1;
+  min-width: 200px;
+}
+
 .jobs-priority-note {
   display: inline-flex;
   align-items: center;

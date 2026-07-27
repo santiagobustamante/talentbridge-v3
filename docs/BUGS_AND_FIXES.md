@@ -361,3 +361,27 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** `Validators.required` (+ `notBlank` en los de texto) agregado a `description`, `role`, `projectType`, `status` y `startDate` en el frontend; espejado en el backend quitando `@IsOptional()` de esos mismos campos (con `@IsNotEmpty()` donde aplica). `responsibilities`, las 3 URLs y `endDate` siguen opcionales a propósito.
 **Prueba realizada:** `npm run build:portfolio` + `ng build`/`lint:css` limpios. Verificado en vivo: formulario con solo `name` lleno → `form.invalid: true`, botón "Agregar proyecto" deshabilitado.
 **Estado:** Corregido.
+
+---
+
+### BUG-031 — El análisis de CV fallaba las primeras 2-3 veces y funcionaba a la 4ta, sin ningún reintento
+
+**Módulo:** Backend — `libs/common` (`DeepSeekService`)
+**Descripción:** El usuario reportó: "me pasa que las primeras veces que hago análisis me sale este mensaje unas 2 o 3 veces a la 4 ya funciona".
+**Causa:** `CvService.performAnalysis()` llama a `DeepSeekService.chatJson()` una sola vez — cualquier error transitorio de la API (timeout, 429, 5xx) se propagaba directo como `BadRequestException` al usuario, sin ningún reintento automático. El patrón "falla un par de veces, después funciona solo" es la firma típica de un error transitorio de red/API sin retry.
+**Archivos afectados:** `BACKEND/libs/common/src/ai/deepseek.service.ts`.
+**Solución:** Nuevo método privado `withRetry()` (hasta 3 intentos, pausa corta entre cada uno) envolviendo la llamada real a la API en `chatJson` y `chatText` — beneficia también al asistente Joaquín, mismo problema de fondo. No reintenta fallos de parseo de JSON (deterministas).
+**Prueba realizada:** `npm run build` (`common-lib`, `portfolio-service`, `assistant-service`) limpio. No se pudo forzar un fallo real de la API para probar el camino de reintento exacto — verificado por revisión de código que el `withRetry` envuelve correctamente la llamada sin cambiar el comportamiento del camino feliz (mismo resultado en éxito).
+**Estado:** Corregido.
+
+---
+
+### BUG-032 — El campo de Municipio en los filtros de "Trabajos" se veía cortado/superpuesto
+
+**Módulo:** Frontend — `candidate-jobs.component.scss`
+**Descripción:** El usuario reportó, con captura: "en trabajos los filtros salen así, está como superpuesto en otro campo".
+**Causa:** La clase `.filter-select` (diseñada para `<input>`/`<select>` simples) le aplicaba la mixin completa `forms.control` (borde, padding, alto, fondo) al *host* de `app-municipio-input` — pero ese componente ya tiene su propio `<input>` interno con la misma mixin aplicada, generando una caja duplicada dentro de otra y dejando muy poco espacio visible dentro del `min-width: 140px`.
+**Archivos afectados:** `FRONTEND/src/app/features/jobs/candidate-jobs.component.scss`.
+**Solución:** Selector específico `app-municipio-input.filter-select` que resetea los estilos de caja duplicados (borde, fondo, padding, alto) y solo controla el ancho dentro de la barra de filtros.
+**Prueba realizada:** `lint:css` limpio. Verificado en vivo: el campo Municipio ahora tiene el mismo alto/proporción que Modalidad y Tipo de contrato, sin superposición.
+**Estado:** Corregido.
