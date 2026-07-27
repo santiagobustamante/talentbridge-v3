@@ -737,3 +737,15 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos afectados:** `FRONTEND/src/app/features/projects/projects.component.ts`.
 **Cómo se probó:** `lint:css` + `ng build` limpios, sin warnings nuevos. Verificado en vivo (inspección de DOM): al seleccionar Estado = "En progreso" el campo "Fecha fin" desaparece del formulario; al cambiar a "Completado" reaparece.
 **Pendientes:** Ninguno.
+
+---
+
+### 2026-07-27 — Ajuste sobre el fix anterior: casilla "Aún en curso" explícita en Proyectos, no solo el efecto del selector de Estado
+
+**Módulo:** Frontend — `projects.component.{ts,scss}`
+**Tipo de cambio:** Ajuste de UX pedido por el usuario tras ver el fix anterior en producción
+**Problema:** El usuario pidió explícitamente: "pon la casilla de en proceso o en curso... como anteriormente se ha hecho" — quería la misma casilla (`mat-checkbox`) visible que usan Experiencia ("Trabajo actual") y Educación ("Cursando actualmente"), no solo que "Fecha fin" se oculte como efecto secundario de elegir "En progreso" en el select de Estado.
+**Solución:** Agregado `<mat-checkbox class="period-checkbox">Aún en curso</mat-checkbox>` junto a las fechas, reusando los mixins `period-row`/`checkbox-inline` de `_forms.scss` (los mismos que ya usa Experiencia) para que se vea igual. En vez de un booleano nuevo que pudiera desincronizarse del campo `status` ya existente (que también alimenta el badge "En progreso" de la tarjeta), la casilla lee/escribe ese mismo campo: `[checked]="status === 'IN_PROGRESS'"` + `(change)="onOngoingChange($event.checked)"`. Cambiar el Estado desde el select también actualiza la casilla sola — una sola fuente de verdad.
+**Archivos afectados:** `FRONTEND/src/app/features/projects/projects.component.ts`, `FRONTEND/src/app/features/projects/projects.component.scss`.
+**Cómo se probó:** `lint:css` + `ng build` limpios (mismos 18 warnings de budget de siempre). Verificado en vivo por inspección de DOM: marcar la casilla oculta "Fecha fin" y pone Estado en "En progreso"; desmarcarla la muestra de nuevo y resetea Estado; elegir "En progreso" desde el select marca la casilla sola.
+**Pendientes:** Ninguno.

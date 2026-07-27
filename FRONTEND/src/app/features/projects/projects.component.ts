@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MatOption } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ProjectsService } from '../../core/services/projects.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
@@ -41,6 +42,7 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
     CommonModule, ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatCardModule, MatIconModule, MatChipsModule, MatSnackBarModule,
     MatSelectModule, MatAutocompleteModule, MatDatepickerModule, MatNativeDateModule, MatSlideToggleModule,
+    MatCheckboxModule,
     GithubWarningComponent,
   ],
   styleUrl: './projects.component.scss',
@@ -171,7 +173,7 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                 </mat-select>
                 <mat-error *ngIf="form.get('status')?.hasError('required')">Requerido</mat-error>
               </mat-form-field>
-              <div class="form-grid">
+              <div class="period-row">
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha inicio <span class="req">*</span></mat-label>
                   <input matInput [matDatepicker]="psPicker" formControlName="startDate" />
@@ -185,6 +187,10 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                   <mat-datepicker-toggle matSuffix [for]="pePicker"/>
                   <mat-datepicker #pePicker/>
                 </mat-form-field>
+                <mat-checkbox class="period-checkbox" [checked]="form.get('status')?.value === 'IN_PROGRESS'"
+                              (change)="onOngoingChange($event.checked)" color="primary">
+                  Aún en curso
+                </mat-checkbox>
               </div>
             </div>
 
@@ -366,6 +372,16 @@ export class ProjectsComponent implements OnInit {
 
   /** Quita una tecnología del proyecto en edición por su posición en la lista de chips. */
   removeTechChip(index: number) { this.selectedTechs.splice(index, 1); }
+
+  /**
+   * Checkbox "Aún en curso", igual en espíritu al `isCurrent` de Experiencia/Educación,
+   * pero sin duplicar el estado: Proyectos ya tiene un campo `status` con la opción
+   * "En progreso" que cumple el mismo rol, así que la casilla lee y escribe ese mismo
+   * campo en vez de guardar un booleano aparte que podría desincronizarse.
+   */
+  onOngoingChange(checked: boolean) {
+    this.form.get('status')?.setValue(checked ? 'IN_PROGRESS' : '');
+  }
 
   /** Guarda el formulario: crea un proyecto nuevo o actualiza el que está en edición, según `editing`. */
   save() {

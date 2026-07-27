@@ -58,6 +58,8 @@
 }
 
 .form-grid { @include forms.grid; }
+.period-row { @include forms.period-row; }
+.period-checkbox { @include forms.checkbox-inline; }
 
 .full-width { width: 100%; }
 
