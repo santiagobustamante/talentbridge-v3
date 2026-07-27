@@ -385,3 +385,39 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** Selector específico `app-municipio-input.filter-select` que resetea los estilos de caja duplicados (borde, fondo, padding, alto) y solo controla el ancho dentro de la barra de filtros.
 **Prueba realizada:** `lint:css` limpio. Verificado en vivo: el campo Municipio ahora tiene el mismo alto/proporción que Modalidad y Tipo de contrato, sin superposición.
 **Estado:** Corregido.
+
+---
+
+### BUG-033 — Dropdown de sugerencias de Municipio se renderizaba detrás de las tarjetas de resultados
+
+**Módulo:** Frontend — `candidate-jobs.component.scss`, `company-candidates.component.scss`
+**Descripción:** El usuario reportó, con captura: "cuando se despliega esta especie de log no se superpone, sino que se pone atrás". El texto del placeholder ("Municipio") también generaba confusión porque el campo filtra tanto por ciudad como por municipio.
+**Causa:** `.suggestions-dropdown` (dentro de `MunicipioInputComponent`) tiene `position: absolute; z-index: 20`, pero sus contenedores directos — `.filters-bar` en `candidate-jobs` y `.filter-row` en `company-candidates` — no tenían `position`/`z-index` propios, así que no formaban su propio contexto de apilamiento. Sin eso, el dropdown perdía la comparación de stacking contra el `.jobs-grid`/`.results-grid` de más abajo (más adelante en el DOM), quedando tapado a medias.
+**Archivos afectados:** `FRONTEND/src/app/features/jobs/candidate-jobs.component.{html,scss}`, `FRONTEND/src/app/features/company/company-candidates.component.{html,scss}`.
+**Solución:** `position: relative; z-index: 30;` en `.filters-bar`/`.filter-row`, para que junto con sus descendientes formen un único grupo de apilamiento por encima del contenido siguiente. Además, `placeholder`/`label` cambiados de "Municipio" a "Ciudad o municipio".
+**Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en vivo por inspección de DOM (`elementFromPoint` en varios puntos del área del dropdown en ambas páginas): el dropdown renderiza por encima de las tarjetas de resultados.
+**Estado:** Corregido.
+
+---
+
+### BUG-034 — El análisis de CV a veces respondía en inglés en vez de español
+
+**Módulo:** Backend — `libs/common` (`DeepSeekService`), `portfolio-service` (`cv.service.ts`)
+**Descripción:** El usuario reportó: "en el analisis de CV aveces me da el resultado en ingles, necesito que SIEMPRE sea en español".
+**Causa:** El prompt de sistema de `CvService.performAnalysis()` está en español pero nunca le indica explícitamente al modelo en qué idioma responder — DeepSeek a veces elegía inglés. Un primer intento de fix (una sola línea "Respondé SIEMPRE en español") se probó aislado contra la API real y **no fue suficiente**, el modelo lo ignoraba. Al verificar en vivo la versión reforzada del fix aparecieron dos bugs adicionales, no reportados por el usuario: (1) `DeepSeekService.chatJson()` solo reintenta (`withRetry`) la llamada HTTP en sí — si la API devuelve 200 con `content` vacío no lanza excepción, así que ese caso nunca se reintentaba; (2) con el prompt más largo, la respuesta a veces se truncaba a mitad del JSON porque `maxTokens: 800` se quedaba corto.
+**Archivos afectados:** `BACKEND/apps/portfolio-service/src/cv.service.ts`, `BACKEND/libs/common/src/ai/deepseek.service.ts`.
+**Solución:** Prompt reforzado con instrucción de idioma repetida (al inicio como "regla inquebrantable" y de nuevo junto a cada campo del JSON) — verificado aislado que esta versión sí es consistente. Chequeo de "contenido vacío" movido DENTRO de la función que reintenta `withRetry` (antes vivía después, fuera del ciclo de reintentos). `maxTokens` subido de 800 a 1200.
+**Prueba realizada:** `npm run build` completo + `npx jest` (mismos 39/44 de siempre) limpios. Verificado en vivo contra el servicio real: 4 corridas consecutivas de análisis con las 2 CVs reales de la cuenta demo, las 4 devolvieron JSON completo 100% en español, sin truncamiento.
+**Estado:** Corregido.
+
+---
+
+### BUG-035 — Proyectos: "Fecha fin" seguía visible aunque el estado fuera "En progreso"
+
+**Módulo:** Frontend — `projects.component.ts`
+**Descripción:** El usuario señaló, con captura: "aquí también hace falta el check de en curso" — Experiencia y Educación ya ocultan "Fecha fin" cuando el ítem sigue en curso; Proyectos no.
+**Causa:** A diferencia de Experiencia/Educación (que usan una casilla `isCurrent`), Proyectos ya tenía un campo `status` obligatorio con la opción "En progreso" cumpliendo el mismo rol semántico, pero nada ataba la visibilidad de "Fecha fin" a ese valor.
+**Archivos afectados:** `FRONTEND/src/app/features/projects/projects.component.ts`.
+**Solución:** `*ngIf="form.get('status')?.value !== 'IN_PROGRESS'"` en el campo "Fecha fin", y `endDate: v.status === 'IN_PROGRESS' ? undefined : ...` en `save()` — mismo patrón que Experiencia/Educación pero reusando el campo `status` ya existente en vez de agregar una casilla redundante.
+**Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en vivo: al elegir "En progreso" el campo desaparece; al cambiar a "Completado" reaparece.
+**Estado:** Corregido.

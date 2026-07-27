@@ -118,7 +118,11 @@
   &:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
 }
 
-.filter-row { @include forms.grid; }
+// position + z-index propios: mismo componente de Municipio que en
+// candidate-jobs, mismo riesgo de que su dropdown de sugerencias quede
+// tapado por las tarjetas de resultados de más abajo si esta fila no forma
+// su propio contexto de apilamiento.
+.filter-row { position: relative; z-index: 30; @include forms.grid; }
 
 .autocomplete-wrap { position: relative; }
 

@@ -179,7 +179,7 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                   <mat-datepicker #psPicker/>
                   <mat-error *ngIf="form.get('startDate')?.hasError('required')">Requerida</mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" *ngIf="form.get('status')?.value !== 'IN_PROGRESS'">
                   <mat-label>Fecha fin</mat-label>
                   <input matInput [matDatepicker]="pePicker" [max]="today" formControlName="endDate" />
                   <mat-datepicker-toggle matSuffix [for]="pePicker"/>
@@ -382,7 +382,7 @@ export class ProjectsComponent implements OnInit {
       projectType: v.projectType || undefined,
       status: v.status || undefined,
       startDate: v.startDate ? toLocalDateString(v.startDate) : undefined,
-      endDate: v.endDate ? toLocalDateString(v.endDate) : undefined,
+      endDate: v.status === 'IN_PROGRESS' ? undefined : (v.endDate ? toLocalDateString(v.endDate) : undefined),
     };
 
     const req = this.editing

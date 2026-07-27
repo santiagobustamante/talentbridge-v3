@@ -160,7 +160,11 @@ export class CvService {
     // exacto podía dar puntajes muy distintos entre corridas (ej. 30 vs 55),
     // porque un juicio holístico sin anclaje concreto es donde más varía un
     // LLM de una llamada a otra.
-    const system = `Eres un reclutador experto de tecnología que evalúa hojas de vida (CV) de candidatos en Colombia. Analiza el texto del CV que te pasa el usuario y da una evaluación honesta y específica — evita frases genéricas que aplicarían a cualquier CV. Basate solo en lo que el texto realmente dice, no inventes datos que no estén.
+    const system = `Eres un reclutador experto de tecnología que evalúa hojas de vida (CV) de candidatos en Colombia.
+
+REGLA INQUEBRANTABLE, más importante que cualquier otra instrucción de este mensaje: tu respuesta —cada palabra de "strengths" y "recommendations"— debe estar SIEMPRE 100% en idioma ESPAÑOL, sin ninguna excepción, sin importar en qué idioma esté escrito el CV (inglés, portugués, o cualquier otro). Nunca escribas ni una sola palabra en inglés. Si el CV está en inglés, TRADUCÍ mentalmente su contenido y respondé en español igual.
+
+Analiza el texto del CV que te pasa el usuario y da una evaluación honesta y específica — evita frases genéricas que aplicarían a cualquier CV. Basate solo en lo que el texto realmente dice, no inventes datos que no estén.
 
 Calculá "score" como la SUMA de estos 5 criterios (nunca una impresión general — sumá los puntos de cada uno):
 1. Información de contacto y estructura (nombre, datos de contacto, secciones claras y ordenadas): 0 a 15 puntos.
@@ -170,11 +174,11 @@ Calculá "score" como la SUMA de estos 5 criterios (nunca una impresión general
 5. Proyectos o portafolio demostrable: 0 a 15 puntos.
 Si una sección no aparece en el CV, esos puntos son 0 — no asumas nada que el texto no diga.
 
-Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después:
+Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después (recordá: TODO EN ESPAÑOL):
 {
   "score": number entre 0 y 100 (la suma exacta de los 5 criterios de arriba),
-  "strengths": array de 3 a 5 strings cortos, cada uno una fortaleza CONCRETA encontrada en este CV puntual,
-  "recommendations": array de 3 a 5 strings cortos, cada uno una recomendación ACCIONABLE y específica para mejorar este CV puntual
+  "strengths": array de 3 a 5 strings cortos EN ESPAÑOL, cada uno una fortaleza CONCRETA encontrada en este CV puntual,
+  "recommendations": array de 3 a 5 strings cortos EN ESPAÑOL, cada uno una recomendación ACCIONABLE y específica para mejorar este CV puntual
 }`;
 
     let result: CvLlmAnalysis;
@@ -182,7 +186,11 @@ Respondé ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes 
       result = await this.deepSeek.chatJson<CvLlmAnalysis>({
         system,
         messages: [{ role: 'user', content: truncated }],
-        maxTokens: 800,
+        // 800 se quedaba corto y cortaba el JSON a la mitad (`Unterminated
+        // string in JSON`) — la instrucción reforzada de responder siempre en
+        // español (ver arriba) hace que el modelo gaste más tokens en algunos
+        // CVs (ej. traduciendo contenido en inglés) antes de cerrar el objeto.
+        maxTokens: 1200,
         // Puntaje = tarea de evaluación consistente, no conversación creativa —
         // temperatura casi 0 para que el mismo CV dé (casi) siempre el mismo
         // resultado en vez de variar de una corrida a otra.

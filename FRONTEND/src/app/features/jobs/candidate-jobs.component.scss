@@ -97,6 +97,13 @@
   gap: 0.75rem;
   align-items: center;
   margin-bottom: 1.5rem;
+  // `position` + `z-index` propios: sin esto, la barra de filtros no forma su
+  // propio contexto de apilamiento y el dropdown de sugerencias de Municipio
+  // (que sí tiene z-index, pero relativo a un ancestro más arriba) terminaba
+  // renderizando DETRÁS de las tarjetas de ofertas de más abajo en vez de
+  // encima, tapado a medias (reportado por el usuario con captura).
+  position: relative;
+  z-index: 30;
 }
 
 .search-wrap {

@@ -27,7 +27,7 @@
         <input type="text" [formControl]="qCtrl" placeholder="Buscar por título, descripción o habilidad..."
           (keydown.enter)="applyFilters()" />
       </div>
-      <app-municipio-input class="filter-select" [value]="cityCtrl.value" (valueChange)="cityCtrl.setValue($event)" [allowRemote]="true" [strict]="false" placeholder="Municipio" />
+      <app-municipio-input class="filter-select" [value]="cityCtrl.value" (valueChange)="cityCtrl.setValue($event)" [allowRemote]="true" [strict]="false" placeholder="Ciudad o municipio" />
       <select class="filter-select" [formControl]="modalityCtrl">
         <option value="">Modalidad</option>
         @for (m of modalities; track m) {

@@ -69,20 +69,24 @@ export class DeepSeekService {
     maxTokens?: number;
     temperature?: number;
   }): Promise<T> {
-    const completion = await this.withRetry(() =>
-      this.getClient().chat.completions.create({
+    // El chequeo de "sin contenido" va DENTRO de withRetry (no después) — una
+    // respuesta 200 con `content` vacío no lanza excepción en el SDK de
+    // OpenAI, así que si este chequeo quedara afuera, ese caso puntual nunca
+    // se reintentaba (solo se reintentaban timeouts/429/5xx reales), aunque
+    // sea exactamente el mismo tipo de hiccup transitorio que sí cubre el
+    // resto de `withRetry`.
+    const content = await this.withRetry(async () => {
+      const completion = await this.getClient().chat.completions.create({
         model: this.model,
         messages: [{ role: 'system', content: params.system }, ...params.messages],
         response_format: { type: 'json_object' },
         max_tokens: params.maxTokens ?? 700,
         temperature: params.temperature ?? 0.4,
-      }),
-    );
-
-    const content = completion.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('DeepSeek no devolvió contenido');
-    }
+      });
+      const c = completion.choices[0]?.message?.content;
+      if (!c) throw new Error('DeepSeek no devolvió contenido');
+      return c;
+    });
 
     try {
       return JSON.parse(content) as T;
