@@ -1,23 +1,28 @@
-import { IsString, IsOptional, IsArray, IsIn, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsArray, IsIn, MaxLength } from 'class-validator';
 import { IsNotFutureDateString, IsAfterOrEqualDateString, IsValidUrl } from '@app/common';
 
 const PROJECT_TYPES = ['INDIVIDUAL', 'TEAM'] as const;
 const PROJECT_STATUSES = ['PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const;
 
+// Antes solo `name` era obligatorio -- un proyecto se podía guardar con un
+// solo campo lleno. Descripción/rol/tipo/estado/fecha de inicio ahora se
+// exigen también (URLs, responsabilidades y fecha fin siguen opcionales:
+// no todo proyecto tiene repo público, demo, o ya terminó).
 export class ProjectDto {
   @IsString()
+  @IsNotEmpty()
   @MaxLength(150)
   name: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(3000)
-  description?: string;
+  description: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(150)
-  role?: string;
+  role: string;
 
   @IsOptional()
   @IsString()
@@ -47,17 +52,15 @@ export class ProjectDto {
   @IsValidUrl()
   imageUrl?: string;
 
-  @IsOptional()
   @IsIn(PROJECT_TYPES)
-  projectType?: string;
+  projectType: string;
 
-  @IsOptional()
   @IsIn(PROJECT_STATUSES)
-  status?: string;
+  status: string;
 
-  @IsOptional()
   @IsString()
-  startDate?: string;
+  @IsNotEmpty()
+  startDate: string;
 
   @IsOptional()
   @IsString()

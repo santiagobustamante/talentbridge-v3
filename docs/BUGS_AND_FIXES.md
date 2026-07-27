@@ -301,3 +301,63 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** `fullName` obligatorio (`@IsNotEmpty() @MaxLength(150)`) en `RegisterDto`; `register.component.ts` lo pide con el mismo patrón de validación que `companyName` en el registro de empresa (`Validators.required` + `notBlank`); `auth.service.ts` guarda `titleCaseText(fullName)` en el `Profile` creado.
 **Prueba realizada:** `npm run build:auth` + `npx jest auth-service` (9/9) limpios. Verificado en vivo end-to-end: registro nuevo con nombre → saludo "Hola, {nombre real}" inmediato, sin pasar por editar el perfil.
 **Estado:** Corregido.
+
+---
+
+### BUG-026 — El límite de intentos por IP solo protegía `auth-service`, los otros 9 servicios no tenían ninguno
+
+**Módulo:** Backend — `libs/common`, los 9 servicios sin `auth-service`
+**Descripción:** Ya documentado desde el 2026-07-18 (`plan-correcciones-seguridad-y-bugs.md` ítem 1.1) como "evaluar si extenderlo al resto de servicios" — quedó pendiente hasta que salió listado en el reporte de inspección del barrido del 2026-07-26 y el usuario pidió arreglarlo.
+**Causa:** `IpThrottlerGuard` + `ThrottlerModule` solo se habían instalado en `auth-service` (login/registro, el de mayor riesgo original) — nunca se replicó al resto, incluido el `api-gateway`, el punto de entrada real de toda la app.
+**Archivos afectados:** `BACKEND/libs/common/src/guards/ip-throttler.guard.ts` (movido desde `auth-service`), `BACKEND/libs/common/src/index.ts`, y los `*.module.ts` de los 9 servicios restantes.
+**Solución:** Guard compartido vía `libs/common`; `ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 300 }])` + `APP_GUARD` en cada uno de los 9 módulos — 300 req/min por IP, más laxo que el límite de login (10/min) a propósito.
+**Prueba realizada:** `npm run build` completo limpio. Carga concurrente real (`xargs -P 40`, 320 requests) contra el gateway local y contra producción real (`https://api-gateway-production-47f0.up.railway.app`): exactamente 300 pasan, 20 devuelven 429 en ambos casos.
+**Estado:** Corregido.
+
+---
+
+### BUG-027 — No se podía descartar un CV ya seleccionado antes de subirlo
+
+**Módulo:** Frontend — `cv-analysis.component.ts`
+**Descripción:** El usuario reportó: "una vez carga una cv antes de darle en subir, no me deja descartar".
+**Causa:** `onFileSelected()` guardaba el archivo en `selectedFile`, pero no existía ningún botón ni método para volver a `null` sin subirlo — la única forma de "salir" de un archivo elegido por error era subirlo igual.
+**Archivos afectados:** `FRONTEND/src/app/features/cv-analysis/cv-analysis.component.ts`, `cv-analysis.component.scss`.
+**Solución:** Botón "Descartar" (ícono `close`) en la esquina de la zona de carga cuando hay un archivo seleccionado, con `clearSelectedFile()` que limpia `selectedFile` y resetea el `value` del input nativo (necesario para poder re-elegir el mismo archivo después).
+**Prueba realizada:** `ng build` + `lint:css` limpios. Verificado en vivo: archivo seleccionado → botón "Descartar" visible → click → vuelve a la zona de carga vacía.
+**Estado:** Corregido.
+
+---
+
+### BUG-028 — Los filtros de Modalidad y Tipo de contrato en "Trabajos" no hacían nada
+
+**Módulo:** Backend — `jobs-service` · Frontend — `candidate-jobs.component.ts`
+**Descripción:** El usuario reportó, con una captura de los filtros: "arreglar filtros, no funcionan".
+**Causa:** `JobsService.getCandidateJobs()` construía el `where` de Prisma leyendo solo `query.q` y `query.city` — `query.modality` y `query.contractType` (que el frontend sí mandaba desde hace tiempo) nunca se leían ni se aplicaban al filtro.
+**Archivos afectados:** `BACKEND/apps/jobs-service/src/jobs.service.ts`.
+**Solución:** Agregados `where.modality`/`where.contractType` cuando vienen en el query.
+**Prueba realizada:** `npm run build:jobs` limpio. Verificado en vivo: filtro "Remoto" → todos los resultados remotos; combinado con "Término indefinido" → ambos aplican a la vez.
+**Estado:** Corregido.
+
+---
+
+### BUG-029 — El campo de Municipio en los filtros de búsqueda borraba lo que se escribía
+
+**Módulo:** Frontend — `municipio-input.component.ts`, usado en `candidate-jobs.component.html` y `company-candidates.component.html`
+**Descripción:** El usuario reportó, en la misma captura de los filtros: "este campo de municipio esta malo".
+**Causa:** `MunicipioInputComponent` exige siempre un match exacto contra el catálogo DIVIPOLA al perder el foco — diseño correcto para datos que se guardan (perfil, experiencia), pero los 2 filtros de búsqueda donde se reusó el mismo componente esperaban texto libre (el backend ya filtra con `contains`, coincidencia parcial). Si el usuario no alcanzaba a hacer click en una sugerencia antes de que el campo perdiera el foco, el texto tipeado se borraba solo — el campo "no funcionaba" desde la perspectiva del usuario.
+**Archivos afectados:** `FRONTEND/src/app/shared/components/municipio-input/municipio-input.component.ts`, `FRONTEND/src/app/features/jobs/candidate-jobs.component.html`, `FRONTEND/src/app/features/company/company-candidates.component.html`.
+**Solución:** Nuevo `@Input() strict` (default `true`, sin cambio de comportamiento en los demás usos del componente). En `strict=false`: el valor se emite en cada tecla (no solo al perder el foco, para evitar que un click directo en "Filtrar" se procese antes que el `setTimeout` de validación) y nunca se descarta. Aplicado `[strict]="false"` en los 2 filtros de búsqueda.
+**Prueba realizada:** `ng build` + `lint:css` limpios. Verificado en vivo: tipear "Medellín" sin elegir sugerencia + click inmediato en "Filtrar" → todos los resultados son de Medellín (antes se hubiera borrado el campo).
+**Estado:** Corregido.
+
+---
+
+### BUG-030 — Se podían crear proyectos con un solo campo lleno (solo el nombre)
+
+**Módulo:** Backend — `portfolio-service` · Frontend — `projects.component.ts`
+**Descripción:** El usuario reportó: "me deja agregar proyectos donde solo tienen un campo lleno, debe tener toda la información".
+**Causa:** Tanto el formulario (`projects.component.ts`) como el DTO del backend (`ProjectDto`) solo exigían `name` — el resto de los campos (incluidos descripción, rol, tipo y estado del proyecto) eran opcionales desde que se crearon, sin que nadie lo cuestionara.
+**Archivos afectados:** `FRONTEND/src/app/features/projects/projects.component.ts`, `BACKEND/apps/portfolio-service/src/dto/project.dto.ts`.
+**Solución:** `Validators.required` (+ `notBlank` en los de texto) agregado a `description`, `role`, `projectType`, `status` y `startDate` en el frontend; espejado en el backend quitando `@IsOptional()` de esos mismos campos (con `@IsNotEmpty()` donde aplica). `responsibilities`, las 3 URLs y `endDate` siguen opcionales a propósito.
+**Prueba realizada:** `npm run build:portfolio` + `ng build`/`lint:css` limpios. Verificado en vivo: formulario con solo `name` lleno → `form.invalid: true`, botón "Agregar proyecto" deshabilitado.
+**Estado:** Corregido.

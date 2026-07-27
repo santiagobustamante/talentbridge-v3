@@ -79,8 +79,10 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                 <input matInput formControlName="name" placeholder="Ej. E-Commerce Platform" />
               </mat-form-field>
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Descripci&oacute;n</mat-label>
+                <mat-label>Descripci&oacute;n <span class="req">*</span></mat-label>
                 <textarea matInput rows="3" formControlName="description" placeholder="Describe tu proyecto, objetivos y resultados..."></textarea>
+                <mat-error *ngIf="form.get('description')?.hasError('required')">Requerida</mat-error>
+                <mat-error *ngIf="form.get('description')?.hasError('notBlank')">No puede ser solo espacios</mat-error>
               </mat-form-field>
             </div>
 
@@ -89,16 +91,19 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
               <div class="section-label">Participaci&oacute;n</div>
               <div class="form-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Rol en el proyecto</mat-label>
+                  <mat-label>Rol en el proyecto <span class="req">*</span></mat-label>
                   <input matInput formControlName="role" placeholder="Ej. Desarrollador Frontend" />
+                  <mat-error *ngIf="form.get('role')?.hasError('required')">Requerido</mat-error>
+                  <mat-error *ngIf="form.get('role')?.hasError('notBlank')">No puede ser solo espacios</mat-error>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
-                  <mat-label>Tipo de proyecto</mat-label>
+                  <mat-label>Tipo de proyecto <span class="req">*</span></mat-label>
                   <mat-select formControlName="projectType">
                     <mat-option value="">—</mat-option>
                     <mat-option value="INDIVIDUAL">Individual</mat-option>
                     <mat-option value="TEAM">En equipo</mat-option>
                   </mat-select>
+                  <mat-error *ngIf="form.get('projectType')?.hasError('required')">Requerido</mat-error>
                 </mat-form-field>
               </div>
               <mat-form-field appearance="outline" class="full-width">
@@ -157,20 +162,22 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
             <div class="form-section">
               <div class="section-label">Estado</div>
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Estado</mat-label>
+                <mat-label>Estado <span class="req">*</span></mat-label>
                 <mat-select formControlName="status">
                   <mat-option value="">—</mat-option>
                   <mat-option value="PLANNED">Planificado</mat-option>
                   <mat-option value="IN_PROGRESS">En progreso</mat-option>
                   <mat-option value="COMPLETED">Completado</mat-option>
                 </mat-select>
+                <mat-error *ngIf="form.get('status')?.hasError('required')">Requerido</mat-error>
               </mat-form-field>
               <div class="form-grid">
                 <mat-form-field appearance="outline">
-                  <mat-label>Fecha inicio</mat-label>
+                  <mat-label>Fecha inicio <span class="req">*</span></mat-label>
                   <input matInput [matDatepicker]="psPicker" formControlName="startDate" />
                   <mat-datepicker-toggle matSuffix [for]="psPicker"/>
                   <mat-datepicker #psPicker/>
+                  <mat-error *ngIf="form.get('startDate')?.hasError('required')">Requerida</mat-error>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha fin</mat-label>
@@ -266,15 +273,15 @@ export class ProjectsComponent implements OnInit {
 
   form = this.fb.group({
     name: ['', [Validators.required, notBlank]],
-    description: [''],
-    role: [''],
+    description: ['', [Validators.required, notBlank]],
+    role: ['', [Validators.required, notBlank]],
     responsibilities: [''],
     repositoryUrl: ['', [validUrl]],
     demoUrl: ['', [validUrl]],
     imageUrl: ['', [validUrl]],
-    projectType: [''],
-    status: [''],
-    startDate: [null as Date | null],
+    projectType: ['', [Validators.required]],
+    status: ['', [Validators.required]],
+    startDate: [null as Date | null, [Validators.required]],
     endDate: [null as Date | null],
   });
 

@@ -251,6 +251,11 @@ export class JobsService {
       ];
     }
     if (query?.city) where.city = { contains: query.city, mode: 'insensitive' };
+    // El frontend ya mandaba estos dos filtros (candidate-jobs.component.ts),
+    // pero acá nunca se leían del query -- elegir una modalidad o un tipo de
+    // contrato no tenía ningún efecto en los resultados.
+    if (query?.modality) where.modality = query.modality;
+    if (query?.contractType) where.contractType = query.contractType;
 
     const [jobs, total] = await Promise.all([
       this.prisma.jobOffer.findMany({

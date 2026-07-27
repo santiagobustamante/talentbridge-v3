@@ -74,6 +74,9 @@ interface CvSkillSuggestion {
           </ng-container>
 
           <ng-template #fileSelected>
+            <button class="clear-file-btn" type="button" title="Descartar" (click)="clearSelectedFile(fileInput); $event.stopPropagation()">
+              <mat-icon>close</mat-icon>
+            </button>
             <div class="upload-icon success">
               <mat-icon>picture_as_pdf</mat-icon>
             </div>
@@ -247,6 +250,17 @@ export class CvAnalysisComponent {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) this.selectedFile = input.files[0];
+  }
+
+  /**
+   * Descarta el PDF elegido antes de subirlo. Además de limpiar `selectedFile`,
+   * resetea el `value` del input nativo — sin esto, volver a elegir el mismo
+   * archivo no dispara `change` (el navegador no repite el evento si la lista
+   * de archivos seleccionados no cambió), dejando el botón "Subir CV" inútil.
+   */
+  clearSelectedFile(fileInput: HTMLInputElement): void {
+    this.selectedFile = null;
+    fileInput.value = '';
   }
 
   /** Sube el PDF seleccionado al backend y refresca la lista de documentos del candidato. */

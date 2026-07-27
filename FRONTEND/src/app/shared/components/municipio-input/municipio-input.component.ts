@@ -82,6 +82,18 @@ export class MunicipioInputComponent {
   @Input() allowRemote = false;
   @Input() label = 'Municipio';
   @Input() placeholder = 'Ej. Villavicencio, Meta';
+  /**
+   * `true` (default): solo acepta el label exacto de un municipio real del
+   * catálogo (o "Remoto") — comportamiento correcto para datos que se guardan
+   * (perfil, experiencia, ofertas). `false`: acepta cualquier texto tal cual
+   * lo escribió el usuario, sin descartar nada al perder el foco — para los
+   * filtros de búsqueda (candidate-jobs, company-candidates), donde el
+   * backend ya busca por coincidencia parcial (`contains`) y exigir un
+   * match exacto contra el catálogo hacía que el campo pareciera no
+   * funcionar (se borraba lo escrito si no se alcanzaba a elegir una
+   * sugerencia antes de perder el foco).
+   */
+  @Input() strict = true;
   @Output() valueChange = new EventEmitter<string | null>();
 
   /**
@@ -108,6 +120,18 @@ export class MunicipioInputComponent {
   ngOnInit() {
     this.inputCtrl.valueChanges.subscribe((raw) => {
       const q = raw || '';
+
+      // En modo no-estricto no hay validación que esperar -- emitir en cada
+      // tecla en vez de solo al perder el foco. Sin esto, un click directo en
+      // un botón "Filtrar" puede disparar el filtro ANTES de que el
+      // setTimeout de `onBlur` llegue a emitir el valor recién tipeado (la
+      // pérdida de foco y el click del botón compiten por el mismo tick).
+      if (!this.strict) {
+        const trimmed = q.trim();
+        this.lastValidValue = trimmed || null;
+        this.valueChange.emit(trimmed || null);
+      }
+
       this.showSuggestions = true;
       this.catalog.search(q, { allowRemote: this.allowRemote }).subscribe((results) => {
         this.suggestions = results;
@@ -166,6 +190,13 @@ export class MunicipioInputComponent {
         return;
       }
       if (typed === this.lastValidValue) return;
+
+      if (!this.strict) {
+        this.lastValidValue = typed;
+        this.valueChange.emit(typed);
+        return;
+      }
+
       this.catalog.isValidLabel(typed, { allowRemote: this.allowRemote }).subscribe((valid) => {
         if (valid) {
           this.lastValidValue = typed;
