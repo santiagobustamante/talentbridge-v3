@@ -11,7 +11,7 @@ export interface ProfileChecklistItem {
 }
 
 /**
- * Widget de "completá tu perfil" que se muestra en el inicio del candidato: un
+ * Widget de "completa tu perfil" que se muestra en el inicio del candidato: un
  * anillo de progreso (SVG, tipo donut) con el porcentaje completado y una lista
  * de pasos pendientes, cada uno enlazando a la pantalla donde se resuelve
  * (perfil, habilidades, experiencia, etc.).

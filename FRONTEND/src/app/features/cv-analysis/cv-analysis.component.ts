@@ -353,7 +353,7 @@ export class CvAnalysisComponent {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Se agregan en nivel Básico',
-        message: `${names.length === 1 ? 'La habilidad se va a agregar' : `Las ${names.length} habilidades se van a agregar`} a tu perfil en nivel Básico. Si querés otro nivel, andá a la sección Habilidades y editalo ahí.`,
+        message: `${names.length === 1 ? 'La habilidad se va a agregar' : `Las ${names.length} habilidades se van a agregar`} a tu perfil en nivel Básico. Si quieres otro nivel, ve a la sección Habilidades y edítalo ahí.`,
         confirmLabel: 'Agregar',
         confirmColor: 'primary',
       },

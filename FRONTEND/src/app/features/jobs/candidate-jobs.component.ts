@@ -106,13 +106,26 @@ export class CandidateJobsComponent implements OnInit {
    * En la pestaña "mis postulaciones", si se llegó desde el enlace de una
    * notificación de cambio de estado, abre directamente el panel de detalle
    * de esa postulación puntual (no solo resalta la tarjeta) — es la
-   * información exacta que la notificación estaba avisando.
+   * información exacta que la notificación estaba avisando. La postulación
+   * puede no estar en la página actual (paginado) — si no aparece ahí, se
+   * busca en el listado completo del candidato antes de rendirse, para que
+   * el detalle se abra sin importar en qué página quedaría normalmente.
    */
   private openHighlightedApplication(): void {
     const id = this.highlightedJobId();
     if (!id) return;
     const app = this.applications.find((a) => a.jobOffer.id === id);
-    if (app) this.openDetailFromApp(app);
+    if (app) {
+      this.openDetailFromApp(app);
+      return;
+    }
+    this.jobsService.getMyApplications({ page: 1, limit: 1000 }).subscribe({
+      next: (res) => {
+        const found = res.data.find((a) => a.jobOffer.id === id);
+        if (found) this.openDetailFromApp(found);
+      },
+      error: () => {}, // best-effort — si falla, el usuario igual queda en "Mis postulaciones"
+    });
   }
 
   /**

@@ -250,7 +250,7 @@ export class ApplicationsService {
           userId: application.candidateId,
           type: NotificationType.APPLICATION_STATUS_CHANGED,
           title: 'Tu postulación cambió de estado',
-          body: `Tu postulación a "${application.jobOffer.title}" pasó a estado "${statusLabel}".`,
+          body: `Tu postulación en "${application.jobOffer.title}" cambió su estado a ${statusLabel}.`,
           link: `/app/jobs?tab=my-applications&jobId=${application.jobOfferId}`,
         },
       });

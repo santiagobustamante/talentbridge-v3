@@ -2,7 +2,7 @@
 
 Guía rápida para no reintroducir el problema que motivó el [plan de consistencia de CSS](../../../docs/plan-consistencia-css.md): 915 colores hardcodeados repartidos en 26 archivos porque no había un lugar único ni componentes compartidos para reutilizar.
 
-**Regla de oro: nunca escribas un color, radio o sombra a mano en un `*.component.scss`.** Si Stylelint te frena con *"No hardcodees colores"*, es exactamente por esto — buscá el token de abajo en vez de silenciar la regla.
+**Regla de oro: nunca escribas un color, radio o sombra a mano en un `*.component.scss`.** Si Stylelint te frena con *"No hardcodees colores"*, es exactamente por esto — busca el token de abajo en vez de silenciar la regla.
 
 ```bash
 npm run lint:css        # falla si hay color hardcodeado fuera de styles.scss
@@ -28,7 +28,7 @@ Todos viven en [`src/styles.scss`](../styles.scss) como custom properties (`var(
 | Marca externa | `--brand-github` | Solo para el ícono/link de GitHub. No usar para nada más. |
 | Overlay | `--overlay-scrim` | Fondo semitransparente detrás de un modal/diálogo. |
 
-Si necesitás un tono que no está: primero revisá si alguno de arriba ya sirve (la mayoría de "necesito otro verde" en realidad era `--success` mal nombrado). Si de verdad falta, agregalo a `styles.scss` con un comentario explicando el caso de uso — no lo dejes suelto en el componente.
+Si necesitas un tono que no está: primero revisa si alguno de arriba ya sirve (la mayoría de "necesito otro verde" en realidad era `--success` mal nombrado). Si de verdad falta, agrégalo a `styles.scss` con un comentario explicando el caso de uso — no lo dejes suelto en el componente.
 
 ## 2. Tipografía, íconos, espaciado
 
@@ -54,7 +54,7 @@ También existe `bp.desktop-up` (≥1024px) y `bp.until-desktop` (≤1023px), us
 
 ## 4. Componentes compartidos
 
-Todos en `src/app/shared/components/`. Antes de escribir tu propio `.btn-algo` o `.badge-algo`, revisá si uno de estos ya lo resuelve.
+Todos en `src/app/shared/components/`. Antes de escribir tu propio `.btn-algo` o `.badge-algo`, revisa si uno de estos ya lo resuelve.
 
 ### Button — `[appButton]`
 
@@ -128,4 +128,4 @@ Aviso legal fijo ("antes de compartir repositorios...") para cualquier campo/sec
 
 ## 6. Componentes con `ViewEncapsulation.None`
 
-Ninguno hoy (el único caso, `profile-editor.component.ts`, se eliminó — ver [plan de mejoras UX](../../../docs/plan-mejoras-frontend-ux.md), Fase 4.1). Si agregás uno, **cualquier selector que toque una clase global** (`.app-btn`, `.app-badge`, etc.) tiene que ir prefijado con la clase raíz del componente (ej. `.mi-componente .app-btn { ... }`), o vas a pisar el estilo de esa clase en toda la app.
+Ninguno hoy (el único caso, `profile-editor.component.ts`, se eliminó — ver [plan de mejoras UX](../../../docs/plan-mejoras-frontend-ux.md), Fase 4.1). Si agregas uno, **cualquier selector que toque una clase global** (`.app-btn`, `.app-badge`, etc.) tiene que ir prefijado con la clase raíz del componente (ej. `.mi-componente .app-btn { ... }`), o vas a pisar el estilo de esa clase en toda la app.

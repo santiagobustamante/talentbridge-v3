@@ -817,3 +817,16 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos afectados:** ver cada entrada de `BUGS_AND_FIXES.md` (BUG-043/044/045) para la lista completa por archivo.
 **Cómo se probó:** `npm run build`/`npx jest` completos sin regresiones (40/45 de siempre, mismos 5 fallos preexistentes de `jobs-service`). `ng build`/`lint:css` limpios. Los 3 fixes verificados en vivo de punta a punta (envío real de correo a un destinatario ajeno a la cuenta de Brevo, publicación real de un portafolio antes inaccesible, clic real sobre notificaciones de ambos lados candidato/empresa).
 **Pendientes:** Ninguno.
+
+---
+
+### 2026-07-28 — Backfill de notificaciones viejas + redacción final del mensaje + barrido completo de voseo
+
+**Módulo:** Backend — `applications-service` (mensaje) · Frontend — `candidate-jobs.component.ts` (paginación), `assistant-service`/`portfolio-service` (prompts de IA), varios componentes (voseo)
+**Tipo de cambio:** Fix (2 bugs, ver `BUG-046`/`BUG-047` en `BUGS_AND_FIXES.md`)
+**Problema y solución:**
+1. **Las notificaciones ya existentes nunca reflejaban los fixes de mensaje/link (BUG-046).** El `body`/`link` se graba fijo al crearse la notificación — arreglar el código de generación no reescribe lo que ya existía en la base. Corrida una migración de datos de un solo uso (backfill, no versionada) que reescribió TODAS las notificaciones ya existentes en local y producción al formato actual, reconstruyendo el id de oferta/postulación a partir del texto/link viejo cuando hacía falta. De paso se encontró y arregló un bug real: si la postulación resaltada por una notificación estaba en una página distinta a la que carga por defecto "Mis postulaciones", el detalle no se abría — ahora se busca en el listado completo si no aparece en la página cargada. Mensaje ajustado una vez más a la redacción final pedida: "Tu postulación en X cambió su estado a Y."
+2. **Voseo colado, esta vez escalado a regla permanente de máxima prioridad (BUG-047).** Encontrado en un mensaje de confirmación (`cv-analysis.component.ts`) y, al hacer un barrido completo del proyecto, en 8 lugares más nunca antes revisados — incluyendo los **system prompts de IA** (Joaquín y el análisis de CV), que hasta ahora habían quedado fuera de los barridos de voseo anteriores (concentrados en templates de componentes). Todo reescrito a tuteo estándar.
+**Archivos afectados:** ver `BUGS_AND_FIXES.md` (BUG-046/047) para la lista completa.
+**Cómo se probó:** `npm run build`/`npx jest` sin regresiones. `ng build`/`lint:css` limpios. Backfill verificado en vivo contra producción real: la notificación original que motivó el reporte del usuario (del 20/07) ahora muestra el texto nuevo y su clic abre el detalle correcto, incluso estando en la segunda página de resultados. Grep final de voseo sobre todo `FRONTEND/src` sin resultados.
+**Pendientes:** Ninguno.

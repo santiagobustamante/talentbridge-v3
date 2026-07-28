@@ -62,7 +62,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
           </div>
           <p class="auth-alt"><a routerLink="/login">Iniciar sesión</a></p>
         } @else {
-          <h1 class="auth-title">Elegí una nueva contraseña</h1>
+          <h1 class="auth-title">Elige una nueva contraseña</h1>
           <p class="auth-subtitle">Debe tener al menos 8 caracteres, con letras y números</p>
 
           <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">

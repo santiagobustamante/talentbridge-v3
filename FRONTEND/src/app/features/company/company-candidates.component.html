@@ -179,7 +179,7 @@
                     [disabled]="endorsingSkillId === s.id || (!c.canEndorse && !s.endorsedByMe)"
                     [attr.aria-label]="s.endorsedByMe ? 'Quitar aval de ' + s.name : 'Avalar ' + s.name"
                     [matTooltip]="!c.canEndorse && !s.endorsedByMe
-                      ? 'Contactá a este candidato (mensaje o postulación a tu vacante) para poder avalar sus habilidades'
+                      ? 'Contacta a este candidato (mensaje o postulación a tu vacante) para poder avalar sus habilidades'
                       : (s.endorsedByMe ? 'Avalada por tu empresa — clic para quitar' : 'Avalar esta habilidad')"
                     (click)="toggleEndorse(c, s)"
                   >
