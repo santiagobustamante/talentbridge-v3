@@ -101,6 +101,26 @@ export class AuthService {
       .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 
+  /** Pide el enlace de recuperación de contraseña; el backend responde el mismo mensaje genérico exista o no el correo. */
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/forgot-password`, { email });
+  }
+
+  /** Establece una nueva contraseña usando el token recibido por correo. */
+  resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/reset-password`, { token, newPassword, confirmPassword });
+  }
+
+  /** Confirma el correo usando el token recibido por email al registrarse. */
+  verifyEmail(token: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/verify-email`, { token });
+  }
+
+  /** Pide reenviar el correo de verificación (requiere sesión activa). Actualiza el usuario en memoria si ya estaba verificado. */
+  resendVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/resend-verification`, {}, { withCredentials: true });
+  }
+
   /** Cierra sesión: pide al backend que invalide la cookie, limpia el token local y el estado, y redirige a la home. */
   logout(): Observable<{ message: string }> {
     return this.http

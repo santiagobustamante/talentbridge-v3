@@ -4,6 +4,8 @@ export { IpThrottlerGuard } from './guards/ip-throttler.guard';
 export { ResponseHelper } from './response.helper';
 export { DeepSeekService } from './ai/deepseek.service';
 export type { DeepSeekChatMessage } from './ai/deepseek.service';
+export { EmailService } from './email/email.service';
+export type { SendMailParams } from './email/email.service';
 
 export * from './normalize/text.util';
 export * from './normalize/email.util';

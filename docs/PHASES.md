@@ -166,11 +166,31 @@ Basado en una auditoría de código + navegación en vivo del 2026-07-11, más 1
 
 ---
 
-## Plan vigente: Correcciones de seguridad y bugs reales (`plan-correcciones-seguridad-y-bugs.md`)
+## Plan (completo): Correcciones de seguridad y bugs reales (`plan-correcciones-seguridad-y-bugs.md`)
 
-**Objetivo:** Cerrar los hallazgos reales (no hipotéticos) de la auditoría técnica completa del 2026-07-18 — 4 críticos de seguridad/funcionalidad, 5 altos, 3 medios. Detalle completo, con archivo/línea y criterio de aceptación por ítem, en [`plan-correcciones-seguridad-y-bugs.md`](./plan-correcciones-seguridad-y-bugs.md).
-**Estado:** Planificado, sin implementar — el usuario pidió dejarlo listo para la próxima sesión ("lo haremos mañana").
-**Al retomar:** Empezar por la Fase 0 (crítico) del plan, en orden, uno por uno con su propio build/prueba.
+**Objetivo:** Cerrar los hallazgos reales (no hipotéticos) de la auditoría técnica completa del 2026-07-18 — 4 críticos de seguridad/funcionalidad, 5 altos, 3 medios. Detalle completo, con archivo/línea y criterio de aceptación por ítem, en [`plan-correcciones-seguridad-y-bugs.md`](./plan-correcciones-seguridad-y-bugs.md) (nota: el encabezado de ese archivo quedó desactualizado diciendo "planificado, sin implementar" — en realidad los 4 críticos y 5 altos ya están corregidos y verificados contra el código actual; ver `CHANGELOG.md` 2026-07-25/26 y el informe de seguridad generado el 2026-07-27).
+**Estado:** Completo (los 4 críticos + 5 altos). Los 3 medios eran cosméticos/deuda técnica no bloqueante, quedaron deliberadamente sin hacer (ver ítem 2.2/2.3 del plan).
+**Al retomar:** Nada pendiente de este plan puntual.
+
+---
+
+## Fase 16 — Correcciones del acta de seguimiento de tesis (27/07/2026)
+
+**Objetivo:** Cerrar los 6 compromisos + 1 recomendación del formato de control y seguimiento de la reunión con el asesor de tesis (UCC, Grupo #5, 27/07/2026), documentado en un archivo `.docx` que el usuario compartió pidiendo "un plan ultra elaborado para cuadrar TODO el proyecto sin romper nada".
+**Tareas (7 fases, plan completo en el historial de la sesión):**
+- **A** — Experiencia: campo "Otro" con texto libre en tipo de contrato (replicando el patrón ya usado en Ofertas laborales).
+- **B1** — Colores de nivel Avanzado (azul)/Experto (verde), incluido un bug de fondo no reportado (el portafolio público los mostraba idénticos entre sí).
+- **B2** — Aviso de nivel Básico al importar habilidades detectadas en el CV.
+- **C** — Notificaciones: mensaje mejorado + deep link real a la oferta específica (antes navegaba siempre a la lista genérica).
+- **D** — Infraestructura de correo nueva (Resend) + tabla `VerificationToken` reutilizable, base para las fases E y F.
+- **E** — Recuperar contraseña (no existía).
+- **F** — Verificación de correo al registrarse, sin bloquear el login (recomendación del asesor).
+**Módulos:** Backend — `portfolio-service`, `applications-service`, `jobs-service`, `auth-service`, `libs/common` (nuevo `EmailService`), `libs/database` (schema) · Frontend — `experiences`, `cv-analysis`, `jobs` (candidato y empresa), `portfolio-content`, `auth` (login, forgot/reset/verify-password, banner de verificación en ambos shells).
+**Estado:** Completa.
+**Decisiones tomadas con el usuario:** proveedor de correo Resend (nivel gratuito, sin tarjeta) — ver `DECISIONS.md`. Verificación de correo no bloqueante — la cuenta funciona igual desde el registro, con un aviso descartable. Cuentas ya existentes antes de esta fase se marcaron como verificadas automáticamente (backfill de migración) — no tendría sentido pedirles retroactivamente un paso que no existía cuando se crearon.
+**Criterios de aceptación:** `npm run build` completo + `ng build`/`lint:css` limpios, sin warnings nuevos (uno de los archivos tocados llegó a superar el límite duro de presupuesto de estilos en un primer intento — se recortó CSS hasta quedar dentro). `npx jest` sin regresiones (mismos 39/44 de siempre — un intento inicial sí rompió 9 tests de `auth-service` por no mockear el `EmailService` nuevo, corregido antes de continuar). Los 7 flujos verificados en vivo end-to-end (no solo por build): experiencia con "Otro" + texto custom visible en privado y en portafolio público; colores confirmados por `getComputedStyle`; diálogo de aviso de nivel Básico; cambio real de estado de una postulación generando la notificación con el link correcto y resaltando/haciendo scroll a la oferta correcta en ambos lados; recuperación de contraseña de punta a punta (correo real recibido, contraseña vieja rechazada, nueva aceptada, token de un solo uso confirmado); registro nuevo con banner de verificación, reenvío, confirmación por link, y cuentas viejas sin banner.
+**Pruebas:** Ver `CHANGELOG.md` y `BUGS_AND_FIXES.md` (BUG-036 a BUG-038 para las fases A-C) para el detalle completo de cada verificación.
+**Pendientes:** Ninguno.
 
 ---
 

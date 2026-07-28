@@ -11,6 +11,7 @@ export interface User {
   id: number;
   email: string;
   role?: 'CANDIDATE' | 'COMPANY';
+  emailVerified?: boolean;
   createdAt: string;
   updatedAt: string;
   profile?: Profile;

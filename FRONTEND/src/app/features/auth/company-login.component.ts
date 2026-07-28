@@ -62,6 +62,8 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
             <mat-error *ngIf="form.get('password')?.hasError('required')">Requerida</mat-error>
           </mat-form-field>
 
+          <p class="auth-forgot"><a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a></p>
+
           <div class="auth-progress" *ngIf="loading">
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </div>

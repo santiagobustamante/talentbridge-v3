@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService, UserRole } from '@app/database';
+import { EmailService } from '@app/common';
 import { AuthService } from './auth.service';
 
 // bcrypt es un binding nativo — sus exports no son configurables, así que
@@ -25,8 +26,11 @@ describe('AuthService', () => {
   let prisma: {
     user: { findUnique: jest.Mock; create: jest.Mock };
     profile: { findUnique: jest.Mock };
+    verificationToken: { findUnique: jest.Mock; create: jest.Mock; update: jest.Mock };
+    $transaction: jest.Mock;
   };
   let jwtService: { sign: jest.Mock };
+  let emailService: { sendMail: jest.Mock };
 
   const baseUser = {
     id: 1,
@@ -43,14 +47,18 @@ describe('AuthService', () => {
     prisma = {
       user: { findUnique: jest.fn(), create: jest.fn() },
       profile: { findUnique: jest.fn() },
+      verificationToken: { findUnique: jest.fn(), create: jest.fn(), update: jest.fn() },
+      $transaction: jest.fn((ops) => Promise.all(ops)),
     };
     jwtService = { sign: jest.fn().mockReturnValue('token-firmado') };
+    emailService = { sendMail: jest.fn().mockResolvedValue(undefined) };
 
     const module = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: prisma },
         { provide: JwtService, useValue: jwtService },
+        { provide: EmailService, useValue: emailService },
       ],
     }).compile();
 

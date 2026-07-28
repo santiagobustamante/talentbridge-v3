@@ -11,6 +11,7 @@ import { ChatSocketService } from '../../core/services/chat-socket.service';
 import { CompanyService } from '../../core/services/company.service';
 import { AssistantChatComponent } from '../../shared/assistant/assistant-chat.component';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+import { EmailVerificationBannerComponent } from '../../shared/components/email-verification-banner/email-verification-banner.component';
 
 /** Ítem del menú lateral de navegación de la empresa. */
 interface NavItem {
@@ -30,7 +31,7 @@ interface NavItem {
 @Component({
   selector: 'app-company-shell',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, AssistantChatComponent, NotificationBellComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, MatButtonModule, MatTooltipModule, AssistantChatComponent, NotificationBellComponent, EmailVerificationBannerComponent],
   templateUrl: './company-shell.component.html',
   styleUrl: './company-shell.component.scss',
 })

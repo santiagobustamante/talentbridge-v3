@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RegisterCompanyDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto } from './dto/auth.dto';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 
 @Controller('auth')
@@ -46,6 +46,27 @@ export class AuthController {
     const result = await this.authService.loginCompany(dto);
     this.setAuthCookie(res, result.token);
     return { user: result.user, token: result.token };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  async resendVerification(@CurrentUser() user: { sub: number }) {
+    return this.authService.resendVerification(user.sub);
   }
 
   @Post('logout')

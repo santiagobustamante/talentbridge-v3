@@ -35,6 +35,21 @@ export const routes: Routes = [
       import('./features/auth/register.component').then((m) => m.RegisterComponent),
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./features/auth/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password.component').then((m) => m.ResetPasswordComponent),
+  },
+  {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./features/auth/verify-email.component').then((m) => m.VerifyEmailComponent),
+  },
+  {
     path: 'company/login',
     loadComponent: () =>
       import('./features/auth/company-login.component').then((m) => m.CompanyLoginComponent),

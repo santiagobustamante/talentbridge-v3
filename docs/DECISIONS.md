@@ -343,3 +343,42 @@ Registro de decisiones que no son obvias mirando el código, o que se descartaro
 **Riesgos:** Ninguno real — la regla es intencionalmente laxa (cualquier letra + cualquier número, sin exigir posición ni tipo de carácter especial).
 **Cómo revertir:** Quitar el `@Matches()` del DTO y el `Validators.pattern` del formulario — vuelve a exigir solo longitud.
 **Cómo revertir:** Railway: Settings → Source → Disconnect en cada servicio (vuelve a requerir `railway up` manual). Vercel: Settings → Git → Disconnect. Ninguno de los dos borra `Root Directory`/`Dockerfile Path` al desconectar.
+
+---
+
+## Correo transaccional: Resend como proveedor, con remitente de pruebas por defecto
+
+**Fecha:** 2026-07-28
+**Contexto:** El acta de seguimiento del asesor de tesis pidió recuperar contraseña (compromiso) y verificación de correo (recomendación) — ninguno de los dos existía, ni tampoco ninguna infraestructura de envío de correo en todo el proyecto. Se le preguntó al usuario directamente qué proveedor usar.
+**Opciones consideradas:** (a) Resend (API moderna, nivel gratuito ~3000 correos/mes sin tarjeta); (b) Nodemailer + SMTP propio (Gmail/institucional, sin crear cuenta nueva pero con más riesgo de spam/bloqueo); (c) SendGrid (muy usado, pero pide verificación de dominio más estricta).
+**Decisión tomada:** (a), elegida explícitamente por el usuario.
+**Motivo:** Nivel gratuito suficiente para un proyecto académico de bajo tráfico, sin necesidad de tarjeta de crédito, SDK de Node simple. El remitente por defecto (`onboarding@resend.dev`) funciona sin verificar un dominio propio — suficiente para desarrollo/demo; un dominio propio verificado lo reemplaza después solo cambiando la variable de entorno `RESEND_FROM_EMAIL`, sin tocar código.
+**Impacto:** `EmailService` nuevo en `BACKEND/libs/common/src/email/email.service.ts` (mismo patrón de cliente perezoso que `DeepSeekService` — ver ese archivo para el motivo de por qué es perezoso). Nueva variable de entorno `RESEND_API_KEY` (+ `RESEND_FROM_EMAIL` opcional), agregada a `.env`/`.env.example` local; **falta agregarla a Railway y Render antes de que el correo funcione en producción**.
+**Riesgos:** El remitente `onboarding@resend.dev` de Resend, en cuentas sin dominio verificado, solo puede enviar al correo con el que se creó la cuenta de Resend (restricción de su modo sandbox) — suficiente para probar, pero si se necesita enviar a cualquier destinatario real en producción hace falta verificar un dominio propio en el dashboard de Resend.
+**Cómo revertir:** Quitar `EmailService` de `CommonModule`, revertir los cambios de `auth.service.ts` que lo usan (`forgotPassword`/`resetPassword`/verificación de correo dejan de existir), quitar `resend` de `package.json`.
+
+---
+
+## Verificación de correo al registrarse: no bloquea el login
+
+**Fecha:** 2026-07-28
+**Contexto:** Misma acta, recomendación 7 ("enviar un correo con un token que permita validar que el correo es válido"). No especificaba si debía impedir el uso de la cuenta hasta verificar. Se le preguntó al usuario directamente.
+**Opciones consideradas:** (a) no bloquear — la cuenta funciona igual desde el registro, con un aviso descartable/reenviable; (b) bloquear el login hasta que el correo esté confirmado.
+**Decisión tomada:** (a), elegida explícitamente por el usuario.
+**Motivo:** (b) es más estricto y más parecido a otras plataformas serias, pero si el envío de correo falla por cualquier motivo (proveedor caído, correo en spam, typo del usuario) deja a alguien sin poder entrar a una cuenta que sí es suya — un riesgo real de romper el registro para ganar poco en un proyecto académico sin usuarios en riesgo real. (a) prioriza el requisito explícito de la tarea ("sin romper nada").
+**Impacto:** `register()`/`registerCompany()` envían el correo de verificación pero nunca esperan ni exigen su confirmación para completar el registro o permitir login. `EmailVerificationBannerComponent` (nuevo, en ambos shells) muestra un aviso no bloqueante con botón "Reenviar correo" mientras `user.emailVerified === false`.
+**Riesgos:** Una cuenta puede quedar sin verificar indefinidamente sin ninguna consecuencia — aceptado a propósito, no es el objetivo de esta implementación forzar la verificación.
+**Cómo revertir:** Envolver las rutas protegidas (o el login mismo) con un chequeo de `emailVerified`, devolviendo 403 si es `false` — el resto de la infraestructura (tokens, envío, endpoints) ya soporta ese cambio sin modificarse.
+
+---
+
+## Verificación de correo: cuentas ya existentes se marcan como verificadas por backfill (no empiezan en falso)
+
+**Fecha:** 2026-07-28
+**Contexto:** La columna nueva `User.emailVerified` es `NOT NULL DEFAULT false` a nivel de schema de Prisma (para que las cuentas *nuevas* creadas por la app, de acá en adelante, empiecen sin verificar). Pero la migración que agrega la columna necesita darle algún valor a las ~100 cuentas demo y cualquier cuenta real ya creada antes de este cambio.
+**Opciones consideradas:** (a) dejar que todas las cuentas existentes también empiecen en `false` (mismo default); (b) backfill explícito a `true` para las cuentas ya existentes al momento de la migración, vía una migración separada de solo datos.
+**Decisión tomada:** (b).
+**Motivo:** (a) hubiera hecho aparecer el aviso de "verificá tu correo" de la nada en cuentas que llevan usándose con normalidad desde antes de que esta función existiera — confuso y no tiene sentido exigirles retroactivamente un paso que no existía cuando se registraron. Es el mismo criterio que usan la mayoría de productos reales al agregar verificación de correo a una base de usuarios ya existente ("grandfathering").
+**Impacto:** Migración separada `20260728140000_backfill_existing_users_verified` (`UPDATE "users" SET "email_verified" = true`), aplicada una sola vez, después de la migración que agrega la columna (que sí respeta el default `false` del schema, sin drift entre Prisma y la base). Verificado en vivo: la cuenta demo del candidato principal no muestra el aviso; una cuenta registrada después sí lo muestra hasta confirmar.
+**Riesgos:** Ninguno — es una migración de datos de un solo uso, no afecta el comportamiento de cuentas nuevas.
+**Cómo revertir:** No aplica (backfill histórico, no hay "revertir" sin perder la distinción entre cuentas viejas/nuevas — si hiciera falta, se podría correr `UPDATE "users" SET "email_verified" = false WHERE created_at > '2026-07-28'` para deshacer solo el efecto en cuentas nuevas).

@@ -82,3 +82,32 @@ export class LoginDto {
   @IsString()
   password: string;
 }
+
+export class ForgotPasswordDto {
+  @IsEmail({}, { message: 'Correo electrónico no válido' })
+  @MaxLength(255)
+  email: string;
+}
+
+export class ResetPasswordDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El token es requerido' })
+  token: string;
+
+  @IsString()
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
+  @MaxLength(72)
+  @Matches(PASSWORD_COMPLEXITY, { message: PASSWORD_COMPLEXITY_MESSAGE })
+  newPassword: string;
+
+  @IsString()
+  @MinLength(8, { message: 'La confirmación debe tener al menos 8 caracteres' })
+  @MaxLength(72)
+  confirmPassword: string;
+}
+
+export class VerifyEmailDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El token es requerido' })
+  token: string;
+}
