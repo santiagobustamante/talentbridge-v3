@@ -556,6 +556,8 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Prueba realizada:** `npm run build`/`npx jest` sin regresiones. `ng build`/`lint:css` limpios. Verificado en vivo contra producción real: la notificación original del 20/07 (la misma que el usuario mostró en su primer reporte) ahora muestra el mensaje nuevo y, al hacer clic, aterriza en "Mis postulaciones" con el detalle de esa postulación específica abierto — aunque estuviera en la segunda página de resultados.
 **Estado:** Corregido.
 
+**Nota — corrección posterior del propio backfill (mismo día):** al verificar el clic en producción, el panel abierto no coincidía con la notificación (mostraba una postulación "Pendiente" en vez de "Contratado"). Causa: el candidato tenía **dos postulaciones distintas con el mismo título de oferta en la misma empresa** ("Ingeniero de Software Junior" en "Talento Llanero S.A.S."), y la reconstrucción de `jobId` del backfill (`findFirst` sin desempate) eligió la incorrecta para 2 de las 16 notificaciones de producción. Corregido con un segundo script (también de uso único) que, ante múltiples postulaciones candidatas para el mismo título, prioriza primero la que tenga el estado ACTUAL igual al mencionado en la notificación, y si sigue empatado, la actualizada más recientemente. Verificado que no había casos ambiguos en local. Este es el motivo por el que un backfill de datos reales, aunque sea cosmético, conviene revisar con una prueba de clic real después de aplicarlo — no alcanza con confirmar que el texto cambió.
+
 ---
 
 ### BUG-047 — Voseo colado en un mensaje de la app, y en varios lugares más nunca revisados (prompts de IA, tooltips, docs internas)
