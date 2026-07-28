@@ -108,13 +108,16 @@ export class CompanyLoginComponent {
   /**
    * Autentica a la empresa y decide a dónde redirigir: si venía con una
    * búsqueda pendiente desde la landing (query param "q") va a Candidatos
-   * con esa búsqueda precargada; si no, al dashboard normal.
+   * con esa búsqueda precargada; si no, al dashboard normal. Si el rechazo
+   * es por correo sin confirmar (verificación bloqueante), ofrece reenviar
+   * el correo desde el mismo snackbar en vez del mensaje de error genérico.
    */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;
-    const { email, password } = this.form.value;
-    this.auth.loginCompany(normalizeEmail(email!), password!).subscribe({
+    const email = normalizeEmail(this.form.value.email!);
+    const password = this.form.value.password!;
+    this.auth.loginCompany(email, password).subscribe({
       next: () => {
         const q = this.route.snapshot.queryParamMap.get('q');
         if (q) {
@@ -125,8 +128,20 @@ export class CompanyLoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.snackBar.open(err.error?.message || 'Error al iniciar sesión', 'Cerrar', { duration: 5000 });
+        if (err.status === 403 && err.error?.message?.includes('correo todavía no fue confirmado')) {
+          const ref = this.snackBar.open(err.error.message, 'Reenviar correo', { duration: 8000 });
+          ref.onAction().subscribe(() => this.resendVerification(email));
+        } else {
+          this.snackBar.open(err.error?.message || 'Error al iniciar sesión', 'Cerrar', { duration: 5000 });
+        }
       },
+    });
+  }
+
+  private resendVerification(email: string) {
+    this.auth.resendVerification(email).subscribe({
+      next: (res) => this.snackBar.open(res.message, 'Cerrar', { duration: 5000 }),
+      error: (err) => this.snackBar.open(err.error?.message || 'No se pudo reenviar el correo', 'Cerrar', { duration: 4000 }),
     });
   }
 }

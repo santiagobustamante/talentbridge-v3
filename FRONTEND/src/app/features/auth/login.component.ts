@@ -106,18 +106,33 @@ export class LoginComponent {
   /**
    * Envía las credenciales al backend (normalizando el email antes, para
    * evitar problemas de mayúsculas/espacios) y navega al home del
-   * candidato si el login es exitoso.
+   * candidato si el login es exitoso. Si el rechazo es por correo sin
+   * confirmar (verificación bloqueante), ofrece reenviar el correo desde
+   * el mismo snackbar en vez del mensaje de error genérico.
    */
   onSubmit() {
     if (this.form.invalid) return;
     this.loading = true;
-    const { email, password } = this.form.value;
-    this.auth.login(normalizeEmail(email!), password!).subscribe({
+    const email = normalizeEmail(this.form.value.email!);
+    const password = this.form.value.password!;
+    this.auth.login(email, password).subscribe({
       next: () => this.router.navigate(['/app/inicio']),
       error: (err) => {
         this.loading = false;
-        this.snackBar.open(err.error?.message || 'Error al iniciar sesión', 'Cerrar', { duration: 5000 });
+        if (err.status === 403 && err.error?.message?.includes('correo todavía no fue confirmado')) {
+          const ref = this.snackBar.open(err.error.message, 'Reenviar correo', { duration: 8000 });
+          ref.onAction().subscribe(() => this.resendVerification(email));
+        } else {
+          this.snackBar.open(err.error?.message || 'Error al iniciar sesión', 'Cerrar', { duration: 5000 });
+        }
       },
+    });
+  }
+
+  private resendVerification(email: string) {
+    this.auth.resendVerification(email).subscribe({
+      next: (res) => this.snackBar.open(res.message, 'Cerrar', { duration: 5000 }),
+      error: (err) => this.snackBar.open(err.error?.message || 'No se pudo reenviar el correo', 'Cerrar', { duration: 4000 }),
     });
   }
 }

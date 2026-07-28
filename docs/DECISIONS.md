@@ -361,6 +361,8 @@ Registro de decisiones que no son obvias mirando el código, o que se descartaro
 
 ## Verificación de correo al registrarse: no bloquea el login
 
+**Estado: SUPERSEDIDA el mismo día (2026-07-28) — ver la decisión siguiente ("Verificación de correo: cambio a bloqueante").** Se deja esta entrada como registro histórico de por qué se tomó la decisión original, tal como pide la política de documentación del proyecto; no refleja el comportamiento actual.
+
 **Fecha:** 2026-07-28
 **Contexto:** Misma acta, recomendación 7 ("enviar un correo con un token que permita validar que el correo es válido"). No especificaba si debía impedir el uso de la cuenta hasta verificar. Se le preguntó al usuario directamente.
 **Opciones consideradas:** (a) no bloquear — la cuenta funciona igual desde el registro, con un aviso descartable/reenviable; (b) bloquear el login hasta que el correo esté confirmado.
@@ -369,6 +371,25 @@ Registro de decisiones que no son obvias mirando el código, o que se descartaro
 **Impacto:** `register()`/`registerCompany()` envían el correo de verificación pero nunca esperan ni exigen su confirmación para completar el registro o permitir login. `EmailVerificationBannerComponent` (nuevo, en ambos shells) muestra un aviso no bloqueante con botón "Reenviar correo" mientras `user.emailVerified === false`.
 **Riesgos:** Una cuenta puede quedar sin verificar indefinidamente sin ninguna consecuencia — aceptado a propósito, no es el objetivo de esta implementación forzar la verificación.
 **Cómo revertir:** Envolver las rutas protegidas (o el login mismo) con un chequeo de `emailVerified`, devolviendo 403 si es `false` — el resto de la infraestructura (tokens, envío, endpoints) ya soporta ese cambio sin modificarse.
+
+---
+
+## Verificación de correo: cambio a bloqueante (supersede la decisión anterior)
+
+**Fecha:** 2026-07-28 (mismo día que la decisión original — el usuario probó el registro no bloqueante, vio que se podía crear una cuenta con un correo sin validar, y pidió explícitamente el cambio: "necesito que antes de crearse envíe un correo y que el cliente tenga que validarlo para crear la cuenta").
+**Contexto:** La decisión anterior priorizó "no romper nada" sobre exigir verificación estricta. En la práctica, el usuario consideró que permitir usar la cuenta con un correo sin confirmar era en sí mismo un problema (cualquiera puede registrarse con un correo ajeno o inventado y usar la plataforma con normalidad) — más grave que el riesgo original de dejar a alguien afuera por un fallo de envío.
+**Opciones consideradas:** (a) mantener no bloqueante; (b) bloquear el login hasta confirmar el correo, usando la infraestructura ya construida (Resend, `VerificationToken`, tokens de un solo uso) sin cambios de esquema.
+**Decisión tomada:** (b).
+**Motivo:** Instrucción explícita y puntual del usuario, revirtiendo la decisión previa con el mismo criterio que ya se aplicó en otras partes del proyecto (priorizar lo que pide el usuario cuando prueba el comportamiento en vivo y lo objeta).
+**Impacto:**
+- `register()`/`registerCompany()` (`BACKEND/apps/auth-service/src/auth.service.ts`) ya no emiten cookie ni token JWT — la cuenta se crea (con `emailVerified: false`, sin cambios de esquema) pero queda inutilizable hasta confirmar el correo. Responden `{ message, email }` en vez de `{ user, token }`.
+- `login()`/`loginCompany()` rechazan con 403 si `user.emailVerified === false`, con un mensaje reconocible (`"...correo todavía no fue confirmado..."`) que el frontend usa para decidir si ofrece "Reenviar correo" en el error, en vez de tratarlo como una contraseña incorrecta genérica.
+- `resendVerification()` deja de requerir sesión (antes usaba el JWT del usuario autenticado) — ahora identifica la cuenta por correo en el body, con el mismo mensaje genérico anti-enumeración que ya usa `forgotPassword` (exista o no la cuenta, o ya esté verificada, la respuesta es idéntica).
+- Frontend: `register`/`company-register` ya no navegan a la app tras el submit — muestran una pantalla de "revisa tu correo" con botón "Reenviar correo" (mismo componente, nuevo estado). `login`/`company-login` detectan el 403 específico y ofrecen "Reenviar correo" como acción del snackbar en vez del mensaje de error genérico.
+- `EmailVerificationBannerComponent` (shells) se deja intacto como red de seguridad para sesiones que ya estaban activas antes de este cambio (JWTs ya emitidos no se invalidan retroactivamente por este cambio, solo el siguiente login los bloquearía) — ya no debería ser alcanzable para una sesión nueva.
+- El backfill de cuentas existentes (ver decisión siguiente) sigue vigente y es lo que evita que las ~100 cuentas demo y cualquier cuenta real ya creada queden bloqueadas por este cambio.
+**Riesgos:** Si el envío de Resend falla justo al registrarse (proveedor caído, typo en el correo), la cuenta queda creada pero inaccesible hasta reenviar el correo manualmente desde el login — el mismo riesgo que la decisión anterior evitaba a propósito. Se acepta porque el usuario lo pidió explícitamente tras evaluar el trade-off en la práctica.
+**Cómo revertir:** Quitar los dos `if (!user.emailVerified) throw new ForbiddenException(...)` de `login()`/`loginCompany()`, y volver a emitir cookie/token desde `register()`/`registerCompany()` — el resto de la infraestructura no necesita cambios para volver al modo no bloqueante.
 
 ---
 

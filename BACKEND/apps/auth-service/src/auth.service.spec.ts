@@ -37,6 +37,7 @@ describe('AuthService', () => {
     email: 'candidato@demo.com',
     passwordHash: 'hash-guardado',
     role: UserRole.CANDIDATE,
+    emailVerified: true,
     createdAt: new Date(),
     updatedAt: new Date(),
     profile: null,
@@ -100,6 +101,15 @@ describe('AuthService', () => {
 
       await expect(service.login({ email: 'empresa@demo.com', password: 'correcta' }))
         .rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('rechaza con 403 si el correo todavía no fue confirmado (cambio de decisión: verificación bloqueante)', async () => {
+      prisma.user.findUnique.mockResolvedValue({ ...baseUser, emailVerified: false });
+      mockedCompare.mockResolvedValue(true);
+
+      await expect(service.login({ email: 'candidato@demo.com', password: 'correcta' }))
+        .rejects.toBeInstanceOf(ForbiddenException);
+      expect(jwtService.sign).not.toHaveBeenCalled();
     });
   });
 

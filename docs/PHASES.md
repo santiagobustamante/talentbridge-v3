@@ -192,6 +192,8 @@ Basado en una auditoría de código + navegación en vivo del 2026-07-11, más 1
 **Pruebas:** Ver `CHANGELOG.md` y `BUGS_AND_FIXES.md` (BUG-036 a BUG-038 para las fases A-C) para el detalle completo de cada verificación.
 **Pendientes:** Ninguno.
 
+**Nota posterior (2026-07-28, mismo día):** el punto **F** (verificación no bloqueante) fue revertido a **bloqueante** el mismo día, a pedido explícito del usuario tras probarlo en vivo — ver `BUG-041` en `BUGS_AND_FIXES.md` y la entrada "Verificación de correo: cambio a bloqueante" en `DECISIONS.md`. El resto de esta fase (A-E) no se vio afectado.
+
 ---
 
 ## Plan previo (ya completo, no vigente): Consistencia de CSS

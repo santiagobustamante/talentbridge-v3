@@ -1,15 +1,26 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/auth/auth.service';
 
 /**
- * Aviso no bloqueante en el shell (candidato/empresa) cuando el correo de la
- * cuenta todavía no fue confirmado. Nunca impide usar la app — solo ofrece
- * reenviar el correo de verificación. No se muestra si no hay sesión, si ya
- * está verificado, o mientras el perfil todavía no cargó (evita un parpadeo
- * del aviso antes de que `currentUser()` tenga el dato real).
+ * Aviso en el shell (candidato/empresa) cuando el correo de la cuenta
+ * todavía no fue confirmado. Desde el cambio a verificación bloqueante,
+ * esto ya no debería ser alcanzable para una sesión nueva (login la
+ * rechaza hasta confirmar el correo) — se mantiene como red de seguridad
+ * para sesiones que ya estaban activas de antes de ese cambio. No se
+ * muestra si no hay sesión, si ya está verificado, o mientras el perfil
+ * todavía no cargó (evita un parpadeo del aviso antes de que
+ * `currentUser()` tenga el dato real).
+ *
+ * `currentUser()` se carga una sola vez al arrancar la app (APP_INITIALIZER)
+ * y no se refresca solo — si la cuenta se verifica por otra vía mientras la
+ * pestaña sigue abierta (ej. el backfill de una cuenta vieja, o el usuario
+ * confirma el correo en OTRA pestaña), el aviso se queda mostrando el dato
+ * viejo indefinidamente hasta recargar. Por eso, al montar el banner, se
+ * refresca `currentUser()` contra `/auth/me` una vez — así el aviso nunca
+ * queda mintiendo sobre una cuenta que en realidad ya está verificada.
  */
 @Component({
   selector: 'app-email-verification-banner',
@@ -66,16 +77,23 @@ import { AuthService } from '../../../core/auth/auth.service';
     }
   `],
 })
-export class EmailVerificationBannerComponent {
+export class EmailVerificationBannerComponent implements OnInit {
   auth = inject(AuthService);
   private snackBar = inject(MatSnackBar);
 
   sending = false;
 
+  ngOnInit(): void {
+    if (this.auth.currentUser()?.emailVerified === false) {
+      this.auth.fetchMe().subscribe({ error: () => {} });
+    }
+  }
+
   resend() {
-    if (this.sending) return;
+    const email = this.auth.currentUser()?.email;
+    if (this.sending || !email) return;
     this.sending = true;
-    this.auth.resendVerification().subscribe({
+    this.auth.resendVerification(email).subscribe({
       next: (res) => {
         this.sending = false;
         this.snackBar.open(res.message, 'Cerrar', { duration: 4000 });

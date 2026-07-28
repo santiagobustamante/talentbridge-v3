@@ -1,9 +1,12 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, Injector, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, map, of, catchError } from 'rxjs';
 import { User, Profile } from './auth.models';
 import { environment } from '../../../environments/environment';
+import { ProfileService } from '../services/profile.service';
+import { ChatService } from '../services/chat.service';
+import { ChatSocketService } from '../services/chat-socket.service';
 
 /**
  * Servicio central de autenticación y estado de sesión del frontend.
@@ -42,7 +45,29 @@ export class AuthService {
   readonly isCompany = computed(() => this._currentUser()?.role === 'COMPANY');
   readonly authReady = computed(() => this._authReady());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private injector: Injector,
+    private profileService: ProfileService,
+  ) {}
+
+  /**
+   * Limpia todo el estado en memoria/caché de otros servicios que viven como
+   * singleton (`providedIn: 'root'`) por el resto de la vida de la pestaña.
+   * Sin esto, cambiar de sesión (logout+login, o login de otra cuenta) en la
+   * misma pestaña sin recargar la página puede mostrarle a un usuario datos
+   * cacheados de la sesión anterior (perfil, contador de no-leídos, socket
+   * de chat conectado con el token viejo). `ChatService`/`ChatSocketService`
+   * se resuelven vía `Injector` en vez de inyectarse en el constructor
+   * porque ambos dependen (indirectamente) de `AuthService`, y la inyección
+   * directa por constructor produciría una dependencia circular.
+   */
+  private clearCrossSessionState(): void {
+    this.profileService.invalidateCache();
+    this.injector.get(ChatSocketService).disconnect();
+    this.injector.get(ChatService).setUnreadCount(0);
+  }
 
   /** Token JWT guardado en localStorage (respaldo de la cookie, ver comentario de la clase). Leído por auth.interceptor.ts en cada request. */
   getToken(): string | null {
@@ -64,28 +89,32 @@ export class AuthService {
     this._currentUser.set({ ...current, profile });
   }
 
-  /** Registra un nuevo candidato; el backend responde con la cookie de sesión ya seteada más el token en el body, que se guarda en localStorage como respaldo (ver comentario de la clase). */
-  register(fullName: string, email: string, password: string, confirmPassword: string): Observable<{ user: User; token: string }> {
-    return this.http
-      .post<{ user: User; token: string }>(`${this.api}/auth/register`, { fullName, email, password, confirmPassword }, { withCredentials: true })
-      .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
+  /**
+   * Registra un nuevo candidato. El backend YA NO establece sesión ni
+   * devuelve token: la cuenta queda creada pero inutilizable hasta que se
+   * confirme el correo (cambio de decisión — antes la verificación era no
+   * bloqueante). Responde solo un mensaje + el correo, para que la pantalla
+   * de registro pueda mostrar "revisa tu correo" y ofrecer reenviarlo.
+   */
+  register(fullName: string, email: string, password: string, confirmPassword: string): Observable<{ message: string; email: string }> {
+    return this.http.post<{ message: string; email: string }>(`${this.api}/auth/register`, { fullName, email, password, confirmPassword });
   }
 
   /** Login de candidato con email/contraseña. */
   login(email: string, password: string): Observable<{ user: User; token: string }> {
     return this.http
       .post<{ user: User; token: string }>(`${this.api}/auth/login`, { email, password }, { withCredentials: true })
-      .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
+      .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 
   /** Login de empresa; usa un endpoint distinto al de candidatos porque valida contra el modelo CompanyProfile. */
   loginCompany(email: string, password: string): Observable<{ user: User; token: string }> {
     return this.http
       .post<{ user: User; token: string }>(`${this.api}/auth/login-company`, { email, password }, { withCredentials: true })
-      .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
+      .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 
-  /** Registro de empresa, con los campos propios de su perfil (nombre, sector, ciudad) además de las credenciales. */
+  /** Registro de empresa, con los campos propios de su perfil (nombre, sector, ciudad) además de las credenciales. Igual que `register()`, ya no establece sesión — ver ese comentario. */
   registerCompany(
     email: string,
     password: string,
@@ -93,12 +122,10 @@ export class AuthService {
     companyName: string,
     sector?: string,
     city?: string
-  ): Observable<{ user: User; token: string }> {
-    return this.http
-      .post<{ user: User; token: string }>(`${this.api}/auth/register-company`, {
-        email, password, confirmPassword, companyName, sector, city
-      }, { withCredentials: true })
-      .pipe(tap((res) => { this._currentUser.set(res.user); this.setToken(res.token); }));
+  ): Observable<{ message: string; email: string }> {
+    return this.http.post<{ message: string; email: string }>(`${this.api}/auth/register-company`, {
+      email, password, confirmPassword, companyName, sector, city
+    });
   }
 
   /** Pide el enlace de recuperación de contraseña; el backend responde el mismo mensaje genérico exista o no el correo. */
@@ -116,9 +143,14 @@ export class AuthService {
     return this.http.post<{ message: string }>(`${this.api}/auth/verify-email`, { token });
   }
 
-  /** Pide reenviar el correo de verificación (requiere sesión activa). Actualiza el usuario en memoria si ya estaba verificado. */
-  resendVerification(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.api}/auth/resend-verification`, {}, { withCredentials: true });
+  /**
+   * Pide reenviar el correo de verificación, identificando la cuenta por
+   * correo (no por sesión) — un usuario recién registrado bajo la
+   * verificación bloqueante todavía no tiene sesión. Mismo mensaje genérico
+   * exista o no la cuenta, o ya esté verificada (anti-enumeración, ver `forgotPassword`).
+   */
+  resendVerification(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/resend-verification`, { email });
   }
 
   /** Cierra sesión: pide al backend que invalide la cookie, limpia el token local y el estado, y redirige a la home. */
@@ -130,6 +162,7 @@ export class AuthService {
           this._currentUser.set(null);
           this._authReady.set(true);
           this.setToken(null);
+          this.clearCrossSessionState();
           this.router.navigate(['/']);
         }),
       );

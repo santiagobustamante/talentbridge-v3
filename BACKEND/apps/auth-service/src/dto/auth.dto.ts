@@ -111,3 +111,9 @@ export class VerifyEmailDto {
   @IsNotEmpty({ message: 'El token es requerido' })
   token: string;
 }
+
+export class ResendVerificationDto {
+  @IsEmail({}, { message: 'Correo electrónico no válido' })
+  @MaxLength(255)
+  email: string;
+}

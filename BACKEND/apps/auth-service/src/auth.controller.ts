@@ -1,31 +1,23 @@
 import { Controller, Post, Get, Body, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto } from './dto/auth.dto';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Registro ya no emite cookie/token: la cuenta queda creada pero inutilizable
+  // hasta que se confirme el correo (ver AuthService.register/login).
   @Post('register')
-  async register(
-    @Body() dto: RegisterDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const result = await this.authService.register(dto);
-    this.setAuthCookie(res, result.token);
-    return { user: result.user, token: result.token };
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
   }
 
   @Post('register-company')
-  async registerCompany(
-    @Body() dto: RegisterCompanyDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const result = await this.authService.registerCompany(dto);
-    this.setAuthCookie(res, result.token);
-    return { user: result.user, token: result.token };
+  async registerCompany(@Body() dto: RegisterCompanyDto) {
+    return this.authService.registerCompany(dto);
   }
 
   @Post('login')
@@ -63,10 +55,11 @@ export class AuthController {
     return this.authService.verifyEmail(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // Sin guard: un usuario recién registrado todavía no tiene sesión (ver
+  // arriba), así que este endpoint identifica la cuenta por correo, no por JWT.
   @Post('resend-verification')
-  async resendVerification(@CurrentUser() user: { sub: number }) {
-    return this.authService.resendVerification(user.sub);
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendVerification(dto);
   }
 
   @Post('logout')

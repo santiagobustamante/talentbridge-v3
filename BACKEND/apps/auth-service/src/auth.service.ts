@@ -11,7 +11,11 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService, UserRole, Prisma, VerificationTokenType } from '@app/database';
 import { normalizeEmail, titleCaseText, trimText, EmailService } from '@app/common';
-import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto } from './dto/auth.dto';
+
+/** Frase exacta que dispara, en el frontend, el botón "Reenviar correo" en el error de login — ver AllExceptionsFilter, que solo reenvía `message` (no un código de error aparte). */
+const EMAIL_NOT_VERIFIED_MESSAGE =
+  'Tu correo todavía no fue confirmado. Revisa tu bandeja de entrada o reenvía el correo de confirmación antes de iniciar sesión.';
 
 /** Vigencia del token de recuperación de contraseña — corto a propósito, es un enlace que llega por correo y se usa una sola vez. */
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hora
@@ -48,8 +52,12 @@ export class AuthService {
     const user = await this.createCandidateWithUniqueSlug(email, passwordHash, dto.fullName);
     await this.sendVerificationEmail(user.id, user.email);
 
-    const token = this.generateToken(user.id, user.email, user.role);
-    return { user: this.sanitizeUser(user), token };
+    // No se emite cookie ni token: la cuenta existe pero no es utilizable
+    // todavía — `login()` la rechaza hasta que `emailVerified` sea true.
+    return {
+      message: `Te enviamos un correo a ${user.email} para confirmar tu cuenta. Tienes que confirmarlo antes de poder iniciar sesión.`,
+      email: user.email,
+    };
   }
 
   /**
@@ -140,8 +148,10 @@ export class AuthService {
 
     await this.sendVerificationEmail(user.id, user.email);
 
-    const token = this.generateToken(user.id, user.email, user.role);
-    return { user: this.sanitizeUser(user), token };
+    return {
+      message: `Te enviamos un correo a ${user.email} para confirmar tu cuenta. Tienes que confirmarlo antes de poder iniciar sesión.`,
+      email: user.email,
+    };
   }
 
   async login(dto: LoginDto) {
@@ -163,6 +173,10 @@ export class AuthService {
       throw new ForbiddenException(
         'Esta cuenta pertenece a una empresa. Ingresa desde el acceso para empresas.',
       );
+    }
+
+    if (!user.emailVerified) {
+      throw new ForbiddenException(EMAIL_NOT_VERIFIED_MESSAGE);
     }
 
     const token = this.generateToken(user.id, user.email, user.role);
@@ -188,6 +202,10 @@ export class AuthService {
       throw new ForbiddenException(
         'Esta cuenta pertenece a un candidato. Ingresa desde el acceso para candidatos.',
       );
+    }
+
+    if (!user.emailVerified) {
+      throw new ForbiddenException(EMAIL_NOT_VERIFIED_MESSAGE);
     }
 
     const token = this.generateToken(user.id, user.email, user.role);
@@ -226,8 +244,8 @@ export class AuthService {
         to: email,
         subject: 'Recuperar tu contraseña — TalentBridge',
         html: `<p>Recibimos una solicitud para restablecer tu contraseña.</p>
-<p><a href="${resetUrl}">Hacé clic acá para elegir una nueva contraseña</a></p>
-<p>Este enlace vence en 1 hora. Si vos no pediste esto, podés ignorar este correo.</p>`,
+<p><a href="${resetUrl}">Haz clic aquí para elegir una nueva contraseña</a></p>
+<p>Este enlace vence en 1 hora. Si tú no pediste esto, puedes ignorar este correo.</p>`,
       });
     } catch (err) {
       // No se filtra el detalle del error de envío al llamador — el mensaje
@@ -253,7 +271,7 @@ export class AuthService {
       record.usedAt ||
       record.expiresAt < new Date()
     ) {
-      throw new BadRequestException('El enlace no es válido o ya venció. Solicitá uno nuevo.');
+      throw new BadRequestException('El enlace no es válido o ya venció. Solicita uno nuevo.');
     }
 
     const passwordHash = await bcrypt.hash(dto.newPassword, 10);
@@ -263,13 +281,15 @@ export class AuthService {
       this.prisma.verificationToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
     ]);
 
-    return { message: 'Contraseña actualizada. Ya podés iniciar sesión con la nueva.' };
+    return { message: 'Contraseña actualizada. Ya puedes iniciar sesión con la nueva.' };
   }
 
   /**
-   * Genera el token de verificación y envía el correo — nunca bloquea el
-   * registro: si el envío falla (proveedor caído, etc.) la cuenta igual
-   * queda creada y utilizable, solo se registra el error para diagnóstico.
+   * Genera el token de verificación y envía el correo. Si el envío falla
+   * (proveedor caído, etc.) no se revierte la creación de la cuenta — queda
+   * creada pero inutilizable hasta confirmar el correo, igual que si el
+   * envío hubiera funcionado; solo se registra el error para diagnóstico
+   * (el usuario tiene la opción de reenviar el correo más adelante).
    * Se usa desde `register()`/`registerCompany()` y desde `resendVerification()`.
    */
   private async sendVerificationEmail(userId: number, email: string): Promise<void> {
@@ -289,10 +309,10 @@ export class AuthService {
     try {
       await this.emailService.sendMail({
         to: email,
-        subject: 'Confirmá tu correo — TalentBridge',
+        subject: 'Confirma tu correo — TalentBridge',
         html: `<p>Gracias por registrarte en TalentBridge.</p>
-<p><a href="${verifyUrl}">Hacé clic acá para confirmar que este correo es tuyo</a></p>
-<p>Este enlace vence en 24 horas. Podés seguir usando tu cuenta normalmente aunque todavía no lo confirmes.</p>`,
+<p><a href="${verifyUrl}">Haz clic aquí para confirmar que este correo es tuyo</a></p>
+<p>Este enlace vence en 24 horas. Tienes que confirmarlo antes de poder iniciar sesión.</p>`,
       });
     } catch (err) {
       this.logger.error(`Fallo el envío de correo de verificación a ${email}: ${(err as Error).message}`);
@@ -309,7 +329,7 @@ export class AuthService {
       record.usedAt ||
       record.expiresAt < new Date()
     ) {
-      throw new BadRequestException('El enlace no es válido o ya venció. Pedí uno nuevo desde tu perfil.');
+      throw new BadRequestException('El enlace no es válido o ya venció. Pide uno nuevo desde la pantalla de inicio de sesión.');
     }
 
     await this.prisma.$transaction([
@@ -317,16 +337,24 @@ export class AuthService {
       this.prisma.verificationToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
     ]);
 
-    return { message: 'Correo verificado. ¡Gracias!' };
+    return { message: 'Correo confirmado. Ya puedes iniciar sesión.' };
   }
 
-  async resendVerification(userId: number): Promise<{ message: string }> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new UnauthorizedException('Usuario no encontrado');
-    if (user.emailVerified) return { message: 'Tu correo ya está verificado.' };
+  /**
+   * Siempre responde el mismo mensaje genérico, exista o no la cuenta, o ya
+   * esté verificada — mismo criterio anti-enumeración que `forgotPassword`.
+   * Sin sesión (a diferencia de la versión anterior, no bloqueante): un
+   * usuario recién registrado todavía no tiene cookie/token, así que este
+   * endpoint tiene que identificar la cuenta por correo, no por el JWT.
+   */
+  async resendVerification(dto: ResendVerificationDto): Promise<{ message: string }> {
+    const genericResponse = { message: 'Si el correo está registrado y todavía no fue confirmado, te reenviamos el enlace de confirmación.' };
+    const email = normalizeEmail(dto.email);
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user || user.emailVerified) return genericResponse;
 
     await this.sendVerificationEmail(user.id, user.email);
-    return { message: 'Te reenviamos el correo de verificación.' };
+    return genericResponse;
   }
 
   private hashToken(rawToken: string): string {
