@@ -119,6 +119,15 @@
         <div class="summary-slug">
           <h3>URL pública</h3>
           <div class="slug-url">{{ publicUrl }}</div>
+          <div class="publish-control" [class.publish-control--live]="summaryProfile.isPublished">
+            <div class="publish-control-text">
+              <strong>{{ summaryProfile.isPublished ? 'Tu portafolio está publicado' : 'Tu portafolio todavía no está publicado' }}</strong>
+              <span>{{ summaryProfile.isPublished ? 'Cualquiera con el enlace puede verlo.' : 'Publícalo para que las empresas puedan verlo en ese enlace.' }}</span>
+            </div>
+            <button type="button" [appButton]="summaryProfile.isPublished ? 'secondary' : 'primary'" size="sm" (click)="togglePublish()">
+              {{ summaryProfile.isPublished ? 'Despublicar' : 'Publicar portafolio' }}
+            </button>
+          </div>
         </div>
       }
     </div>
@@ -253,6 +262,15 @@
         @if (currentSlug) {
           <div class="slug-preview">
             <strong>{{ publicUrl }}</strong>
+          </div>
+          <div class="publish-control" [class.publish-control--live]="profile?.isPublished">
+            <div class="publish-control-text">
+              <strong>{{ profile?.isPublished ? 'Publicado' : 'No publicado' }}</strong>
+              <span>{{ profile?.isPublished ? 'Cualquiera con el enlace puede verlo.' : 'Nadie puede ver este enlace todavía.' }}</span>
+            </div>
+            <button type="button" [appButton]="profile?.isPublished ? 'secondary' : 'primary'" size="sm" (click)="togglePublish()">
+              {{ profile?.isPublished ? 'Despublicar' : 'Publicar portafolio' }}
+            </button>
           </div>
           <div class="slug-actions">
             <button type="button" appButton="secondary" (click)="copyLink()">

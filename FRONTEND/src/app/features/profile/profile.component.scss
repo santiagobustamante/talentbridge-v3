@@ -272,6 +272,27 @@
   display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;
 }
 
+/* ─── Estado de publicación ──────────────── */
+.publish-control {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 12px; padding: 12px 14px;
+  background: var(--warning-soft); border: 1px solid var(--warning-border); border-radius: 10px;
+
+  &.publish-control--live {
+    background: var(--success-soft); border-color: var(--success-border);
+  }
+}
+
+.publish-control-text {
+  display: flex; flex-direction: column; gap: 2px;
+  strong { font-size: 0.88rem; color: var(--warning-strong); }
+  span { font-size: 0.8rem; color: var(--text-muted); }
+}
+
+.publish-control--live .publish-control-text strong {
+  color: var(--success-strong);
+}
+
 /* ─── GitHub warning ─────────────────────── */
 .form-actions {
   display: flex; align-items: center; gap: 14px; justify-content: flex-end;

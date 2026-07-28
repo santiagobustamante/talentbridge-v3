@@ -203,6 +203,42 @@ export class ProfileComponent implements OnInit {
   }
 
   /**
+   * Publica o despublica el portafolio (`isPublished`), con el mismo
+   * patrón optimista que `toggleSummaryVisibility` — aplica el cambio ya
+   * mismo y lo revierte si falla. Sin esto no existía ningún control en
+   * toda la app para que un candidato nuevo pasara de `isPublished: false`
+   * (default del schema) a `true`: la URL pública se mostraba igual, pero
+   * visitarla siempre daba "Portafolio no encontrado" — las cuentas demo
+   * se ven bien porque sus seeds las crean ya publicadas de entrada, lo
+   * que escondía que ningún registro real podía publicarse jamás.
+   */
+  togglePublish(): void {
+    if (!this.profile || this.saving) return;
+
+    const previous = Boolean(this.profile.isPublished);
+    const next = !previous;
+
+    (this.profile as any).isPublished = next;
+    if (this.lastSavedProfile) (this.lastSavedProfile as any).isPublished = next;
+
+    this.profileService.updateProfile({ isPublished: next } as any).subscribe({
+      next: (updatedProfile) => {
+        const merged: Profile = { ...(this.profile as Profile), ...(updatedProfile ?? {}), isPublished: next };
+        this.profile = merged;
+        this.lastSavedProfile = { ...merged };
+        this.auth.updateCurrentProfile(merged);
+        this.snackBar.open(next ? 'Portafolio publicado' : 'Portafolio despublicado', 'Cerrar', { duration: 2500 });
+      },
+      error: (error) => {
+        (this.profile as any).isPublished = previous;
+        if (this.lastSavedProfile) (this.lastSavedProfile as any).isPublished = previous;
+        const message = error?.error?.message || error?.message || 'No se pudo actualizar el estado de publicación';
+        this.snackBar.open(message, 'Cerrar', { duration: 3000 });
+      },
+    });
+  }
+
+  /**
    * Invierte un toggle de visibilidad directamente desde la vista de
    * resumen (fuera de modo edición) y lo guarda al instante en el
    * backend, de forma optimista: aplica el cambio ya mismo y lo revierte

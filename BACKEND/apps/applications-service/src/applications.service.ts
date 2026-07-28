@@ -83,8 +83,8 @@ export class ApplicationsService {
             userId: job.companyId,
             type: NotificationType.NEW_APPLICATION,
             title: 'Nueva postulación',
-            body: `${candidateName} se postuló a tu vacante "${job.title}". Toca para ver la oferta.`,
-            link: `/company/jobs?jobId=${jobId}`,
+            body: `${candidateName} se postuló a tu vacante "${job.title}".`,
+            link: `/company/jobs?jobId=${jobId}&applicationId=${created.id}`,
           },
         });
 
@@ -250,7 +250,7 @@ export class ApplicationsService {
           userId: application.candidateId,
           type: NotificationType.APPLICATION_STATUS_CHANGED,
           title: 'Tu postulación cambió de estado',
-          body: `Tu estado en tu postulación a "${application.jobOffer.title}" ha cambiado a ${statusLabel}.`,
+          body: `Tu postulación a "${application.jobOffer.title}" pasó a estado "${statusLabel}".`,
           link: `/app/jobs?tab=my-applications&jobId=${application.jobOfferId}`,
         },
       });

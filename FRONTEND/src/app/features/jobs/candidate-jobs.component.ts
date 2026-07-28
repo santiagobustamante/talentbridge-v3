@@ -103,25 +103,42 @@ export class CandidateJobsComponent implements OnInit {
   }
 
   /**
+   * En la pestaña "mis postulaciones", si se llegó desde el enlace de una
+   * notificación de cambio de estado, abre directamente el panel de detalle
+   * de esa postulación puntual (no solo resalta la tarjeta) — es la
+   * información exacta que la notificación estaba avisando.
+   */
+  private openHighlightedApplication(): void {
+    const id = this.highlightedJobId();
+    if (!id) return;
+    const app = this.applications.find((a) => a.jobOffer.id === id);
+    if (app) this.openDetailFromApp(app);
+  }
+
+  /**
    * La oferta que trae una notificación puede no estar en la página/orden
    * actual de resultados (paginación, filtros de match) — si no aparece en
    * la lista ya cargada, se busca puntualmente por id y se antepone, para
    * que el candidato siempre pueda ver la oferta que originó la notificación.
+   * Además de resaltar/hacer scroll, abre directamente el panel de detalle
+   * de esa oferta — el objetivo de venir desde una notificación es ver la
+   * información puntual que avisa, no solo ubicarla en la lista.
    */
   private ensureHighlightedJobLoaded(): void {
     const id = this.highlightedJobId();
     if (!id) return;
-    if (this.jobOffers.some((j) => j.id === id)) {
+    const existing = this.jobOffers.find((j) => j.id === id);
+    if (existing) {
       this.scrollToHighlighted();
+      this.openDetail(existing);
       return;
     }
     this.jobsService.getJob(id).subscribe({
       next: (job) => {
-        this.jobOffers = [
-          { ...job, requiredSkillsList: job.requiredSkillsList ?? [], matchedSkills: job.matchedSkills ?? [] },
-          ...this.jobOffers,
-        ];
+        const normalized = { ...job, requiredSkillsList: job.requiredSkillsList ?? [], matchedSkills: job.matchedSkills ?? [] };
+        this.jobOffers = [normalized, ...this.jobOffers];
         this.scrollToHighlighted();
+        this.openDetail(normalized);
       },
       error: () => {}, // la oferta puede haberse cerrado/archivado entre la notificación y ahora — no rompe la vista
     });
@@ -201,6 +218,7 @@ export class CandidateJobsComponent implements OnInit {
         this.appTotalPages = res.meta.totalPages;
         this.loadingApps.set(false);
         this.scrollToHighlighted();
+        this.openHighlightedApplication();
       },
       error: (err) => {
         if (requestId !== this.appsRequestId) return;

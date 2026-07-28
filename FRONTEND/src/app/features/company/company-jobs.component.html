@@ -337,7 +337,7 @@
       @if (applications.length > 0) {
         <div class="applications-list">
           @for (app of applications; track app.id) {
-            <div class="app-card">
+            <div class="app-card" [id]="'app-' + app.id" [class.app-card-highlighted]="app.id === highlightedApplicationId()">
               <div class="app-card-main">
                 <div class="app-avatar">
                   {{ (app.candidate?.profile?.fullName || 'C').charAt(0).toUpperCase() }}

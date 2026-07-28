@@ -89,6 +89,8 @@ export class CompanyJobsComponent implements OnInit {
 
   /** Id de oferta a resaltar/hacer scroll cuando se llega desde el enlace de una notificación (?jobId=). */
   highlightedJobId = signal<number | null>(null);
+  /** Id de postulación puntual a resaltar dentro del panel de postulaciones (?applicationId=, ej. desde la notificación de nueva postulación). */
+  highlightedApplicationId = signal<number | null>(null);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
 
@@ -198,7 +200,11 @@ export class CompanyJobsComponent implements OnInit {
   /**
    * Si se llegó desde el enlace de una notificación (?jobId=), salta a la
    * página donde cae esa oferta dentro del listado filtrado/paginado — sin
-   * esto, la oferta podía quedar en una página que la empresa nunca ve.
+   * esto, la oferta podía quedar en una página que la empresa nunca ve. Si
+   * además trae una postulación puntual (?applicationId=, ej. desde la
+   * notificación de nueva postulación), abre directamente el panel de
+   * postulaciones de esa oferta — es la información exacta que la
+   * notificación estaba avisando, no solo la oferta en general.
    */
   private goToHighlightedJobPage(): void {
     const id = this.highlightedJobId();
@@ -209,6 +215,10 @@ export class CompanyJobsComponent implements OnInit {
     setTimeout(() => {
       document.getElementById('job-row-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
+
+    if (this.highlightedApplicationId()) {
+      this.viewApplications(this.filteredJobs[index]);
+    }
   }
 
   /** Cualquier cambio de filtro/orden vuelve a la página 1 — evita quedar "varado" en una página que ya no tiene resultados. */
@@ -230,6 +240,8 @@ export class CompanyJobsComponent implements OnInit {
   ngOnInit(): void {
     const jobIdParam = this.route.snapshot.queryParamMap.get('jobId');
     if (jobIdParam) this.highlightedJobId.set(+jobIdParam);
+    const applicationIdParam = this.route.snapshot.queryParamMap.get('applicationId');
+    if (applicationIdParam) this.highlightedApplicationId.set(+applicationIdParam);
     this.loadJobs();
   }
 
@@ -489,6 +501,7 @@ export class CompanyJobsComponent implements OnInit {
       next: (apps) => {
         this.applications = apps;
         this.loadingApps.set(false);
+        this.scrollToHighlightedApplication();
       },
       error: (err) => {
         this.loadingApps.set(false);
@@ -496,6 +509,15 @@ export class CompanyJobsComponent implements OnInit {
         this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
       },
     });
+  }
+
+  /** Hace scroll hasta la postulación resaltada dentro del panel recién cargado (llegada desde el enlace de una notificación de nueva postulación). */
+  private scrollToHighlightedApplication(): void {
+    const id = this.highlightedApplicationId();
+    if (!id) return;
+    setTimeout(() => {
+      document.getElementById('app-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 
   /** Cierra el panel de postulaciones y limpia la lista cargada. */
