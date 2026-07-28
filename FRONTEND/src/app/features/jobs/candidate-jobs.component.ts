@@ -81,14 +81,40 @@ export class CandidateJobsComponent implements OnInit {
   readonly contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro'];
   readonly workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
 
+  /**
+   * Se suscribe a `queryParamMap` (no solo lee el snapshot una vez) porque
+   * Angular reutiliza esta misma instancia del componente al navegar entre
+   * `/app/jobs` con y sin query params (misma ruta) — si solo se leyera el
+   * snapshot al crear el componente, un detalle abierto por el link de una
+   * notificación quedaba pegado para siempre, incluso navegando manualmente
+   * después (sidebar, etc.) sin ningún `jobId` en la URL. Con la suscripción,
+   * cada vez que la URL deja de traer `jobId` (navegación manual, no desde
+   * una notificación) se cierra cualquier detalle que hubiera quedado abierto.
+   */
   ngOnInit(): void {
-    const params = this.route.snapshot.queryParamMap;
-    const jobIdParam = params.get('jobId');
-    if (jobIdParam) this.highlightedJobId.set(+jobIdParam);
+    this.route.queryParamMap.subscribe((params) => {
+      const jobIdParam = params.get('jobId');
+      this.highlightedJobId.set(jobIdParam ? +jobIdParam : null);
 
-    if (params.get('tab') === 'my-applications') {
-      this.setTab('my-applications');
-    } else {
+      if (!jobIdParam) {
+        // Navegación manual (no viene de una notificación): nunca debe
+        // quedar abierto el detalle de una visita anterior a esta ruta.
+        this.closeDetail();
+        return;
+      }
+
+      if (params.get('tab') === 'my-applications') {
+        if (this.activeTab() !== 'my-applications' || this.applications.length === 0) {
+          this.setTab('my-applications');
+        } else {
+          this.openHighlightedApplication();
+        }
+      } else if (this.jobOffers.length > 0) {
+        this.ensureHighlightedJobLoaded();
+      }
+    });
+
+    if (this.route.snapshot.queryParamMap.get('tab') !== 'my-applications') {
       this.loadJobs();
     }
   }

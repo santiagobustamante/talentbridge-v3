@@ -830,3 +830,13 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos afectados:** ver `BUGS_AND_FIXES.md` (BUG-046/047) para la lista completa.
 **Cómo se probó:** `npm run build`/`npx jest` sin regresiones. `ng build`/`lint:css` limpios. Backfill verificado en vivo contra producción real: la notificación original que motivó el reporte del usuario (del 20/07) ahora muestra el texto nuevo y su clic abre el detalle correcto, incluso estando en la segunda página de resultados. Grep final de voseo sobre todo `FRONTEND/src` sin resultados.
 **Pendientes:** Ninguno.
+
+---
+
+### 2026-07-28 — Fix: el detalle de una notificación quedaba pegado al navegar manualmente después (BUG-048)
+
+**Módulo:** Frontend — `candidate-jobs.component.ts`, `company-jobs.component.ts`
+**Problema:** Tras hacer clic en una notificación, si el usuario navegaba manualmente después (menú lateral, sin pasar por otra notificación), seguía viendo abierta la oferta/postulación específica de la notificación anterior — Angular reutiliza la misma instancia del componente al navegar entre la misma ruta con distintos query params, así que `ngOnInit` (que solo leía `route.snapshot` una vez) nunca se enteraba de que la URL ya no traía ningún `jobId`.
+**Solución:** Reemplazada la lectura única de `route.snapshot.queryParamMap` por una suscripción a `route.queryParamMap` (se re-emite en cada cambio de query params, incluso reutilizando la instancia). Si la URL no trae `jobId`, se interpreta como navegación manual y se cierra cualquier panel que hubiera quedado abierto de una notificación anterior.
+**Cómo se probó:** `ng build`/`lint:css` limpios. Verificado en vivo en ambos lados (candidato y empresa): clic en notificación abre el detalle correcto (sin regresión), clic manual posterior en el menú lateral cierra el panel y muestra la lista completa sin nada preseleccionado.
+**Pendientes:** Ninguno.

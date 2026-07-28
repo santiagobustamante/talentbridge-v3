@@ -237,11 +237,35 @@ export class CompanyJobsComponent implements OnInit {
     this.page = Math.min(Math.max(1, p), this.totalFilteredPages);
   }
 
+  /**
+   * Se suscribe a `queryParamMap` (no solo lee el snapshot una vez) porque
+   * Angular reutiliza esta misma instancia del componente al navegar entre
+   * `/company/jobs` con y sin query params (misma ruta) — si solo se leyera
+   * el snapshot al crear el componente, el panel de postulaciones abierto
+   * por el link de una notificación quedaba pegado para siempre, incluso
+   * navegando manualmente después (sidebar, etc.) sin ningún `jobId` en la
+   * URL. Con la suscripción, cada vez que la URL deja de traer `jobId`
+   * (navegación manual, no desde una notificación) se cierra el panel.
+   */
   ngOnInit(): void {
-    const jobIdParam = this.route.snapshot.queryParamMap.get('jobId');
-    if (jobIdParam) this.highlightedJobId.set(+jobIdParam);
-    const applicationIdParam = this.route.snapshot.queryParamMap.get('applicationId');
-    if (applicationIdParam) this.highlightedApplicationId.set(+applicationIdParam);
+    this.route.queryParamMap.subscribe((params) => {
+      const jobIdParam = params.get('jobId');
+      const applicationIdParam = params.get('applicationId');
+      this.highlightedJobId.set(jobIdParam ? +jobIdParam : null);
+      this.highlightedApplicationId.set(applicationIdParam ? +applicationIdParam : null);
+
+      if (!jobIdParam) {
+        // Navegación manual (no viene de una notificación): nunca debe
+        // quedar abierto el panel de postulaciones de una visita anterior.
+        this.closeApplications();
+        return;
+      }
+
+      if (this.jobOffers.length > 0) {
+        this.goToHighlightedJobPage();
+      }
+    });
+
     this.loadJobs();
   }
 
