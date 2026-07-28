@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -40,6 +40,7 @@ export class CandidateJobsComponent implements OnInit {
   private jobsService = inject(JobsService);
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   /** Id de oferta a resaltar/hacer scroll cuando se llega desde el enlace de una notificación (?jobId=). */
   highlightedJobId = signal<number | null>(null);
@@ -82,21 +83,32 @@ export class CandidateJobsComponent implements OnInit {
   readonly workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
 
   /**
-   * Se suscribe a `queryParamMap` (no solo lee el snapshot una vez) porque
-   * Angular reutiliza esta misma instancia del componente al navegar entre
-   * `/app/jobs` con y sin query params (misma ruta) — si solo se leyera el
-   * snapshot al crear el componente, un detalle abierto por el link de una
-   * notificación quedaba pegado para siempre, incluso navegando manualmente
-   * después (sidebar, etc.) sin ningún `jobId` en la URL. Con la suscripción,
-   * cada vez que la URL deja de traer `jobId` (navegación manual, no desde
-   * una notificación) se cierra cualquier detalle que hubiera quedado abierto.
+   * `jobId`/`tab`/`applicationId` en la URL son una instrucción de una sola
+   * vez ("mostrame esto puntual"), no un estado a mantener — si se dejaran
+   * en la URL después de mostrarlos, CUALQUIER recarga posterior de datos
+   * (cambiar de pestaña, filtrar, paginar) los volvía a leer y reabría el
+   * mismo detalle una y otra vez, aunque el usuario ya lo hubiera cerrado y
+   * estuviera navegando con normalidad — eso es lo que se reportó como bug.
+   * Por eso, apenas se consume el parámetro (se abre el detalle, o se
+   * intenta y no se encuentra), se limpia inmediatamente de la URL
+   * (`clearNotificationParams`). Esa limpieza dispara una nueva emisión de
+   * `queryParamMap` sin `jobId` — `consumedByThisComponent` distingue esa
+   * limpieza propia (no debe "cerrar" nada, ya se mostró/consumió) de una
+   * navegación manual real del usuario (esa sí debe cerrar cualquier
+   * detalle que hubiera quedado abierto).
    */
+  private consumedByThisComponent = false;
+
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((params) => {
       const jobIdParam = params.get('jobId');
       this.highlightedJobId.set(jobIdParam ? +jobIdParam : null);
 
       if (!jobIdParam) {
+        if (this.consumedByThisComponent) {
+          this.consumedByThisComponent = false;
+          return;
+        }
         // Navegación manual (no viene de una notificación): nunca debe
         // quedar abierto el detalle de una visita anterior a esta ruta.
         this.closeDetail();
@@ -117,6 +129,13 @@ export class CandidateJobsComponent implements OnInit {
     if (this.route.snapshot.queryParamMap.get('tab') !== 'my-applications') {
       this.loadJobs();
     }
+  }
+
+  /** Quita `jobId`/`tab`/`applicationId` de la URL una vez consumidos — ver el comentario de `ngOnInit` para el motivo. */
+  private clearNotificationParams(): void {
+    if (!this.route.snapshot.queryParamMap.keys.length) return;
+    this.consumedByThisComponent = true;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   /** Hace scroll hasta la tarjeta resaltada (llegada desde el enlace de una notificación), si ya está en el DOM. */
@@ -143,14 +162,16 @@ export class CandidateJobsComponent implements OnInit {
     const app = this.applications.find((a) => a.jobOffer.id === id);
     if (app) {
       this.openDetailFromApp(app);
+      this.clearNotificationParams();
       return;
     }
     this.jobsService.getMyApplications({ page: 1, limit: 1000 }).subscribe({
       next: (res) => {
         const found = res.data.find((a) => a.jobOffer.id === id);
         if (found) this.openDetailFromApp(found);
+        this.clearNotificationParams();
       },
-      error: () => {}, // best-effort — si falla, el usuario igual queda en "Mis postulaciones"
+      error: () => this.clearNotificationParams(), // best-effort — si falla, el usuario igual queda en "Mis postulaciones"
     });
   }
 
@@ -170,6 +191,7 @@ export class CandidateJobsComponent implements OnInit {
     if (existing) {
       this.scrollToHighlighted();
       this.openDetail(existing);
+      this.clearNotificationParams();
       return;
     }
     this.jobsService.getJob(id).subscribe({
@@ -178,8 +200,9 @@ export class CandidateJobsComponent implements OnInit {
         this.jobOffers = [normalized, ...this.jobOffers];
         this.scrollToHighlighted();
         this.openDetail(normalized);
+        this.clearNotificationParams();
       },
-      error: () => {}, // la oferta puede haberse cerrado/archivado entre la notificación y ahora — no rompe la vista
+      error: () => this.clearNotificationParams(), // la oferta puede haberse cerrado/archivado entre la notificación y ahora — no rompe la vista
     });
   }
 

@@ -219,6 +219,7 @@ export class CompanyJobsComponent implements OnInit {
     if (this.highlightedApplicationId()) {
       this.viewApplications(this.filteredJobs[index]);
     }
+    this.clearNotificationParams();
   }
 
   /** Cualquier cambio de filtro/orden vuelve a la página 1 — evita quedar "varado" en una página que ya no tiene resultados. */
@@ -238,15 +239,21 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   /**
-   * Se suscribe a `queryParamMap` (no solo lee el snapshot una vez) porque
-   * Angular reutiliza esta misma instancia del componente al navegar entre
-   * `/company/jobs` con y sin query params (misma ruta) — si solo se leyera
-   * el snapshot al crear el componente, el panel de postulaciones abierto
-   * por el link de una notificación quedaba pegado para siempre, incluso
-   * navegando manualmente después (sidebar, etc.) sin ningún `jobId` en la
-   * URL. Con la suscripción, cada vez que la URL deja de traer `jobId`
-   * (navegación manual, no desde una notificación) se cierra el panel.
+   * `jobId`/`applicationId` en la URL son una instrucción de una sola vez
+   * ("mostrame esto puntual"), no un estado a mantener — si se dejaran en
+   * la URL después de mostrarlos, CUALQUIER recarga posterior de datos
+   * (filtrar, ordenar, paginar) los volvía a leer y reabría el mismo panel
+   * una y otra vez, aunque la empresa ya lo hubiera cerrado y estuviera
+   * navegando con normalidad — eso es lo que se reportó como bug. Por eso,
+   * apenas se consume el parámetro (`goToHighlightedJobPage`), se limpia
+   * inmediatamente de la URL (`clearNotificationParams`). Esa limpieza
+   * dispara una nueva emisión de `queryParamMap` sin `jobId`;
+   * `consumedByThisComponent` distingue esa limpieza propia (no debe
+   * "cerrar" nada, ya se mostró/consumió) de una navegación manual real de
+   * la empresa (esa sí debe cerrar cualquier panel que hubiera quedado abierto).
    */
+  private consumedByThisComponent = false;
+
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((params) => {
       const jobIdParam = params.get('jobId');
@@ -255,6 +262,10 @@ export class CompanyJobsComponent implements OnInit {
       this.highlightedApplicationId.set(applicationIdParam ? +applicationIdParam : null);
 
       if (!jobIdParam) {
+        if (this.consumedByThisComponent) {
+          this.consumedByThisComponent = false;
+          return;
+        }
         // Navegación manual (no viene de una notificación): nunca debe
         // quedar abierto el panel de postulaciones de una visita anterior.
         this.closeApplications();
@@ -267,6 +278,13 @@ export class CompanyJobsComponent implements OnInit {
     });
 
     this.loadJobs();
+  }
+
+  /** Quita `jobId`/`applicationId` de la URL una vez consumidos — ver el comentario de `ngOnInit` para el motivo. */
+  private clearNotificationParams(): void {
+    if (!this.route.snapshot.queryParamMap.keys.length) return;
+    this.consumedByThisComponent = true;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
   }
 
   /** Trae todas las ofertas publicadas por la empresa (en cualquier estado: borrador, publicada, cerrada, archivada). */
