@@ -81,7 +81,7 @@
         <span class="col-actions">Acciones</span>
       </div>
       @for (job of pagedJobs; track job.id) {
-        <div class="table-row">
+        <div class="table-row" [id]="'job-row-' + job.id" [class.job-row-highlighted]="job.id === highlightedJobId()">
           <span class="col-offer">
             <span class="offer-title">{{ job.title }}</span>
             @if (job.salaryMin || job.salaryMax) {

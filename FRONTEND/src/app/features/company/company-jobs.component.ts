@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -85,6 +85,10 @@ export class CompanyJobsComponent implements OnInit {
   private jobsService = inject(JobsService);
   private chatService = inject(ChatService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  /** Id de oferta a resaltar/hacer scroll cuando se llega desde el enlace de una notificación (?jobId=). */
+  highlightedJobId = signal<number | null>(null);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
 
@@ -191,6 +195,22 @@ export class CompanyJobsComponent implements OnInit {
     return this.filteredJobs.slice(start, start + this.pageSize);
   }
 
+  /**
+   * Si se llegó desde el enlace de una notificación (?jobId=), salta a la
+   * página donde cae esa oferta dentro del listado filtrado/paginado — sin
+   * esto, la oferta podía quedar en una página que la empresa nunca ve.
+   */
+  private goToHighlightedJobPage(): void {
+    const id = this.highlightedJobId();
+    if (!id) return;
+    const index = this.filteredJobs.findIndex((j) => j.id === id);
+    if (index === -1) return;
+    this.page = Math.floor(index / this.pageSize) + 1;
+    setTimeout(() => {
+      document.getElementById('job-row-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
+
   /** Cualquier cambio de filtro/orden vuelve a la página 1 — evita quedar "varado" en una página que ya no tiene resultados. */
   onJobFilterChange(): void {
     this.page = 1;
@@ -208,6 +228,8 @@ export class CompanyJobsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const jobIdParam = this.route.snapshot.queryParamMap.get('jobId');
+    if (jobIdParam) this.highlightedJobId.set(+jobIdParam);
     this.loadJobs();
   }
 
@@ -218,6 +240,7 @@ export class CompanyJobsComponent implements OnInit {
       next: (jobs) => {
         this.jobOffers = jobs;
         this.loading.set(false);
+        this.goToHighlightedJobPage();
       },
       error: (err) => {
         this.loading.set(false);

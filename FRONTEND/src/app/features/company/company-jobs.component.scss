@@ -156,6 +156,12 @@
   &:hover { background: var(--bg-surface-hover); }
 }
 
+// Resalta la fila a la que se llegó desde el enlace de una notificación (?jobId=...).
+.job-row-highlighted {
+  background: var(--primary-soft) !important;
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
 .col-offer {
   display: flex;
   flex-direction: column;

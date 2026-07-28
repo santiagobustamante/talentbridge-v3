@@ -193,6 +193,13 @@ app-municipio-input.filter-select {
   }
 }
 
+// Resalta la tarjeta a la que se llegó desde el enlace de una notificación
+// (?jobId=...) — mismo id "job-{id}" en la tarjeta de oferta y en la de postulación.
+.job-card-highlighted {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
 .job-card-header {
   display: flex;
   align-items: flex-start;

@@ -109,6 +109,10 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
                     <mat-option value="OTHER">Otro</mat-option>
                   </mat-select>
                 </mat-form-field>
+                <mat-form-field appearance="outline" class="span-full" *ngIf="form.get('contractType')?.value === 'OTHER'">
+                  <mat-label>Especifica el tipo de contrato</mat-label>
+                  <input matInput formControlName="customContractType" placeholder="Ej. Contrato por proyecto académico" maxlength="100" />
+                </mat-form-field>
               </div>
             </div>
 
@@ -201,7 +205,7 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
               <div class="exp-meta-tags">
                 <span class="meta-tag" *ngIf="e.city"><mat-icon>location_on</mat-icon>{{ e.city }}</span>
                 <span class="meta-tag" *ngIf="e.workMode">{{ workModeLabel(e.workMode) }}</span>
-                <span class="meta-tag" *ngIf="e.contractType">{{ contractTypeLabel(e.contractType) }}</span>
+                <span class="meta-tag" *ngIf="e.contractType">{{ contractTypeLabel(e) }}</span>
               </div>
               <div class="date-range">
                 <mat-icon>calendar_today</mat-icon>
@@ -261,6 +265,7 @@ export class ExperiencesComponent implements OnInit {
     city: [''],
     workMode: [''],
     contractType: [''],
+    customContractType: [''],
     functions: [''],
     achievements: [''],
     tools: [''],
@@ -351,6 +356,7 @@ export class ExperiencesComponent implements OnInit {
       city: v.city ? trimText(v.city) : undefined,
       workMode: v.workMode || undefined,
       contractType: v.contractType || undefined,
+      customContractType: v.contractType === 'OTHER' && v.customContractType ? trimText(v.customContractType) : undefined,
       functions: v.functions ? trimText(v.functions) : undefined,
       achievements: v.achievements ? trimText(v.achievements) : undefined,
       tools: v.tools ? trimText(v.tools) : undefined,
@@ -387,6 +393,7 @@ export class ExperiencesComponent implements OnInit {
       city: e.city || '',
       workMode: e.workMode || '',
       contractType: e.contractType || '',
+      customContractType: e.customContractType || '',
       functions: e.functions || '',
       achievements: e.achievements || '',
       tools: e.tools || '',
@@ -404,7 +411,7 @@ export class ExperiencesComponent implements OnInit {
     this.skillInputCtrl.setValue('');
     this.form.reset({
       company: '', position: '', startDate: null, endDate: null, isCurrent: false,
-      city: '', workMode: '', contractType: '', functions: '', achievements: '', tools: '',
+      city: '', workMode: '', contractType: '', customContractType: '', functions: '', achievements: '', tools: '',
     });
   }
 
@@ -431,12 +438,13 @@ export class ExperiencesComponent implements OnInit {
     return map[m] || m;
   }
 
-  /** Traduce el codigo de tipo de contrato a una etiqueta legible en español. */
-  contractTypeLabel(t: string): string {
+  /** Traduce el codigo de tipo de contrato a una etiqueta legible en español — si es "Otro" y hay texto custom, muestra ese texto en vez de la palabra "Otro". */
+  contractTypeLabel(e: Pick<Experience, 'contractType' | 'customContractType'>): string {
+    if (e.contractType === 'OTHER' && e.customContractType) return e.customContractType;
     const map: Record<string, string> = {
       FULL_TIME: 'Tiempo completo', PART_TIME: 'Medio tiempo', CONTRACTOR: 'Contratista',
       INTERNSHIP: 'Prácticas', FREELANCE: 'Freelance', TEMPORARY: 'Temporal', OTHER: 'Otro',
     };
-    return map[t] || t;
+    return map[e.contractType || ''] || e.contractType || '';
   }
 }

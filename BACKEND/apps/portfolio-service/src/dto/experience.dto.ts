@@ -28,6 +28,11 @@ export class ExperienceDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(100)
+  customContractType?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(3000)
   description?: string;
 

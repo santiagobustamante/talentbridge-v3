@@ -350,20 +350,31 @@ export class CvAnalysisComponent {
     const names = this.cvSuggestions.filter((s) => s.selected).map((s) => s.name);
     if (!names.length || this.addingSuggestions) return;
 
-    this.addingSuggestions = true;
-    forkJoin(
-      names.map((name) => this.skillsService.create({ name, level: 'BASIC' }).pipe(catchError(() => of(null)))),
-    ).subscribe((results) => {
-      this.addingSuggestions = false;
-      const added = results.filter((r) => r !== null).length;
-      const failed = results.length - added;
-      names.forEach((name) => this.candidateSkillNames.add(name.toLowerCase()));
-      this.cvSuggestions = this.cvSuggestions.filter((s) => !names.includes(s.name));
-      if (failed === 0) {
-        this.snackBar.open(`${added} habilidad(es) agregada(s) a tu perfil`, 'Cerrar', { duration: 2500 });
-      } else {
-        this.snackBar.open(`${added} agregada(s), ${failed} ya existían o fallaron`, 'Cerrar', { duration: 4000 });
-      }
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Se agregan en nivel Básico',
+        message: `${names.length === 1 ? 'La habilidad se va a agregar' : `Las ${names.length} habilidades se van a agregar`} a tu perfil en nivel Básico. Si querés otro nivel, andá a la sección Habilidades y editalo ahí.`,
+        confirmLabel: 'Agregar',
+        confirmColor: 'primary',
+      },
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.addingSuggestions = true;
+      forkJoin(
+        names.map((name) => this.skillsService.create({ name, level: 'BASIC' }).pipe(catchError(() => of(null)))),
+      ).subscribe((results) => {
+        this.addingSuggestions = false;
+        const added = results.filter((r) => r !== null).length;
+        const failed = results.length - added;
+        names.forEach((name) => this.candidateSkillNames.add(name.toLowerCase()));
+        this.cvSuggestions = this.cvSuggestions.filter((s) => !names.includes(s.name));
+        if (failed === 0) {
+          this.snackBar.open(`${added} habilidad(es) agregada(s) a tu perfil`, 'Cerrar', { duration: 2500 });
+        } else {
+          this.snackBar.open(`${added} agregada(s), ${failed} ya existían o fallaron`, 'Cerrar', { duration: 4000 });
+        }
+      });
     });
   }
 

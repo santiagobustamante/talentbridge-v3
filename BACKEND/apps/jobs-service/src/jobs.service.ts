@@ -196,7 +196,7 @@ export class JobsService {
         type: NotificationType.JOB_MATCH,
         title: 'Vacante que podría interesarte',
         body: `"${job.title}" coincide con tu perfil — revisala antes de que se llene.`,
-        link: '/app/jobs',
+        link: `/app/jobs?jobId=${job.id}`,
       })),
     });
   }

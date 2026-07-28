@@ -70,7 +70,7 @@
       </div>
       <div class="jobs-grid">
         @for (job of jobOffers; track job.id) {
-          <div class="job-card animate-fade-in-scale">
+          <div class="job-card animate-fade-in-scale" [id]="'job-' + job.id" [class.job-card-highlighted]="job.id === highlightedJobId()">
             <div class="job-card-header">
               <div class="company-avatar">
                 @if (companyLogo(job); as logo) {
@@ -254,7 +254,7 @@
     @if (applications.length > 0) {
       <div class="applications-list">
         @for (app of applications; track app.id) {
-          <div class="application-card animate-fade-in-up">
+          <div class="application-card animate-fade-in-up" [id]="'job-' + app.jobOffer.id" [class.job-card-highlighted]="app.jobOffer.id === highlightedJobId()">
             <div class="app-card-header">
               <div class="app-company-avatar">
                 @if (appCompanyLogo(app); as logo) {

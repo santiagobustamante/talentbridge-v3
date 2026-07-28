@@ -161,6 +161,7 @@ model Experience {
   city          String?   @map("city")
   workMode      String?   @map("work_mode")
   contractType  String?   @map("contract_type")
+  customContractType String? @map("custom_contract_type")
   description   String?
   functions     String?
   achievements  String?

@@ -423,3 +423,39 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Archivos afectados (ajuste):** + `FRONTEND/src/app/features/projects/projects.component.scss` (estilos `period-row`/`period-checkbox`, reusando mixins ya existentes).
 **Prueba realizada:** `lint:css` + `ng build` limpios, mismos 18 warnings de budget de siempre. Verificado en vivo por inspección de DOM: marcar la casilla oculta "Fecha fin" y pone el Estado en "En progreso"; desmarcarla la vuelve a mostrar y resetea Estado a "—"; elegir "En progreso" directo desde el select también marca la casilla sola.
 **Estado:** Corregido.
+
+---
+
+### BUG-036 — Experiencia: sin campo de texto libre para "Otro" tipo de contrato
+
+**Módulo:** Backend — `portfolio-service` · Frontend — `experiences.component.ts`, `portfolio-content.component.ts`
+**Descripción:** Reportado en el acta de seguimiento del 27/07/2026 (asesor de tesis): "en experiencia en tipo de contrato falta el campo otro donde se especifique el tipo de contrato".
+**Causa:** `Experience` solo tenía `contractType` (con "Otro" como opción de catálogo) pero ningún campo para especificar cuál — a diferencia de `JobOffer`, que ya resuelve exactamente este mismo caso con un campo `customContractType` desde antes.
+**Archivos afectados:** `BACKEND/prisma/schema.prisma`, `BACKEND/apps/portfolio-service/src/dto/experience.dto.ts`, `BACKEND/apps/portfolio-service/src/experiences.service.ts`, `FRONTEND/src/app/core/auth/auth.models.ts`, `FRONTEND/src/app/features/experiences/experiences.component.ts`, `FRONTEND/src/app/shared/components/portfolio-content/portfolio-content.component.{ts,html}`.
+**Solución:** Replicado el patrón de `JobOffer` — `customContractType` opcional en Prisma/DTO/service, campo de texto condicional (`*ngIf="contractType === 'OTHER'"`) en el formulario, y la función de label (tanto la privada en `experiences.component.ts` como la del portafolio público en `portfolio-content.component.ts`, que tenía su propia copia) devuelve el texto custom en vez de la palabra "Otro" cuando corresponde.
+**Prueba realizada:** `npm run build:portfolio` + `ng build`/`lint:css` limpios. Verificado en vivo: experiencia creada con "Otro" + texto custom → se guarda, y se muestra el texto (no "Otro") tanto en la página privada de Experiencia como en el portafolio público.
+**Estado:** Corregido.
+
+---
+
+### BUG-037 — Colores de nivel de habilidad Avanzado/Experto invertidos (+ bug de fondo en el portafolio público)
+
+**Módulo:** Frontend — `styles.scss`, `portfolio-content.component.ts`
+**Descripción:** Reportado en el acta de seguimiento: "cambiar el color del avanzado a azul y el de experto a color verde". Estaban al revés: Avanzado en verde, Experto en azul.
+**Causa:** Valores de `--level-advanced`/`--level-expert` en `styles.scss` con los colores cruzados respecto a lo pedido. Además, un bug no reportado por el asesor: `portfolio-content.component.ts` juntaba Avanzado y Experto en una sola clase CSS (`level-high`) que usaba un único color — ahí ambos niveles ya se veían idénticos entre sí, y hubieran seguido igual (solo que del otro color) si solo se intercambiaban las variables.
+**Archivos afectados:** `FRONTEND/src/styles.scss`, `FRONTEND/src/app/shared/components/portfolio-content/portfolio-content.component.{ts,scss}`.
+**Solución:** Intercambiados los valores hex de las 2 variables. Separada la clase `level-high` en `level-advanced`/`level-expert` con su regla CSS propia cada una, replicando el patrón que ya existía para `level-mid`/`level-low` en el mismo archivo.
+**Prueba realizada:** `ng build`/`lint:css` limpios. Verificado en vivo con `getComputedStyle`: `--level-advanced` = `#3b82f6` (azul), `--level-expert` = `#22c55e` (verde), en la página de Habilidades y en el portafolio público con habilidades de ambos niveles mostrando colores distintos entre sí.
+**Estado:** Corregido.
+
+---
+
+### BUG-038 — Faltaba aviso de nivel Básico al importar habilidades desde el análisis de CV, y notificaciones sin enlace a la oferta específica
+
+**Módulo:** Frontend — `cv-analysis.component.ts`, `candidate-jobs.component.{ts,html,scss}`, `company-jobs.component.{ts,html,scss}` · Backend — `applications.service.ts`, `jobs.service.ts`
+**Descripción:** Acta de seguimiento: "añadir pop-up donde se mencione que todas las habilidades son añadidas en nivel básico..." y "en las notificaciones mejorar el mensaje de cambio de estado y llevar a la oferta u opción mencionada en la notificación".
+**Causa:** (1) El alta en lote de habilidades detectadas en el CV ya funcionaba (mismo endpoint que Habilidades) y ya usaba nivel Básico por defecto — solo faltaba avisarlo. (2) El clic en una notificación ya navegaba (`link` ya existía en el modelo `Notification` y se usaba), pero siempre apuntaba a la lista genérica de ofertas, nunca a la oferta puntual — no había ningún mecanismo de deep-link por id en ninguno de los dos componentes de listado de ofertas.
+**Archivos afectados:** `FRONTEND/src/app/features/cv-analysis/cv-analysis.component.ts`, `BACKEND/apps/applications-service/src/applications.service.ts`, `BACKEND/apps/jobs-service/src/jobs.service.ts`, `FRONTEND/src/app/features/jobs/candidate-jobs.component.{ts,html,scss}`, `FRONTEND/src/app/features/company/company-jobs.component.{ts,html,scss}`.
+**Solución:** (1) Diálogo de confirmación (`ConfirmDialogComponent`) antepuesto al alta en lote, sin tocar la lógica existente. (2) `link` de las 3 notificaciones (cambio de estado, nueva postulación, coincidencia) ahora incluye `?jobId=<id>`; construido de cero en el frontend el soporte de ese query param — lee `ActivatedRoute`, si la oferta no está en la página actual la busca puntualmente (candidato) o salta a su página (empresa, paginación client-side), resalta la tarjeta/fila y hace scroll automático.
+**Prueba realizada:** `npm run build` completo + `ng build`/`lint:css` limpios, `npx jest` sin cambios (39/44 de siempre). Verificado en vivo end-to-end: cambio real de estado de una postulación (FinSoft Colombia) generó la notificación esperada en la base de datos (mensaje + link correctos), y visitar ese link resaltó y centró la oferta correcta en `/app/jobs` (ambas pestañas) y en `/company/jobs`.
+**Estado:** Corregido.

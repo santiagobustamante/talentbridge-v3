@@ -92,7 +92,7 @@
           <div class="timeline-meta" *ngIf="e.city || e.workMode || e.contractType">
             <span class="meta-pill" *ngIf="e.city">{{ e.city }}</span>
             <span class="meta-pill" *ngIf="e.workMode">{{ workModeLabel(e.workMode) }}</span>
-            <span class="meta-pill" *ngIf="e.contractType">{{ contractTypeLabel(e.contractType) }}</span>
+            <span class="meta-pill" *ngIf="e.contractType">{{ contractTypeLabel(e.contractType, e.customContractType) }}</span>
           </div>
           <p class="timeline-dates">
             {{ e.startDate | appDate:'monthYear' }} —

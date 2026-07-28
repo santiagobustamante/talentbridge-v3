@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -39,6 +39,10 @@ import { MunicipioInputComponent } from '../../shared/components/municipio-input
 export class CandidateJobsComponent implements OnInit {
   private jobsService = inject(JobsService);
   private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+
+  /** Id de oferta a resaltar/hacer scroll cuando se llega desde el enlace de una notificación (?jobId=). */
+  highlightedJobId = signal<number | null>(null);
 
   activeTab = signal<'available' | 'my-applications'>('available');
   loading = signal(false);
@@ -78,7 +82,49 @@ export class CandidateJobsComponent implements OnInit {
   readonly workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
 
   ngOnInit(): void {
-    this.loadJobs();
+    const params = this.route.snapshot.queryParamMap;
+    const jobIdParam = params.get('jobId');
+    if (jobIdParam) this.highlightedJobId.set(+jobIdParam);
+
+    if (params.get('tab') === 'my-applications') {
+      this.setTab('my-applications');
+    } else {
+      this.loadJobs();
+    }
+  }
+
+  /** Hace scroll hasta la tarjeta resaltada (llegada desde el enlace de una notificación), si ya está en el DOM. */
+  private scrollToHighlighted(): void {
+    const id = this.highlightedJobId();
+    if (!id) return;
+    setTimeout(() => {
+      document.getElementById('job-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
+
+  /**
+   * La oferta que trae una notificación puede no estar en la página/orden
+   * actual de resultados (paginación, filtros de match) — si no aparece en
+   * la lista ya cargada, se busca puntualmente por id y se antepone, para
+   * que el candidato siempre pueda ver la oferta que originó la notificación.
+   */
+  private ensureHighlightedJobLoaded(): void {
+    const id = this.highlightedJobId();
+    if (!id) return;
+    if (this.jobOffers.some((j) => j.id === id)) {
+      this.scrollToHighlighted();
+      return;
+    }
+    this.jobsService.getJob(id).subscribe({
+      next: (job) => {
+        this.jobOffers = [
+          { ...job, requiredSkillsList: job.requiredSkillsList ?? [], matchedSkills: job.matchedSkills ?? [] },
+          ...this.jobOffers,
+        ];
+        this.scrollToHighlighted();
+      },
+      error: () => {}, // la oferta puede haberse cerrado/archivado entre la notificación y ahora — no rompe la vista
+    });
   }
 
   /** Cambia entre la pestaña de ofertas disponibles y la de postulaciones propias, cargando los datos correspondientes. */
@@ -127,6 +173,7 @@ export class CandidateJobsComponent implements OnInit {
         this.total = res.meta.total;
         this.totalPages = res.meta.totalPages;
         this.loading.set(false);
+        this.ensureHighlightedJobLoaded();
       },
       error: (err) => {
         if (requestId !== this.jobsRequestId) return;
@@ -153,6 +200,7 @@ export class CandidateJobsComponent implements OnInit {
         this.appTotal = res.meta.total;
         this.appTotalPages = res.meta.totalPages;
         this.loadingApps.set(false);
+        this.scrollToHighlighted();
       },
       error: (err) => {
         if (requestId !== this.appsRequestId) return;

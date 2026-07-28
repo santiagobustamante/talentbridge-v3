@@ -103,6 +103,7 @@ export interface Experience {
   city?: string;
   workMode?: string;
   contractType?: string;
+  customContractType?: string;
   functions?: string;
   achievements?: string;
   tools?: string;

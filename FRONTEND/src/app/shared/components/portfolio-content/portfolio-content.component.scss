@@ -238,7 +238,7 @@ $max-width: 920px;
   // (success/warning) sin relación con el nivel real, y el resultado
   // quedaba invertido: Básico se veía "success" (verde, como si fuera lo
   // mejor) y Intermedio se veía "warning" (naranja, como si fuera peor).
-  &.level-high {
+  &.level-expert {
     border-color: var(--level-expert);
     background: color-mix(in srgb, var(--level-expert) 12%, transparent);
 
@@ -247,6 +247,17 @@ $max-width: 920px;
     }
 
     .skill-level { color: var(--level-expert); }
+  }
+
+  &.level-advanced {
+    border-color: var(--level-advanced);
+    background: color-mix(in srgb, var(--level-advanced) 12%, transparent);
+
+    &:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skill-level { color: var(--level-advanced); }
   }
 
   &.level-mid {

@@ -51,7 +51,8 @@ export class PortfolioContentComponent {
   /** Clase CSS según el nivel de la habilidad, para pintarla con distinta intensidad de color en el portafolio. */
   levelClass(level: string): string {
     const l = level?.toUpperCase() || '';
-    if (l === 'EXPERT' || l === 'ADVANCED') return 'level-high';
+    if (l === 'EXPERT') return 'level-expert';
+    if (l === 'ADVANCED') return 'level-advanced';
     if (l === 'INTERMEDIATE') return 'level-mid';
     return 'level-low';
   }
@@ -63,9 +64,10 @@ export class PortfolioContentComponent {
     return map[mode] || mode;
   }
 
-  /** Traduce el tipo de contrato de una experiencia laboral a español. */
-  contractTypeLabel(type?: string): string {
+  /** Traduce el tipo de contrato de una experiencia laboral a español — si es "Otro" y hay texto custom, muestra ese texto en vez de la palabra "Otro". */
+  contractTypeLabel(type?: string, customType?: string): string {
     if (!type) return '';
+    if (type === 'OTHER' && customType) return customType;
     const map: Record<string, string> = { FULL_TIME: 'Tiempo completo', PART_TIME: 'Medio tiempo', CONTRACTOR: 'Contratista', INTERNSHIP: 'Prácticas', FREELANCE: 'Freelance', TEMPORARY: 'Temporal', OTHER: 'Otro' };
     return map[type] || type;
   }
