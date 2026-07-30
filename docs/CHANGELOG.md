@@ -885,3 +885,17 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos afectados:** ver `docs/plan-panel-administrativo.md` (Fases 2-8) para la lista completa por archivo.
 **Cómo se probó:** Build limpio en cada fase (backend completo + frontend + `lint:css`). `npx jest`: se encontraron y corrigieron 2 regresiones reales en el camino (mock de Prisma incompleto en `notifications.service.spec.ts`, firma de llamada a `jwtService.sign` cambiada) — confirmado el mismo baseline de siempre (40/45, 5 fallos preexistentes) después de cada corrección. Se detectó y corrigió además un problema del propio entorno de pruebas (servidor de desarrollo con compilación incremental corrupta mostrando errores ya resueltos) — reiniciado, y las pantallas admin ya construidas (Catálogos, Usuarios) se re-verificaron contra el servidor sano. Cada fase probada en vivo de punta a punta contra los servicios locales reales, no solo build — ver el plan para el detalle exacto de cada prueba.
 **Pendientes:** Fase 9 — despliegue a producción del nuevo servicio (Railway/Render/Supabase), pendiente de confirmación puntual antes de ejecutar.
+
+---
+
+### 2026-07-30 — Panel de administración: Fase 9 (despliegue a producción)
+
+**Módulo:** Infraestructura — Railway (`admin-service` nuevo), Supabase (migración), Vercel (auto-deploy)
+**Tipo de cambio:** Despliegue
+**Qué se hizo:**
+1. Commit `7ef9095` (todas las Fases 1-8) pusheado a `master` — disparó auto-deploy de los 10 servicios Railway existentes y de Vercel.
+2. `admin-service` creado como servicio nuevo en Railway (API GraphQL: `serviceCreate` + `serviceInstanceUpdate`), con su propio Dockerfile de un solo target (`BACKEND/docker/admin-service.Dockerfile`, mismo patrón que los otros 10). Variables de entorno copiadas de `auth-service` (`DATABASE_URL`/`JWT_SECRET`/`JWT_EXPIRES_IN`/`FRONTEND_URL`) más las propias (`PORT`/`ADMIN_SERVICE_PORT`). `ADMIN_SERVICE_URL` seteada en `api-gateway`.
+3. Las 2 migraciones nuevas aplicadas contra Supabase producción (vía el *session pooler*, puerto 5432 — ver `docs/DEPLOYMENT.md` sección 6). Seeds de parámetros/catálogos corridos contra producción. Cuenta ADMIN real creada con contraseña generada al azar (no la de demo local).
+**Archivos afectados:** `BACKEND/docker/admin-service.Dockerfile` (nuevo).
+**Cómo se probó:** Verificado en vivo contra la infraestructura real, no solo "deploy exitoso": login admin y candidato vía `https://api-gateway-production-47f0.up.railway.app`, `GET /admin/parameters`/`GET /admin/catalogs`/`GET /jobs/catalogs`/`GET /feature-flags` con datos reales correctos, y login completo por la UI real de producción (`https://talentbridge-v3.vercel.app/admin/login`) mostrando el panel de Parámetros con los 6 parámetros reales.
+**Pendientes:** Render (respaldo sin tráfico) no recibió el servicio nuevo — queda como paridad pendiente si se decide invertir en mantener el respaldo actualizado también para esto.

@@ -11,7 +11,7 @@ No repite lo que ya está en [`CLAUDE.md`](../CLAUDE.md) (reglas de seguridad, c
 | Pieza | Dónde | Plan |
 |---|---|---|
 | Frontend (Angular) | **Vercel** | Hobby (gratis) |
-| Backend (10 microservicios NestJS, uno por contenedor Docker) | **Railway** (primario, desde 2026-07-25) — Render queda desplegado intacto como respaldo, sin tráfico del frontend | Railway Hobby (pago) · Render Free |
+| Backend (11 microservicios NestJS, uno por contenedor Docker — `admin-service` agregado 2026-07-30) | **Railway** (primario, desde 2026-07-25) — Render queda desplegado intacto como respaldo para los primeros 10, sin tráfico del frontend; `admin-service` **no** está en Render todavía (ver Fase 9 de `plan-panel-administrativo.md`) | Railway Hobby (pago) · Render Free |
 | Base de datos (PostgreSQL) | **Supabase** | Free |
 
 **Historial:** Railway → Render (2026-07-18, por un 502 que en ese momento se atribuyó a la plataforma) → Railway de nuevo (2026-07-25, tras diagnosticar que el 502 original era config propia, no la plataforma). Detalle completo de ambas migraciones en [`DECISIONS.md`](./DECISIONS.md). Render **no se desmanteló** — sigue con los 10 servicios y las mismas env vars, listo como fallback si Railway falla (solo hay que revertir `environment.prod.ts` y redesplegar Vercel, ver sección 5).
@@ -26,7 +26,7 @@ No repite lo que ya está en [`CLAUDE.md`](../CLAUDE.md) (reglas de seguridad, c
 | **API Gateway** (todo el tráfico del frontend pasa por acá, prefijo `/api`) | https://api-gateway-production-47f0.up.railway.app |
 | chat-service (dominio público propio — WebSocket directo desde el navegador) | https://chat-service-production-ac0b.up.railway.app |
 | portfolio-service (dominio público propio — subida de CV directa) | https://portfolio-service-production-4815.up.railway.app |
-| auth-service, candidate-service, company-service, jobs-service, applications-service, assistant-service, dashboard-service | Sin dominio público — solo alcanzables por red interna Railway (`http://<servicio>.railway.internal:<puerto>`) desde `api-gateway`. Generar uno desde el dashboard (**Settings → Networking → Generate Domain**) si hace falta pegarle directo a alguno para debug. |
+| auth-service, candidate-service, company-service, jobs-service, applications-service, assistant-service, dashboard-service, admin-service | Sin dominio público — solo alcanzables por red interna Railway (`http://<servicio>.railway.internal:<puerto>`) desde `api-gateway`. Generar uno desde el dashboard (**Settings → Networking → Generate Domain**) si hace falta pegarle directo a alguno para debug. |
 
 Excepción de ruteo (igual que antes, ver `FRONTEND/src/environments/environment.prod.ts`): `chat-service` y `portfolio-service` necesitan dominio público propio porque el frontend les pega directo, bypaseando el gateway — los otros 8 no.
 
@@ -65,6 +65,7 @@ El proyecto Railway se llama **`renewed-enchantment`** (project ID `59919120-ace
 | chat-service | `251009ea-b979-4d03-bf60-eeefbe82fe2a` |
 | assistant-service | `acc76095-fa0a-4ba6-ad78-bf4203d0dea1` |
 | dashboard-service | `709626ae-0716-4fc1-8d10-9f547831d3cc` |
+| admin-service | `09f7eed8-d51e-4195-b6fb-3fe24c37a95d` |
 
 Cada uno tiene su propio `Dockerfile` en `BACKEND/docker/<nombre-servicio>.Dockerfile`, con `rootDirectory: /BACKEND` y `dockerfilePath: docker/<nombre-servicio>.Dockerfile` configurados **a nivel de servicio en Railway** (no hay un `railway.json` en el repo — esa config vive server-side, ver la trampa en la sección 7).
 
@@ -101,7 +102,7 @@ Nombres de las variables que cada servicio necesita configuradas en Railway (Das
 | `FRONTEND_URL` | los 10 servicios | CORS — el único origen permitido |
 | `NODE_ENV` | los 10 servicios | `production` |
 | `PORT` | los 10 servicios | **A diferencia de Render, Railway NO inyecta esta variable sola** — hay que setearla a mano con el mismo valor que `<NOMBRE>_SERVICE_PORT` de ese servicio (ej. `chat-service`: `CHAT_SERVICE_PORT=3008` y también `PORT=3008`). Sin esto, el proxy de borde de Railway no encuentra el puerto y devuelve 502 — ver sección 7 |
-| `<NOMBRE>_SERVICE_URL` (×9, ej. `AUTH_SERVICE_URL`) | solo `api-gateway` | A dónde reenviar cada ruta — ver tabla de ruteo en la sección siguiente. En Railway apuntan a la red interna (`http://<servicio>.railway.internal:<puerto>`), no a URLs públicas |
+| `<NOMBRE>_SERVICE_URL` (×10, ej. `AUTH_SERVICE_URL`, incluye `ADMIN_SERVICE_URL` desde 2026-07-30) | solo `api-gateway` | A dónde reenviar cada ruta — ver tabla de ruteo en la sección siguiente. En Railway apuntan a la red interna (`http://<servicio>.railway.internal:<puerto>`), no a URLs públicas |
 | `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL` | `portfolio-service` (análisis de CV), `assistant-service` (chatbot Joaquín) | Integración con DeepSeek para IA — si cambia el modelo soportado por DeepSeek, hay que actualizar `DEEPSEEK_MODEL` en **ambos** servicios, en **ambas** plataformas (Railway y Render) si se quiere mantener el respaldo funcional |
 | `MAX_PDF_SIZE_MB`, `UPLOAD_DIR` | `portfolio-service` | Subida/análisis de CV |
 
@@ -127,6 +128,7 @@ Todo pasa por `/api/*`. El gateway decide a qué servicio reenviar según el pat
 | `/api/chat` | chat-service |
 | `/api/assistant` | assistant-service |
 | `/api/dashboard` | dashboard-service |
+| `/api/admin`, `/api/feature-flags` | admin-service (nuevo, 2026-07-30 — parámetros/catálogos/audit log del panel administrativo; `/api/feature-flags` no exige rol ADMIN, cualquier autenticado) |
 
 Si agregás un endpoint nuevo en un servicio existente, **acordate de agregar la regla acá también** — si no, el gateway devuelve 404 aunque el servicio sí tenga la ruta.
 
