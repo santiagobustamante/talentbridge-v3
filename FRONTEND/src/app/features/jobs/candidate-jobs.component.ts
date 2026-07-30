@@ -78,9 +78,12 @@ export class CandidateJobsComponent implements OnInit {
   private jobsRequestId = 0;
   private appsRequestId = 0;
 
-  readonly modalities = ['Remoto', 'Presencial', 'Híbrido'];
-  readonly contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro'];
-  readonly workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
+  // Valores iniciales de respaldo — se sobrescriben en `ngOnInit` con lo que
+  // devuelva `getJobCatalogs()` (fuente real: `SystemCatalog`, administrable
+  // desde el panel admin sin redeploy, Fase 3).
+  modalities = ['Remoto', 'Presencial', 'Híbrido'];
+  contractTypes = ['Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje', 'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro'];
+  workloads = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'];
 
   /**
    * `jobId`/`tab`/`applicationId` en la URL son una instrucción de una sola
@@ -100,6 +103,15 @@ export class CandidateJobsComponent implements OnInit {
   private consumedByThisComponent = false;
 
   ngOnInit(): void {
+    this.jobsService.getJobCatalogs().subscribe({
+      next: (catalogs) => {
+        this.modalities = catalogs.modality.map((m) => m.value);
+        this.contractTypes = catalogs.contractType.map((c) => c.value);
+        this.workloads = catalogs.workload.map((w) => w.value);
+      },
+      error: () => {},
+    });
+
     this.route.queryParamMap.subscribe((params) => {
       const jobIdParam = params.get('jobId');
       this.highlightedJobId.set(jobIdParam ? +jobIdParam : null);

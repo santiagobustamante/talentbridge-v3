@@ -117,6 +117,10 @@ export class CompanyJobsComponent implements OnInit {
   skillRows: SkillRow[] = [];
   skillCatalogNames = SKILL_CATALOG.map((e) => e.name);
 
+  // Valores iniciales de respaldo (por si `getJobCatalogs()` todavía no
+  // resolvió o falla) — la fuente de verdad real es `SystemCatalog`,
+  // administrable desde el panel admin sin redeploy (Fase 3). Se
+  // sobrescriben en `ngOnInit` apenas responde el backend.
   contractTypes = [
     { value: 'Término indefinido', label: 'Término indefinido' },
     { value: 'Término fijo', label: 'Término fijo' },
@@ -255,6 +259,15 @@ export class CompanyJobsComponent implements OnInit {
   private consumedByThisComponent = false;
 
   ngOnInit(): void {
+    this.jobsService.getJobCatalogs().subscribe({
+      next: (catalogs) => {
+        this.modalities = catalogs.modality;
+        this.contractTypes = catalogs.contractType;
+        this.workloads = catalogs.workload;
+      },
+      error: () => {},
+    });
+
     this.route.queryParamMap.subscribe((params) => {
       const jobIdParam = params.get('jobId');
       const applicationIdParam = params.get('applicationId');

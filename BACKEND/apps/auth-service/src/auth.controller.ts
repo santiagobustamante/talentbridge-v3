@@ -40,6 +40,16 @@ export class AuthController {
     return { user: result.user, token: result.token };
   }
 
+  @Post('login-admin')
+  async loginAdmin(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.loginAdmin(dto);
+    this.setAuthCookie(res, result.token);
+    return { user: result.user, token: result.token };
+  }
+
   @Post('forgot-password')
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto);

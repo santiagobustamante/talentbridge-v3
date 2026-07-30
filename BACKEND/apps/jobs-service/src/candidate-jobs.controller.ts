@@ -12,6 +12,14 @@ export class CandidateJobsController {
     return this.jobsService.getCandidateJobs(user.sub, query);
   }
 
+  // Declarada antes de ':id' — si no, ':id' (con ParseIntPipe) la interceptaría
+  // primero y devolvería un 400 al no poder parsear "catalogs" como entero.
+  @UseGuards(JwtAuthGuard)
+  @Get('catalogs')
+  async getCatalogs() {
+    return this.jobsService.getJobCatalogs();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getJobById(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService, NotificationType } from '@app/database';
+import { getPaginationLimits, clampLimit } from '@app/common';
 
 /**
  * Notificaciones in-app. `create()` la usan otros services de esta misma app
@@ -20,7 +21,8 @@ export class NotificationsService {
 
   async list(userId: number, params?: { page?: string; limit?: string }) {
     const page = Math.max(1, parseInt(params?.page || '1', 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(params?.limit || '20', 10) || 20));
+    const paginationLimits = await getPaginationLimits(this.prisma);
+    const limit = clampLimit(params?.limit ? parseInt(params.limit, 10) : undefined, paginationLimits);
 
     const [data, total] = await Promise.all([
       this.prisma.notification.findMany({

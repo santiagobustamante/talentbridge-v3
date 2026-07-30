@@ -9,6 +9,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
 import { CompanyService } from '../../core/services/company.service';
+import { FeatureFlagsService } from '../../core/services/feature-flags.service';
 import { AssistantChatComponent } from '../../shared/assistant/assistant-chat.component';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 import { EmailVerificationBannerComponent } from '../../shared/components/email-verification-banner/email-verification-banner.component';
@@ -41,6 +42,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
   private readonly chatService = inject(ChatService);
   private readonly chatSocket = inject(ChatSocketService);
   private readonly companyService = inject(CompanyService);
+  private readonly featureFlags = inject(FeatureFlagsService);
 
   mobileOpen = signal(false);
   currentRoute = signal('');
@@ -76,6 +78,7 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
     this.unreadSub = this.chatSocket.unreadCount$.subscribe((data) => {
       this.chatService.setUnreadCount(data.count ?? 0);
     });
+    this.featureFlags.load();
     this.companyService.getProfile().subscribe({
       next: (profile) => {
         this.companyName.set(profile.companyName || null);
@@ -121,6 +124,11 @@ export class CompanyShellComponent implements OnInit, OnDestroy {
   /** Inicial usada en el avatar cuando la empresa no tiene logo cargado. */
   get userInitial(): string {
     return this.greetingName.charAt(0).toUpperCase();
+  }
+
+  /** Si un admin desactiva `FEATURE_ASSISTANT_ENABLED` desde el panel, Joaquín deja de mostrarse sin redeploy (Fase 8). */
+  get assistantEnabled(): boolean {
+    return this.featureFlags.isEnabled('FEATURE_ASSISTANT_ENABLED');
   }
 
   /** Cierra el menú mobile automáticamente al agrandar la ventana a tamaño desktop. */

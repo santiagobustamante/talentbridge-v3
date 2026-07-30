@@ -17,6 +17,9 @@ import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPass
 const EMAIL_NOT_VERIFIED_MESSAGE =
   'Tu correo todavía no fue confirmado. Revisa tu bandeja de entrada o reenvía el correo de confirmación antes de iniciar sesión.';
 
+/** Cuenta suspendida por un administrador (Fase 7 del panel admin) — mensaje genérico, sin detalle del motivo (eso queda en el audit log, no en la respuesta al usuario). */
+const SUSPENDED_MESSAGE = 'Esta cuenta está suspendida. Si crees que es un error, contacta al soporte.';
+
 /** Vigencia del token de recuperación de contraseña — corto a propósito, es un enlace que llega por correo y se usa una sola vez. */
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hora
 /** Vigencia del token de verificación de correo — más laxo que el de reset: no es tan urgente, y no bloquea el uso de la cuenta mientras tanto. */
@@ -175,6 +178,10 @@ export class AuthService {
       );
     }
 
+    if (user.suspended) {
+      throw new ForbiddenException(SUSPENDED_MESSAGE);
+    }
+
     if (!user.emailVerified) {
       throw new ForbiddenException(EMAIL_NOT_VERIFIED_MESSAGE);
     }
@@ -204,8 +211,45 @@ export class AuthService {
       );
     }
 
+    if (user.suspended) {
+      throw new ForbiddenException(SUSPENDED_MESSAGE);
+    }
+
     if (!user.emailVerified) {
       throw new ForbiddenException(EMAIL_NOT_VERIFIED_MESSAGE);
+    }
+
+    const token = this.generateToken(user.id, user.email, user.role);
+    return { user: this.sanitizeUser(user), token };
+  }
+
+  /**
+   * Login del panel de administración — ruta separada del login de
+   * candidato/empresa a propósito (menor superficie de descubrimiento para
+   * el login más sensible del sistema). No existe (ni debe existir) un
+   * registro público para ADMIN: la única forma de crear esta cuenta es un
+   * script de un solo uso corrido a mano contra la base.
+   */
+  async loginAdmin(dto: LoginDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: normalizeEmail(dto.email) },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    const valid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Esta cuenta no tiene acceso al panel de administración.');
+    }
+
+    if (user.suspended) {
+      throw new ForbiddenException(SUSPENDED_MESSAGE);
     }
 
     const token = this.generateToken(user.id, user.email, user.role);
@@ -374,8 +418,20 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
+  /**
+   * Las cuentas ADMIN firman con una sesión más corta que candidato/empresa
+   * (2h en vez del `JWT_EXPIRES_IN` general, hoy 1d) — dado el poder de este
+   * rol, conviene que una sesión abierta en un dispositivo compartido u
+   * olvidado expire rápido. A propósito NO es un `SystemParameter`
+   * editable desde el propio panel: dejar que un admin extienda su propia
+   * sesión sería debilitar esta protección justo desde donde más importa.
+   */
   private generateToken(userId: number, email: string, role?: string): string {
-    return this.jwtService.sign({ sub: userId, email, role });
+    const payload = { sub: userId, email, role };
+    if (role === UserRole.ADMIN) {
+      return this.jwtService.sign(payload, { expiresIn: '2h' });
+    }
+    return this.jwtService.sign(payload);
   }
 
   private sanitizeUser(user: {

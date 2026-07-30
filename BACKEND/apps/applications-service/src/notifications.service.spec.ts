@@ -19,6 +19,9 @@ describe('NotificationsService', () => {
       update: jest.Mock;
       updateMany: jest.Mock;
     };
+    systemParameter: {
+      findMany: jest.Mock;
+    };
   };
 
   beforeEach(async () => {
@@ -30,6 +33,12 @@ describe('NotificationsService', () => {
         findUnique: jest.fn(),
         update: jest.fn(),
         updateMany: jest.fn(),
+      },
+      // Usado por getPaginationLimits() (Fase 4 del panel admin) — vacío
+      // acá porque estos tests no ejercitan el clamp de límites, solo que
+      // el valor pedido se propague correctamente a skip/take.
+      systemParameter: {
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 

@@ -8,6 +8,7 @@ import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
+import { FeatureFlagsService } from '../../core/services/feature-flags.service';
 import { AssistantChatComponent } from '../assistant/assistant-chat.component';
 import { NotificationBellComponent } from '../components/notification-bell/notification-bell.component';
 import { EmailVerificationBannerComponent } from '../components/email-verification-banner/email-verification-banner.component';
@@ -49,6 +50,7 @@ export class AppShellComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly chatService = inject(ChatService);
   private readonly chatSocket = inject(ChatSocketService);
+  private readonly featureFlags = inject(FeatureFlagsService);
 
   mobileOpen = signal(false);
   currentRoute = signal('');
@@ -82,6 +84,12 @@ export class AppShellComponent implements OnInit, OnDestroy {
     this.unreadSub = this.chatSocket.unreadCount$.subscribe((data) => {
       this.chatService.setUnreadCount(data.count ?? 0);
     });
+    this.featureFlags.load();
+  }
+
+  /** Si un admin desactiva `FEATURE_ASSISTANT_ENABLED` desde el panel, Joaquín deja de mostrarse sin redeploy (Fase 8). */
+  get assistantEnabled(): boolean {
+    return this.featureFlags.isEnabled('FEATURE_ASSISTANT_ENABLED');
   }
 
   /** Libera las suscripciones (contador de no leídos y navegación) al destruir el shell, para evitar fugas de memoria. */

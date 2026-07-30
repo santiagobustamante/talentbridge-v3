@@ -22,6 +22,7 @@ RUN npx nest build applications-service
 RUN npx nest build chat-service
 RUN npx nest build assistant-service
 RUN npx nest build dashboard-service
+RUN npx nest build admin-service
 
 FROM node:22-alpine AS api-gateway
 WORKDIR /app
@@ -90,5 +91,12 @@ FROM node:22-alpine AS dashboard-service
 WORKDIR /app
 COPY --from=0 /app/node_modules ./node_modules
 COPY --from=0 /app/dist/apps/dashboard-service ./dist
+COPY --from=0 /app/package.json ./
+CMD ["node", "dist/main.js"]
+
+FROM node:22-alpine AS admin-service
+WORKDIR /app
+COPY --from=0 /app/node_modules ./node_modules
+COPY --from=0 /app/dist/apps/admin-service ./dist
 COPY --from=0 /app/package.json ./
 CMD ["node", "dist/main.js"]

@@ -68,6 +68,14 @@ export class GatewayController {
       return this.httpClient.proxy(req, res, process.env['DASHBOARD_SERVICE_URL'] || 'http://localhost:3010');
     }
 
+    if (fullPath.startsWith('/api/admin')) {
+      return this.httpClient.proxy(req, res, process.env['ADMIN_SERVICE_URL'] || 'http://localhost:3011');
+    }
+
+    if (fullPath.startsWith('/api/feature-flags')) {
+      return this.httpClient.proxy(req, res, process.env['ADMIN_SERVICE_URL'] || 'http://localhost:3011');
+    }
+
     return res.status(404).json({ statusCode: 404, message: 'Ruta no encontrada' });
   }
 }

@@ -595,3 +595,15 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 - **Candidato:** clic en notificación de cambio de estado ("Analista QA Junior") → abre el detalle correcto → URL confirmada limpia (`/app/jobs`, sin query params) inmediatamente después. Cerrado el panel, se alternó "Ofertas disponibles" ↔ "Mis postulaciones" varias veces seguidas: nunca se reabrió. Aplicado un filtro en "Ofertas disponibles" (recarga interna vía `loadJobs()`): sin reapertura. Recarga completa de página (F5) en "Mis postulaciones": sin reapertura. Navegación de ruta completa (Inicio → Trabajos por el menú lateral): sin reapertura. Simulado también el otro tipo de notificación (oferta nueva, `jobId` sin `tab=my-applications`) navegando directo a `/app/jobs?jobId=65`: abre el detalle de esa oferta puntual, limpia la URL, y cerrar el panel deja la lista navegable con normalidad.
 - **Empresa (Talento Llanero S.A.S., la misma empresa del reporte original del usuario):** simulado el link exacto que genera una notificación de nueva postulación (`/company/jobs?jobId=12&applicationId=1`) → abre el panel de postulantes de esa oferta puntual → URL confirmada limpia inmediatamente después → cerrado el panel, recarga completa de página: lista limpia, sin nada preseleccionado.
 **Estado:** Corregido. Esta vez la prueba cubrió explícitamente los mismos caminos de recarga que el usuario señaló como rotos (cambio de pestaña, filtro, recarga completa), no solo la navegación de ruta completa que cubrió (insuficientemente) BUG-048.
+
+---
+
+### BUG-050 — `JWT_EXPIRES_IN` era config muerta: declarada en `.env` desde el principio del proyecto, pero nunca leída
+
+**Módulo:** Backend — `auth-service` (`auth.module.ts`)
+**Descripción:** Encontrado durante la Fase 5 del panel de administración (auditoría de qué parámetros de seguridad podían parametrizarse). `JWT_EXPIRES_IN=1d` está en `.env`/`.env.example` desde hace tiempo, dando la impresión de ser una configuración real y ajustable.
+**Causa:** `auth.module.ts` configuraba `JwtModule.register({ signOptions: { expiresIn: '1d' as StringValue } })` con el valor hardcodeado — la variable de entorno nunca se leía en ningún punto del código. Cambiar `JWT_EXPIRES_IN` en `.env` no tenía ningún efecto, silenciosamente.
+**Archivos afectados:** `BACKEND/apps/auth-service/src/auth.module.ts`.
+**Solución:** `expiresIn` ahora se arma con `process.env['JWT_EXPIRES_IN'] || '1d'` — mismo valor por defecto que antes (`.env` ya tenía `1d`), así que no cambia el comportamiento actual, pero la variable ahora sí tiene efecto real si se edita. De paso (Fase 5, no un bug sino un endurecimiento nuevo): las cuentas ADMIN firman con una sesión de 2 horas en vez del `JWT_EXPIRES_IN` general, dado el poder de ese rol.
+**Prueba realizada:** `npm run build:auth` limpio. `npx jest apps/auth-service` (10/10, tras corregir un test que esperaba `jwtService.sign` con una firma de un solo argumento). Verificado en vivo decodificando el JWT real emitido: cuenta ADMIN → 2 horas de validez; cuenta CANDIDATE → 24 horas (sin cambio respecto a antes).
+**Estado:** Corregido.

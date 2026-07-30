@@ -2,12 +2,6 @@ import { IsString, IsOptional, IsInt, IsIn, Min, Max, MaxLength, ValidateBy, bui
 import { PartialType } from '@nestjs/swagger';
 import { IsValidMunicipio, IsGreaterOrEqual } from '@app/common';
 
-const MODALITIES = ['Remoto', 'Híbrido', 'Presencial'] as const;
-const CONTRACT_TYPES = [
-  'Término indefinido', 'Término fijo', 'Obra o labor', 'Aprendizaje',
-  'Prestación de servicios', 'Temporal / ocasional / accidental', 'Prácticas', 'Otro',
-] as const;
-const WORKLOADS = ['Tiempo completo', 'Medio tiempo', 'Por horas', 'Turnos', 'Flexible', 'Otra'] as const;
 /** Única moneda que la app maneja hoy (ver `formatSalaryRange` en el frontend) — antes
  *  `currency` solo tenía `@MaxLength(10)`, así que cualquier string corto pasaba. */
 const CURRENCIES = ['COP'] as const;
@@ -56,12 +50,18 @@ export class CreateJobOfferDto {
   @IsValidMunicipio({ allowRemote: true })
   city?: string;
 
+  // La lista de valores válidos ya no es un array estático acá — se
+  // administra en SystemCatalog (panel admin) y JobsService la valida en
+  // tiempo real contra la tabla antes de guardar (assertValidCatalogValue).
+  // Solo se valida forma/longitud a nivel de DTO.
   @IsOptional()
-  @IsIn(MODALITIES)
+  @IsString()
+  @MaxLength(100)
   modality?: string;
 
   @IsOptional()
-  @IsIn(CONTRACT_TYPES)
+  @IsString()
+  @MaxLength(100)
   contractType?: string;
 
   @IsOptional()
@@ -70,7 +70,8 @@ export class CreateJobOfferDto {
   customContractType?: string;
 
   @IsOptional()
-  @IsIn(WORKLOADS)
+  @IsString()
+  @MaxLength(100)
   workload?: string;
 
   @IsOptional()

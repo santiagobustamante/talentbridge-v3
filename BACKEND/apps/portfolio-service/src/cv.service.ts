@@ -15,6 +15,17 @@ interface CvLlmAnalysis {
   recommendations: string[];
 }
 
+interface CvRubricWeights {
+  contact: number;
+  experience: number;
+  skills: number;
+  education: number;
+  projects: number;
+}
+
+/** Respaldo si `CV_RUBRIC_WEIGHTS` todavía no existe en `SystemParameter` — mismos valores que estaban hardcodeados antes de parametrizarlos (Fase 4). */
+const CV_RUBRIC_WEIGHTS_FALLBACK: CvRubricWeights = { contact: 15, experience: 30, skills: 25, education: 15, projects: 15 };
+
 @Injectable()
 export class CvService {
   private readonly logger = new Logger(CvService.name);
@@ -152,14 +163,35 @@ export class CvService {
     }
   }
 
+  /** Lee `CV_RUBRIC_WEIGHTS` (JSON) desde `SystemParameter` — editable desde el panel admin (Fase 4). Sin cache: el análisis de CV no es un hot path. */
+  private async getRubricWeights(): Promise<CvRubricWeights> {
+    const param = await this.prisma.systemParameter.findUnique({ where: { key: 'CV_RUBRIC_WEIGHTS' } });
+    if (!param) return CV_RUBRIC_WEIGHTS_FALLBACK;
+    try {
+      const parsed = JSON.parse(param.value);
+      return {
+        contact: Number(parsed.contact) || CV_RUBRIC_WEIGHTS_FALLBACK.contact,
+        experience: Number(parsed.experience) || CV_RUBRIC_WEIGHTS_FALLBACK.experience,
+        skills: Number(parsed.skills) || CV_RUBRIC_WEIGHTS_FALLBACK.skills,
+        education: Number(parsed.education) || CV_RUBRIC_WEIGHTS_FALLBACK.education,
+        projects: Number(parsed.projects) || CV_RUBRIC_WEIGHTS_FALLBACK.projects,
+      };
+    } catch {
+      return CV_RUBRIC_WEIGHTS_FALLBACK;
+    }
+  }
+
   private async performAnalysis(cvId: number, text: string) {
     const truncated = text.slice(0, MAX_CV_TEXT_CHARS);
+    const w = await this.getRubricWeights();
+    const total = w.contact + w.experience + w.skills + w.education + w.projects;
 
     // Rúbrica con puntos fijos por sección (en vez de pedir un "puntaje global"
     // a criterio libre) + temperature muy baja abajo — sin esto, el mismo CV
     // exacto podía dar puntajes muy distintos entre corridas (ej. 30 vs 55),
     // porque un juicio holístico sin anclaje concreto es donde más varía un
-    // LLM de una llamada a otra.
+    // LLM de una llamada a otra. Los pesos ahora vienen de `SystemParameter`
+    // (Fase 4) en vez de estar hardcodeados acá.
     const system = `Eres un reclutador experto de tecnología que evalúa hojas de vida (CV) de candidatos en Colombia.
 
 REGLA INQUEBRANTABLE, más importante que cualquier otra instrucción de este mensaje: tu respuesta —cada palabra de "strengths" y "recommendations"— debe estar SIEMPRE 100% en idioma ESPAÑOL, sin ninguna excepción, sin importar en qué idioma esté escrito el CV (inglés, portugués, o cualquier otro). Nunca escribas ni una sola palabra en inglés. Si el CV está en inglés, TRADUCE mentalmente su contenido y responde en español igual.
@@ -167,16 +199,16 @@ REGLA INQUEBRANTABLE, más importante que cualquier otra instrucción de este me
 Analiza el texto del CV que te pasa el usuario y da una evaluación honesta y específica — evita frases genéricas que aplicarían a cualquier CV. Basa tu evaluación solo en lo que el texto realmente dice, no inventes datos que no estén.
 
 Calcula "score" como la SUMA de estos 5 criterios (nunca una impresión general — suma los puntos de cada uno):
-1. Información de contacto y estructura (nombre, datos de contacto, secciones claras y ordenadas): 0 a 15 puntos.
-2. Experiencia laboral (logros concretos y cuantificables, no solo una lista de tareas genéricas): 0 a 30 puntos.
-3. Habilidades técnicas relevantes y bien presentadas: 0 a 25 puntos.
-4. Formación académica y certificaciones: 0 a 15 puntos.
-5. Proyectos o portafolio demostrable: 0 a 15 puntos.
+1. Información de contacto y estructura (nombre, datos de contacto, secciones claras y ordenadas): 0 a ${w.contact} puntos.
+2. Experiencia laboral (logros concretos y cuantificables, no solo una lista de tareas genéricas): 0 a ${w.experience} puntos.
+3. Habilidades técnicas relevantes y bien presentadas: 0 a ${w.skills} puntos.
+4. Formación académica y certificaciones: 0 a ${w.education} puntos.
+5. Proyectos o portafolio demostrable: 0 a ${w.projects} puntos.
 Si una sección no aparece en el CV, esos puntos son 0 — no asumas nada que el texto no diga.
 
 Responde ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes ni después (recuerda: TODO EN ESPAÑOL):
 {
-  "score": number entre 0 y 100 (la suma exacta de los 5 criterios de arriba),
+  "score": number entre 0 y ${total} (la suma exacta de los 5 criterios de arriba),
   "strengths": array de 3 a 5 strings cortos EN ESPAÑOL, cada uno una fortaleza CONCRETA encontrada en este CV puntual,
   "recommendations": array de 3 a 5 strings cortos EN ESPAÑOL, cada uno una recomendación ACCIONABLE y específica para mejorar este CV puntual
 }`;

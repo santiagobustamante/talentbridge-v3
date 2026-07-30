@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/database';
 import { Prisma } from '@app/database';
+import { getPaginationLimits, clampLimit } from '@app/common';
 
 interface SearchParams {
   q?: string;
@@ -50,7 +51,8 @@ export class CandidateSearchService {
   async search(companyUserId: number, params: SearchParams) {
     const { q, city, profession, skills, mode } = params;
     const page = params.page || 1;
-    const limit = Math.min(params.limit || 20, 100);
+    const paginationLimits = await getPaginationLimits(this.prisma);
+    const limit = clampLimit(params.limit, paginationLimits);
 
     const where: Prisma.ProfileWhereInput = { isPublished: true };
 

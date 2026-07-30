@@ -43,6 +43,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._currentUser());
   readonly isCandidate = computed(() => this._currentUser()?.role === 'CANDIDATE');
   readonly isCompany = computed(() => this._currentUser()?.role === 'COMPANY');
+  readonly isAdmin = computed(() => this._currentUser()?.role === 'ADMIN');
   readonly authReady = computed(() => this._authReady());
 
   constructor(
@@ -111,6 +112,13 @@ export class AuthService {
   loginCompany(email: string, password: string): Observable<{ user: User; token: string }> {
     return this.http
       .post<{ user: User; token: string }>(`${this.api}/auth/login-company`, { email, password }, { withCredentials: true })
+      .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
+  }
+
+  /** Login del panel de administración; ruta separada de candidato/empresa a propósito (ver auth.service.ts del backend). */
+  loginAdmin(email: string, password: string): Observable<{ user: User; token: string }> {
+    return this.http
+      .post<{ user: User; token: string }>(`${this.api}/auth/login-admin`, { email, password }, { withCredentials: true })
       .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 

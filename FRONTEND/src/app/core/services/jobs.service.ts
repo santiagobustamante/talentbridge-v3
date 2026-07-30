@@ -18,6 +18,17 @@ export class JobsService {
 
   constructor(private http: HttpClient) {}
 
+  /** Catálogos de opciones (modalidad/tipo de contrato/jornada) para el formulario de oferta y los filtros — administrables desde el panel admin, ver `SystemCatalog` (Fase 3). */
+  getJobCatalogs(): Observable<{
+    modality: { value: string; label: string }[];
+    contractType: { value: string; label: string }[];
+    workload: { value: string; label: string }[];
+  }> {
+    return this.http.get<{ modality: { value: string; label: string }[]; contractType: { value: string; label: string }[]; workload: { value: string; label: string }[] }>(
+      `${this.api}/jobs/catalogs`,
+    );
+  }
+
   /** Búsqueda pública de ofertas publicadas, con filtros combinados y paginación (lado candidato). */
   searchJobs(params: {
     q?: string; city?: string; modality?: string;

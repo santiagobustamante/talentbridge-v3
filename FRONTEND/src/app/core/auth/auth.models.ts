@@ -10,7 +10,7 @@
 export interface User {
   id: number;
   email: string;
-  role?: 'CANDIDATE' | 'COMPANY';
+  role?: 'CANDIDATE' | 'COMPANY' | 'ADMIN';
   emailVerified?: boolean;
   createdAt: string;
   updatedAt: string;

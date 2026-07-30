@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
+import { PrismaService } from '@app/database';
 
 export interface DeepSeekChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -22,7 +23,21 @@ export interface DeepSeekChatMessage {
 export class DeepSeekService {
   private readonly logger = new Logger(DeepSeekService.name);
   private client: OpenAI | null = null;
-  private readonly model = process.env['DEEPSEEK_MODEL'] || 'deepseek-chat';
+  private readonly envModel = process.env['DEEPSEEK_MODEL'] || 'deepseek-chat';
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * El modelo de DeepSeek ahora es editable en caliente desde el panel admin
+   * (`SystemParameter` key `DEEPSEEK_MODEL`, Fase 6) — antes quedaba fijo
+   * desde el arranque del proceso (`process.env['DEEPSEEK_MODEL']`), así que
+   * cambiarlo exigía redeploy. Se sigue leyendo el env var como respaldo si
+   * el parámetro todavía no existe en la base.
+   */
+  private async getModel(): Promise<string> {
+    const param = await this.prisma.systemParameter.findUnique({ where: { key: 'DEEPSEEK_MODEL' } });
+    return param?.value || this.envModel;
+  }
 
   private getClient(): OpenAI {
     if (!this.client) {
@@ -75,9 +90,10 @@ export class DeepSeekService {
     // se reintentaba (solo se reintentaban timeouts/429/5xx reales), aunque
     // sea exactamente el mismo tipo de hiccup transitorio que sí cubre el
     // resto de `withRetry`.
+    const model = await this.getModel();
     const content = await this.withRetry(async () => {
       const completion = await this.getClient().chat.completions.create({
-        model: this.model,
+        model,
         messages: [{ role: 'system', content: params.system }, ...params.messages],
         response_format: { type: 'json_object' },
         max_tokens: params.maxTokens ?? 700,
@@ -103,9 +119,10 @@ export class DeepSeekService {
     maxTokens?: number;
     temperature?: number;
   }): Promise<string> {
+    const model = await this.getModel();
     const completion = await this.withRetry(() =>
       this.getClient().chat.completions.create({
-        model: this.model,
+        model,
         messages: [{ role: 'system', content: params.system }, ...params.messages],
         max_tokens: params.maxTokens ?? 700,
         temperature: params.temperature ?? 0.4,

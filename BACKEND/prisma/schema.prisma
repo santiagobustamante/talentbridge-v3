@@ -11,6 +11,85 @@ datasource db {
 enum UserRole {
   CANDIDATE
   COMPANY
+  ADMIN
+}
+
+enum ParameterType {
+  BOOLEAN
+  NUMBER
+  STRING
+  JSON
+}
+
+/**
+ * Parámetro de sistema editable desde el panel de administración — cada fila
+ * es un valor de configuración con su propia metadata de validación, para que
+ * agregar un parámetro nuevo sea insertar una fila, no escribir código nuevo.
+ * `value`/`defaultValue` se guardan como texto y se castean al tipo real
+ * (`type`) al leerlos — permite un único modelo para booleanos/números/strings/JSON
+ * sin una columna por tipo. `riskLevel` (1-4) define qué tan fuerte debe ser
+ * la confirmación en la UI antes de aplicar el cambio.
+ */
+model SystemParameter {
+  id            Int            @id @default(autoincrement())
+  key           String         @unique
+  category      String
+  type          ParameterType
+  value         String
+  defaultValue  String         @map("default_value")
+  minValue      Float?         @map("min_value")
+  maxValue      Float?         @map("max_value")
+  allowedValues Json?          @map("allowed_values")
+  description   String
+  riskLevel     Int            @default(1) @map("risk_level")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  updatedById   Int?           @map("updated_by_id")
+  updatedBy     User?          @relation("ParameterUpdatedBy", fields: [updatedById], references: [id])
+
+  @@map("system_parameters")
+}
+
+/**
+ * Catálogo de opciones editable (tipos de contrato, modalidad de trabajo,
+ * categorías de habilidades, etc.). Un valor de catálogo NUNCA se borra
+ * físicamente — se da de baja con `active: false` — porque datos históricos
+ * (ofertas, experiencias ya guardadas) pueden seguir referenciando ese valor
+ * y no deben romperse si un admin lo quita del catálogo.
+ */
+model SystemCatalog {
+  id         Int      @id @default(autoincrement())
+  catalogKey String   @map("catalog_key")
+  value      String
+  label      String
+  sortOrder  Int      @default(0) @map("sort_order")
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([catalogKey, value])
+  @@map("system_catalogs")
+}
+
+/**
+ * Registro de cada cambio hecho por un administrador — no existía ningún
+ * mecanismo de auditoría/versión/soft-delete en el proyecto antes de esto, y
+ * dado que este rol puede modificar prácticamente todo, es la única forma de
+ * responder "quién cambió esto y cuándo" cuando algo salga mal.
+ */
+model AdminAuditLog {
+  id         Int      @id @default(autoincrement())
+  adminId    Int      @map("admin_id")
+  admin      User     @relation("AdminAuditLogs", fields: [adminId], references: [id])
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  before     Json?
+  after      Json?
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, entityId])
+  @@index([adminId])
+  @@map("admin_audit_logs")
 }
 
 /**
@@ -41,6 +120,7 @@ model User {
   passwordHash   String          @map("password_hash")
   role           UserRole        @default(CANDIDATE)
   emailVerified  Boolean         @default(false) @map("email_verified")
+  suspended      Boolean         @default(false)
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
   profile        Profile?
@@ -58,6 +138,8 @@ model User {
   skillEndorsementsGiven SkillEndorsement[]
   notifications          Notification[]
   verificationTokens     VerificationToken[]
+  parametersUpdated      SystemParameter[] @relation("ParameterUpdatedBy")
+  adminAuditLogs         AdminAuditLog[]   @relation("AdminAuditLogs")
 
   @@map("users")
 }

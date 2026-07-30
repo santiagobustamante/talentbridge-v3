@@ -34,12 +34,12 @@ export class CandidateGuard implements CanActivate {
       if (this.auth.isCompany()) {
         return of(this.router.createUrlTree(['/company/dashboard']));
       }
+      if (this.auth.isAdmin()) {
+        return of(this.router.createUrlTree(['/admin']));
+      }
       if (!this.auth.isAuthenticated()) {
         return of(this.router.createUrlTree(['/login']));
       }
-    }
-
-    if (this.auth.isAuthenticated() && !this.auth.authReady()) {
     }
 
     return this.auth.fetchMe().pipe(
@@ -49,6 +49,9 @@ export class CandidateGuard implements CanActivate {
         }
         if (this.auth.isCompany()) {
           return this.router.createUrlTree(['/company/dashboard']);
+        }
+        if (this.auth.isAdmin()) {
+          return this.router.createUrlTree(['/admin']);
         }
         return this.router.createUrlTree(['/login']);
       }),
@@ -71,6 +74,9 @@ export class CompanyGuard implements CanActivate {
       if (this.auth.isCandidate()) {
         return of(this.router.createUrlTree(['/app/inicio']));
       }
+      if (this.auth.isAdmin()) {
+        return of(this.router.createUrlTree(['/admin']));
+      }
       if (!this.auth.isAuthenticated()) {
         return of(this.router.createUrlTree(['/company/login']));
       }
@@ -84,9 +90,51 @@ export class CompanyGuard implements CanActivate {
         if (this.auth.isCandidate()) {
           return this.router.createUrlTree(['/app/inicio']);
         }
+        if (this.auth.isAdmin()) {
+          return this.router.createUrlTree(['/admin']);
+        }
         return this.router.createUrlTree(['/company/login']);
       }),
       catchError(() => of(this.router.createUrlTree(['/company/login']))),
+    );
+  }
+}
+
+/** Guard simétrico a CandidateGuard/CompanyGuard: solo deja pasar usuarios con rol ADMIN, redirige candidato/empresa a su propio panel y no autenticados a /admin/login (no /login — el panel admin tiene su propia entrada, separada a propósito). */
+@Injectable({ providedIn: 'root' })
+export class AdminGuard implements CanActivate {
+  constructor(private auth: AuthService, private router: Router) {}
+
+  canActivate(): Observable<boolean | UrlTree> {
+    if (this.auth.authReady()) {
+      if (this.auth.isAdmin()) {
+        return of(true);
+      }
+      if (this.auth.isCandidate()) {
+        return of(this.router.createUrlTree(['/app/inicio']));
+      }
+      if (this.auth.isCompany()) {
+        return of(this.router.createUrlTree(['/company/dashboard']));
+      }
+      if (!this.auth.isAuthenticated()) {
+        return of(this.router.createUrlTree(['/admin/login']));
+      }
+    }
+
+    return this.auth.fetchMe().pipe(
+      map(() => {
+        if (this.auth.isAdmin()) {
+          return true;
+        }
+        if (this.auth.isCandidate()) {
+          return this.router.createUrlTree(['/app/inicio']);
+        }
+        if (this.auth.isCompany()) {
+          return this.router.createUrlTree(['/company/dashboard']);
+        }
+        return this.router.createUrlTree(['/admin/login']);
+      }),
+      catchError(() => of(this.router.createUrlTree(['/admin/login']))),
     );
   }
 }

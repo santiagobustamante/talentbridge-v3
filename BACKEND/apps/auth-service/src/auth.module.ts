@@ -20,6 +20,11 @@ if (!jwtSecret) {
   throw new Error('JWT_SECRET no está seteado. El servicio no puede arrancar sin este secreto.');
 }
 
+// Bug corregido (Fase 5 del panel admin): esto estaba hardcodeado a '1d' y
+// nunca leía la variable de entorno — `JWT_EXPIRES_IN` estaba declarada en
+// .env.example desde antes pero era config muerta, sin ningún efecto real.
+const jwtExpiresIn = (process.env['JWT_EXPIRES_IN'] || '1d') as StringValue;
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -28,7 +33,7 @@ if (!jwtSecret) {
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: jwtSecret,
-      signOptions: { expiresIn: '1d' as StringValue },
+      signOptions: { expiresIn: jwtExpiresIn },
     }),
     // Sin esto, nada frenaba intentos repetidos de login/registro por fuerza
     // bruta — 10 requests por minuto por IP contra todo el servicio (login,

@@ -1,11 +1,17 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService, UserRole, NotificationType, JobOfferStatus } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
-import { titleCaseText, trimText } from '@app/common';
+import { titleCaseText, trimText, getPaginationLimits, clampLimit } from '@app/common';
 import { CreateJobOfferDto, UpdateJobOfferDto } from './dto/create-job-offer.dto';
 
-/** Debajo de este % de coincidencia con los requisitos, no vale la pena alertar al candidato — sería ruido. */
-const JOB_MATCH_ALERT_THRESHOLD = 50;
+/**
+ * Debajo de este % de coincidencia con los requisitos, no vale la pena
+ * alertar al candidato — sería ruido. Valor de respaldo si por algún motivo
+ * el parámetro `JOB_MATCH_ALERT_THRESHOLD` no existe todavía en
+ * `SystemParameter` (ej. una base que no corrió el seed del panel admin) —
+ * el valor real y editable en caliente vive en la base, ver `getMatchThreshold()`.
+ */
+const JOB_MATCH_ALERT_THRESHOLD_FALLBACK = 50;
 
 // Alias del enum real de Prisma (en vez de los `'PUBLISHED' as any` que había
 // antes) — mismos nombres para no tocar el resto del archivo, pero ahora
@@ -21,6 +27,13 @@ function assertValidSalaryRange(salaryMin?: number, salaryMax?: number): void {
     throw new BadRequestException('El salario máximo no puede ser menor que el salario mínimo');
   }
 }
+
+/** Claves de `SystemCatalog` para las 3 listas de opciones de oferta laboral (editables desde el panel admin — Fase 3). */
+const JOB_CATALOG_KEYS = {
+  modality: 'JOB_MODALITY',
+  contractType: 'JOB_CONTRACT_TYPE',
+  workload: 'JOB_WORKLOAD',
+} as const;
 
 @Injectable()
 export class JobsService {
@@ -72,8 +85,38 @@ export class JobsService {
     return job;
   }
 
+  /**
+   * Valida `value` contra las filas activas de `SystemCatalog` para ese
+   * `catalogKey` — reemplaza el `@IsIn(ARRAY_ESTATICO)` que tenía el DTO:
+   * la lista de valores válidos ahora la administra un admin desde el
+   * panel (Fase 3), y agregar/desactivar una opción no requiere redeploy.
+   */
+  private async assertValidCatalogValue(catalogKey: string, value: string | undefined, fieldLabel: string): Promise<void> {
+    if (value === undefined) return;
+    const entry = await this.prisma.systemCatalog.findUnique({
+      where: { catalogKey_value: { catalogKey, value } },
+    });
+    if (!entry || !entry.active) {
+      throw new BadRequestException(`${fieldLabel} no es un valor válido`);
+    }
+  }
+
+  /** Catálogos de opciones para el formulario de oferta laboral — leídos por candidato y empresa (Fase 3). */
+  async getJobCatalogs() {
+    const [modality, contractType, workload] = await Promise.all([
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.modality, active: true }, orderBy: { sortOrder: 'asc' } }),
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.contractType, active: true }, orderBy: { sortOrder: 'asc' } }),
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.workload, active: true }, orderBy: { sortOrder: 'asc' } }),
+    ]);
+    const toOptions = (rows: { value: string; label: string }[]) => rows.map((r) => ({ value: r.value, label: r.label }));
+    return { modality: toOptions(modality), contractType: toOptions(contractType), workload: toOptions(workload) };
+  }
+
   async createJob(companyUserId: number, dto: CreateJobOfferDto) {
     assertValidSalaryRange(dto.salaryMin, dto.salaryMax);
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.modality, dto.modality, 'La modalidad');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.contractType, dto.contractType, 'El tipo de contrato');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.workload, dto.workload, 'La jornada');
     return this.prisma.jobOffer.create({
       data: {
         companyId: companyUserId,
@@ -111,6 +154,9 @@ export class JobsService {
       dto.salaryMin !== undefined ? dto.salaryMin : (job.salaryMin ?? undefined),
       dto.salaryMax !== undefined ? dto.salaryMax : (job.salaryMax ?? undefined),
     );
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.modality, dto.modality, 'La modalidad');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.contractType, dto.contractType, 'El tipo de contrato');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.workload, dto.workload, 'La jornada');
 
     const updateData: any = {};
     if (dto.title !== undefined) updateData.title = titleCaseText(dto.title);
@@ -172,6 +218,21 @@ export class JobsService {
    * Si la oferta no pide ninguna skill puntual, no hay "match" real que avisar
    * (todo el mundo "matchea" trivialmente) — se omite para no generar ruido.
    */
+  /**
+   * Lee el umbral desde `SystemParameter` (editable en caliente desde el
+   * panel admin) en vez de una constante — primer parámetro del sistema
+   * migrado a esta tabla, como prueba de concepto de la Fase 1 del panel.
+   * Sin cache: esto solo corre al publicar una oferta, no es un hot path.
+   */
+  private async getMatchThreshold(): Promise<number> {
+    const param = await this.prisma.systemParameter.findUnique({
+      where: { key: 'JOB_MATCH_ALERT_THRESHOLD' },
+    });
+    if (!param) return JOB_MATCH_ALERT_THRESHOLD_FALLBACK;
+    const value = Number(param.value);
+    return Number.isNaN(value) ? JOB_MATCH_ALERT_THRESHOLD_FALLBACK : value;
+  }
+
   private async notifyMatchingCandidates(job: { id: number; title: string; skillsRequired: string | null }): Promise<void> {
     if (!job.skillsRequired?.trim()) return;
 
@@ -183,9 +244,10 @@ export class JobsService {
       },
     });
 
+    const threshold = await this.getMatchThreshold();
     const matchingUserIds = profiles
       .map((p) => ({ userId: p.userId, match: computeSkillMatch(job.skillsRequired, p.skills) }))
-      .filter((p) => p.match.matchPercent >= JOB_MATCH_ALERT_THRESHOLD)
+      .filter((p) => p.match.matchPercent >= threshold)
       .map((p) => p.userId);
 
     if (matchingUserIds.length === 0) return;
@@ -240,7 +302,8 @@ export class JobsService {
     // de Prisma más abajo con un error crudo en vez de simplemente usar la
     // página por defecto.
     const page = Math.max(1, parseInt(query?.page, 10) || 1);
-    const limit = Math.min(Math.max(1, parseInt(query?.limit, 10) || 20), 100);
+    const paginationLimits = await getPaginationLimits(this.prisma);
+    const limit = clampLimit(query?.limit ? parseInt(query.limit, 10) : undefined, paginationLimits);
 
     const where: any = { status: PUBLISHED };
     if (query?.q) {

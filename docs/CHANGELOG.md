@@ -850,3 +850,38 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Solución:** Los parámetros se tratan ahora como una instrucción de una sola vez, no como estado: apenas se consumen (se abre el panel/detalle correspondiente), se borran de inmediato de la URL (`router.navigate([], { queryParams: {}, replaceUrl: true })`). Un flag (`consumedByThisComponent`) distingue esa limpieza propia de una navegación manual real del usuario, para no cerrar el panel que se acaba de abrir.
 **Cómo se probó:** `ng build` limpio. Verificado en vivo reproduciendo el escenario exacto reportado (no solo el de BUG-048): clic en notificación → detalle correcto → URL confirmada limpia → alternar pestañas "Ofertas disponibles"/"Mis postulaciones" varias veces, aplicar un filtro, recargar la página completa (F5), y navegar por el menú lateral — en ningún caso se reabrió el panel. Repetido en el lado empresa (Talento Llanero S.A.S., la empresa del reporte original) simulando el link real de una notificación de nueva postulación.
 **Pendientes:** Ninguno.
+
+---
+
+### 2026-07-30 — Panel de administración: Fase 1 (rol ADMIN, `admin-service` nuevo, primer parámetro real)
+
+**Módulo:** Backend — nuevo `admin-service`, `auth-service`, `jobs-service`, `libs/database`, `libs/common` · Frontend — `core/guards`, `core/auth`, `core/services`, `features/admin/` (nuevo) · Prisma — migración `20260730000000_add_admin_panel`
+**Tipo de cambio:** Feature nueva (ampliación de alcance real — `docs/alcance-mvp.md` excluía explícitamente "Panel administrativo" del MVP original; decisión documentada en `DECISIONS.md`)
+**Qué se construyó:** Primera fase (de 9 planeadas, ver `docs/plan-panel-administrativo.md`) de un panel de administración capaz de modificar en caliente los parámetros generales del sistema:
+1. **Rol ADMIN** agregado a `UserRole`, con 3 tablas nuevas: `SystemParameter` (cada parámetro es una fila con tipo/valor/default/min/max/descripción/nivel de riesgo — parametrizar es insertar una fila, no escribir código), `SystemCatalog` (catálogos de opciones, nunca se borran físicamente), `AdminAuditLog` (registro de cada cambio — no existía ningún mecanismo de auditoría en el proyecto antes de esto).
+2. **`admin-service` nuevo** (microservicio 11, puerto 3011): CRUD de parámetros con validación contra la propia metadata del parámetro, lectura del audit log, rate limit propio más estricto (60/min).
+3. **Login separado** (`POST /auth/login-admin`, ruta frontend `/admin/login`) — no hay ni habrá registro público para ADMIN; la primera cuenta se crea con un script de un solo uso (`create-admin.ts`).
+4. **`JOB_MATCH_ALERT_THRESHOLD`** (antes hardcodeado en `jobs.service.ts`) migrado a `SystemParameter` real — primer parámetro genuinamente editable en caliente desde el panel, con efecto real verificado.
+5. **Frontend**: `AdminGuard`, `AdminShellComponent` (mismo patrón de sidebar que `app-shell`/`company-shell`), páginas de Parámetros (con confirmación escalada por nivel de riesgo) y Auditoría.
+**Archivos afectados:** ver `docs/plan-panel-administrativo.md` (Fase 1) para el detalle completo por archivo.
+**Cómo se probó:** Build limpio de todo lo tocado (`build:admin`/`build:auth`/`build:jobs`/`build:gateway`/`build:libs`, `ng build`, `lint:css`). `npx jest`: 40/45, mismos 5 fallos preexistentes de siempre (confirmado con `git stash` que fallan igual sin estos cambios). Probado en vivo de punta a punta contra los 4 servicios corriendo localmente: login admin real → editar el parámetro (50→65) → diálogo de confirmación con el valor antes/después → guardado → confirmado en la tabla real de Postgres → revertido a 50 → 2 entradas correctas en el audit log. Verificados los 4 cruces de guard (admin no puede entrar a `/app` ni `/company`, candidato no puede entrar a `/admin`, sin sesión redirige a `/admin/login`).
+**Pendientes:** Fases 2-9 del plan (catálogos, reglas de negocio, seguridad, integraciones, gestión de usuarios/moderación, feature flags, y el despliegue a producción del nuevo servicio — este último requiere confirmación puntual antes de ejecutar, no está incluido en el trabajo de hoy).
+
+---
+
+### 2026-07-30 — Panel de administración: Fases 2-8 (catálogos, reglas de negocio, seguridad, IA, usuarios, feature flags)
+
+**Módulo:** Backend — `admin-service`, `jobs-service`, `auth-service`, `libs/common` (DeepSeek, paginación) · Frontend — `features/admin/`, `company-jobs`/`candidate-jobs`, `app-shell`/`company-shell`
+**Tipo de cambio:** Feature (continuación directa del panel de administración, ver Fase 1 arriba y detalle completo por fase en `docs/plan-panel-administrativo.md`)
+**Qué se construyó**, fase por fase (resumen — ver el plan para el detalle con archivos y pruebas):
+1. **Auditoría con filtros** — por tipo de entidad y rango de fecha.
+2. **Catálogos** — CRUD genérico de opciones (nunca borrado físico) migrando de punta a punta modalidad/tipo de contrato/jornada de oferta laboral: el DTO dejó de validar contra un array estático (`@IsIn`) y ahora `JobsService` valida en tiempo real contra `SystemCatalog`; el frontend (candidato y empresa) deja de usar arrays hardcodeados y los pide a un nuevo endpoint `GET /jobs/catalogs`.
+3. **Reglas de negocio** — rúbrica de análisis de CV (5 pesos) y límites de paginación (unificados: antes 4 valores default/tope distintos según el endpoint, ahora 2 parámetros únicos) migrados a `SystemParameter`.
+4. **Seguridad** — corregido un bug real: `JWT_EXPIRES_IN` estaba declarado en `.env` pero nunca se leía (`auth.module.ts` lo tenía hardcodeado a `'1d'`). De paso, sesión ADMIN endurecida a 2 horas (no editable desde el propio panel, a propósito).
+5. **Integraciones IA** — el modelo de DeepSeek (Joaquín + análisis de CV) ya no queda fijo al arrancar el proceso, se lee en cada llamada.
+6. **Gestión de usuarios** — campo `User.suspended`, panel para listar/suspender/reactivar candidatos y empresas (nunca cuentas ADMIN, ni la propia), enforcement real en las 3 funciones de login.
+7. **Feature flags** — patrón genérico (parámetro booleano en categoría `feature-flags`) con un caso real: `FEATURE_ASSISTANT_ENABLED` apaga/prende el asistente Joaquín en toda la app sin redeploy.
+**Decisiones conscientes de alcance** (documentadas en detalle en el plan, no son huecos sin explicar): no se migraron los catálogos de habilidades/experiencia/educación/proyectos (needs de modelo distintos, uno de ellos requeriría un campo de agrupación que `SystemCatalog` no tiene); no se hicieron los rate limits dinámicamente editables (requeriría un guard custom, fingir un parámetro sin efecto real hubiera sido peor que no tenerlo).
+**Archivos afectados:** ver `docs/plan-panel-administrativo.md` (Fases 2-8) para la lista completa por archivo.
+**Cómo se probó:** Build limpio en cada fase (backend completo + frontend + `lint:css`). `npx jest`: se encontraron y corrigieron 2 regresiones reales en el camino (mock de Prisma incompleto en `notifications.service.spec.ts`, firma de llamada a `jwtService.sign` cambiada) — confirmado el mismo baseline de siempre (40/45, 5 fallos preexistentes) después de cada corrección. Se detectó y corrigió además un problema del propio entorno de pruebas (servidor de desarrollo con compilación incremental corrupta mostrando errores ya resueltos) — reiniciado, y las pantallas admin ya construidas (Catálogos, Usuarios) se re-verificaron contra el servidor sano. Cada fase probada en vivo de punta a punta contra los servicios locales reales, no solo build — ver el plan para el detalle exacto de cada prueba.
+**Pendientes:** Fase 9 — despliegue a producción del nuevo servicio (Railway/Render/Supabase), pendiente de confirmación puntual antes de ejecutar.

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService, JobOfferStatus, JobApplicationStatus, NotificationType, Prisma } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
+import { getPaginationLimits, clampLimit } from '@app/common';
 
 /** Traduce el estado de una postulación al texto que ve el candidato en su notificación. */
 const STATUS_LABELS: Record<string, string> = {
@@ -111,7 +112,8 @@ export class ApplicationsService {
     params?: { page?: string; limit?: string; status?: string; fromDate?: string; toDate?: string },
   ) {
     const page = Math.max(1, parseInt(params?.page || '1', 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(params?.limit || '10', 10) || 10));
+    const paginationLimits = await getPaginationLimits(this.prisma);
+    const limit = clampLimit(params?.limit ? parseInt(params.limit, 10) : undefined, paginationLimits);
 
     const where: any = { candidateId: candidateUserId };
 

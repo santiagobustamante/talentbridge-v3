@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { CandidateGuard, CompanyGuard } from './core/guards/auth.guard';
+import { CandidateGuard, CompanyGuard, AdminGuard } from './core/guards/auth.guard';
 
 /**
  * Tabla de rutas raíz de la aplicación.
@@ -12,6 +12,10 @@ import { CandidateGuard, CompanyGuard } from './core/guards/auth.guard';
  *   sidebar/navbar del candidato.
  * - `company/*`: shell de la empresa (CompanyShellComponent), protegido por
  *   `CompanyGuard` — mismo patrón pero para el rol empresa.
+ * - `admin/*`: shell del panel de administración (AdminShellComponent),
+ *   protegido por `AdminGuard` — login separado en `admin/login` (no
+ *   `/login`), sin registro público (la cuenta se crea a mano, ver
+ *   `BACKEND/prisma/create-admin.ts`).
  *
  * Todos los componentes de feature se cargan con `loadComponent` (lazy
  * loading a nivel de componente standalone) para que el bundle inicial no
@@ -58,6 +62,11 @@ export const routes: Routes = [
     path: 'company/register',
     loadComponent: () =>
       import('./features/auth/company-register.component').then((m) => m.CompanyRegisterComponent),
+  },
+  {
+    path: 'admin/login',
+    loadComponent: () =>
+      import('./features/admin/admin-login.component').then((m) => m.AdminLoginComponent),
   },
   {
     path: 'app',
@@ -187,6 +196,40 @@ export const routes: Routes = [
           import('./features/company/company-analytics.component').then(
             (m) => m.CompanyAnalyticsComponent,
           ),
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/admin-shell.component').then((m) => m.AdminShellComponent),
+    canActivate: [AdminGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+      },
+      {
+        path: 'parameters',
+        loadComponent: () =>
+          import('./features/admin/admin-parameters.component').then((m) => m.AdminParametersComponent),
+      },
+      {
+        path: 'catalogs',
+        loadComponent: () =>
+          import('./features/admin/admin-catalogs.component').then((m) => m.AdminCatalogsComponent),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/admin-users.component').then((m) => m.AdminUsersComponent),
+      },
+      {
+        path: 'audit-log',
+        loadComponent: () =>
+          import('./features/admin/admin-audit-log.component').then((m) => m.AdminAuditLogComponent),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

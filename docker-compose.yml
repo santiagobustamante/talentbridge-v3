@@ -189,6 +189,23 @@ services:
     networks:
       - talentbridge_net
 
+  admin-service:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+      target: admin-service
+    container_name: talentbridge_admin_service
+    restart: unless-stopped
+    ports:
+      - "3011:3011"
+    env_file:
+      - ./BACKEND/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - talentbridge_net
+
 volumes:
   pgdata_v3:
 

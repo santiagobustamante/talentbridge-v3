@@ -59,6 +59,7 @@ VERSION 3/
 | Candidato (perfil demo principal) | `bustamantemolinasantiago@gmail.com` | `Santiago.123` |
 | Candidato genérico | `candidato001@demo.com` … `candidato100@demo.com` | `Candidato.123` |
 | Empresa | `empresa001@demo.com` | `Empresa.123` |
+| Administrador (panel `/admin`, login separado en `/admin/login`) | `admin@talentbridge.com` | `Admin.123` |
 
 Más cuentas y su origen (qué seed las crea): [`docs/DATABASE.md`](./docs/DATABASE.md#4-usuarios-y-empresas-demo).
 

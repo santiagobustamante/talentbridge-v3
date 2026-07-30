@@ -100,7 +100,7 @@
 
 </div>
 
-@if (!isActive('/app/messages')) {
+@if (!isActive('/app/messages') && assistantEnabled) {
   @defer (on idle) {
     <app-assistant-chat />
   }
