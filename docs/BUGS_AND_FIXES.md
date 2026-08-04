@@ -643,3 +643,27 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** Igual que el resto de Fase 10 — `@IsIn(['COP'])` reemplazado por `@IsString() @MaxLength(10)`, con la validación real movida a `JobsService.assertValidCatalogValue()` contra el catálogo `CURRENCY` (COP/USD/EUR) recién creado.
 **Prueba realizada:** `build:jobs` limpio. Verificado en vivo: crear una oferta con `currency: "MONEDA_FALSA"` (14 caracteres) rechazada por longitud; `currency: "XXX"` (pasa longitud, no existe en el catálogo) rechazada con "La moneda no es un valor válido"; `currency: "USD"` — antes rechazada, ahora aceptada y creada correctamente — verificada y luego eliminada (no quedó dato de prueba).
 **Estado:** Corregido.
+
+---
+
+### BUG-054 — Panel admin: tarjetas se ven pegadas sin espacio entre sí (reportado por el usuario con captura de pantalla)
+
+**Módulo:** Frontend — `shared/components/card/card.component.scss` (componente compartido, usado en 24 archivos)
+**Descripción:** En la página de Parámetros del panel admin (y potencialmente cualquier otra que use `app-card` con espaciado por `margin`), las tarjetas aparecían completamente pegadas entre sí, sin el espacio de 12px que el código sí declaraba.
+**Causa:** `CardComponent` nunca declaraba `:host { display: block }`. Los custom elements (`<app-card>`) son `display: inline` por defecto en el navegador si el componente no lo fuerza a `block`, y en CSS los márgenes verticales (`margin-top`/`margin-bottom`) no tienen ningún efecto en elementos `inline` — por eso `.param-card { margin-bottom: 12px }` en `admin-parameters.component.ts` se aplicaba en el código pero no producía ningún efecto visual.
+**Archivos afectados:** `FRONTEND/src/app/shared/components/card/card.component.scss`.
+**Solución:** Agregado `:host { display: block; }`. Fix en el componente compartido, no en cada página que lo usa — evita que el mismo bug reaparezca silenciosamente en cualquiera de los otros 23 archivos que lo usan si alguno depende de `margin` en vez de `gap` de un contenedor flex/grid.
+**Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en navegador real: `getBoundingClientRect()` de las tarjetas de Parámetros mostró exactamente 12px de separación entre tarjetas de la misma categoría (antes, 0px).
+**Estado:** Corregido.
+
+---
+
+### BUG-055 — Panel admin: dashboard se queda en blanco sin ningún mensaje si la llamada a la API falla
+
+**Módulo:** Frontend — `features/admin/admin-dashboard.component.ts`
+**Descripción:** Reportado por el usuario como "el dashboard está vacío". La causa concreta en ese momento fue que los servidores locales de desarrollo se habían caído (efecto colateral ya conocido de esta sesión de trabajo — los procesos en segundo plano no sobreviven un reinicio del entorno de Claude Code), no un problema de datos: se confirmó que tanto el entorno local como producción devuelven métricas reales y correctas cuando el backend está disponible. Pero revisando el código se encontró un bug real independiente de esa causa puntual.
+**Causa:** El callback `error` de `getDashboardStats().subscribe(...)` seteaba `loading = false` pero no mostraba ningún mensaje ni guardaba el error — el template solo tiene ramas para `loading` y `stats`, así que cualquier falla de red (no solo la caída de los servidores locales: también aplicaría a un timeout real, un 500, o cualquier otro fallo del backend en producción) deja la pantalla completamente en blanco, sin ninguna pista de qué pasó.
+**Archivos afectados:** `FRONTEND/src/app/features/admin/admin-dashboard.component.ts`.
+**Solución:** Agregado estado `error: boolean` seteado en el callback de error, con una rama `@else if (error)` en el template que muestra un mensaje claro en vez de dejar la pantalla vacía.
+**Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en navegador real con servidores arriba: dashboard muestra datos reales (104 candidatos, 61 empresas, 112 ofertas publicadas en local; 110/61/232 en producción). No se forzó el escenario de error en vivo (requeriría tumbar el backend a propósito), pero la lógica del nuevo estado es la misma ya usada en `admin-parameters.component.ts` para su propio caso de error.
+**Estado:** Corregido.

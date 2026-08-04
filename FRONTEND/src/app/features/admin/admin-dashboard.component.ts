@@ -6,9 +6,8 @@ import { CardComponent } from '../../shared/components/card/card.component';
 /**
  * Panel de control (Fase 14) — métricas generales agregadas en vivo desde
  * `admin-service` (usuarios por rol, ofertas por estado, postulaciones
- * totales). Sin modelo propio: son `COUNT`/`GROUP BY` sobre tablas que ya
- * existen. Moderación pendiente no aparece todavía porque ese modelo
- * (`Report`) no existe (ver Fase 12 de docs/plan-panel-administrativo.md).
+ * totales, reportes pendientes). Todo es `COUNT`/`GROUP BY` sobre tablas
+ * que ya existen, sin modelo propio.
  */
 @Component({
   selector: 'app-admin-dashboard',
@@ -21,6 +20,10 @@ import { CardComponent } from '../../shared/components/card/card.component';
 
       @if (loading) {
         <p>Cargando...</p>
+      } @else if (error) {
+        <app-card variant="flat" padding="lg">
+          <p>No se pudieron cargar las métricas del panel. Verificá que el servicio esté disponible e intentá de nuevo más tarde.</p>
+        </app-card>
       } @else if (stats) {
         <h2 class="section-title">Usuarios</h2>
         <div class="stats-grid">
@@ -93,6 +96,7 @@ export class AdminDashboardComponent implements OnInit {
   private admin = inject(AdminService);
 
   loading = true;
+  error = false;
   stats: AdminDashboardStats | null = null;
 
   ngOnInit(): void {
@@ -103,6 +107,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+        this.error = true;
       },
     });
   }
