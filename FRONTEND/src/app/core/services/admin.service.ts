@@ -74,6 +74,38 @@ export interface PaginatedUsers {
   limit: number;
 }
 
+export interface AdminDashboardStats {
+  users: { candidates: number; companies: number; admins: number; suspended: number };
+  jobOffers: { draft: number; published: number; closed: number; archived: number };
+  totalApplications: number;
+  pendingReports: number;
+}
+
+export type ReportTargetType = 'JOB_OFFER' | 'CHAT_MESSAGE' | 'USER';
+export type ReportStatus = 'PENDING' | 'REVIEWED' | 'DISMISSED' | 'ACTION_TAKEN';
+
+export interface AdminReport {
+  id: number;
+  reporterId: number;
+  reporter: { email: string };
+  targetType: ReportTargetType;
+  targetId: number;
+  reason: string;
+  status: ReportStatus;
+  reviewedById: number | null;
+  reviewedBy: { email: string } | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  target: { id: number; title?: string; status?: string; body?: string; senderId?: number; email?: string; suspended?: boolean } | null;
+}
+
+export interface PaginatedReports {
+  data: AdminReport[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 /** Cliente HTTP del panel de administración (admin-service, vía el gateway). */
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -122,5 +154,20 @@ export class AdminService {
 
   setUserSuspended(id: number, suspended: boolean): Observable<{ id: number; email: string; suspended: boolean }> {
     return this.http.patch<{ id: number; email: string; suspended: boolean }>(`${this.api}/admin/users/${id}/suspend-state`, { suspended });
+  }
+
+  getDashboardStats(): Observable<AdminDashboardStats> {
+    return this.http.get<AdminDashboardStats>(`${this.api}/admin/dashboard`);
+  }
+
+  listReports(params: { status?: string; targetType?: string; page: number; limit: number }): Observable<PaginatedReports> {
+    const httpParams: Record<string, string | number> = { page: params.page, limit: params.limit };
+    if (params.status) httpParams['status'] = params.status;
+    if (params.targetType) httpParams['targetType'] = params.targetType;
+    return this.http.get<PaginatedReports>(`${this.api}/admin/moderation`, { params: httpParams });
+  }
+
+  resolveReport(id: number, status: 'DISMISSED' | 'ACTION_TAKEN'): Observable<AdminReport> {
+    return this.http.patch<AdminReport>(`${this.api}/admin/moderation/${id}`, { status });
   }
 }

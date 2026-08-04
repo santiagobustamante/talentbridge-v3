@@ -607,3 +607,39 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** `expiresIn` ahora se arma con `process.env['JWT_EXPIRES_IN'] || '1d'` — mismo valor por defecto que antes (`.env` ya tenía `1d`), así que no cambia el comportamiento actual, pero la variable ahora sí tiene efecto real si se edita. De paso (Fase 5, no un bug sino un endurecimiento nuevo): las cuentas ADMIN firman con una sesión de 2 horas en vez del `JWT_EXPIRES_IN` general, dado el poder de ese rol.
 **Prueba realizada:** `npm run build:auth` limpio. `npx jest apps/auth-service` (10/10, tras corregir un test que esperaba `jwtService.sign` con una firma de un solo argumento). Verificado en vivo decodificando el JWT real emitido: cuenta ADMIN → 2 horas de validez; cuenta CANDIDATE → 24 horas (sin cambio respecto a antes).
 **Estado:** Corregido.
+
+---
+
+### BUG-051 — Catálogos (admin): fila "Agregar valor" inalcanzable en mobile
+
+**Módulo:** Frontend — `admin-catalogs.component.ts`
+**Descripción:** Encontrado durante el barrido de verificación del panel administrativo (2026-08-03), revisando las 6 pantallas admin a 375px de ancho. La fila para agregar un valor nuevo a un catálogo (input "Nuevo valor" + input "Texto a mostrar" + botón "Agregar") no era usable en mobile.
+**Causa:** `.add-entry` era `display: flex` sin `flex-wrap`, con dos inputs a `flex: 1` — su ancho de contenido combinado (460px) excedía el contenedor (246px a 375px de viewport). El `.page-content` padre tiene `overflow-x: hidden` (para evitar que la página entera scrollee horizontalmente por otros motivos), así que el excedente no generaba una barra de scroll visible ni un gesto táctil descubrible: simplemente se cortaba. El botón "Agregar" quedaba renderizado 147px fuera del borde derecho de la pantalla.
+**Archivos afectados:** `FRONTEND/src/app/features/admin/admin-catalogs.component.ts`.
+**Solución:** `flex-wrap: wrap` en `.add-entry`, y los inputs pasan de `flex: 1` a `flex: 1 1 140px; min-width: 0` — en mobile se apilan en 1-2 filas en vez de desbordar; en desktop siguen en una sola fila como antes.
+**Prueba realizada:** `ng build`/`lint:css` limpios. Medido con `getBoundingClientRect()` a 375px: antes, el botón "Agregar" terminaba en `right: 522px`; después, el contenedor completo termina en `right: 308px`, dentro de los 375px del viewport, sin overflow de página.
+**Estado:** Corregido.
+
+---
+
+### BUG-052 — Usuarios (admin): fila de filtros inalcanzable en mobile
+
+**Módulo:** Frontend — `admin-users.component.ts`
+**Descripción:** Mismo tipo de hallazgo que BUG-051, encontrado en la misma revisión, en la pantalla `/admin/users`. La fila de filtros (select de rol + input de búsqueda por correo + botón "Buscar") no era usable en mobile.
+**Causa:** Igual que BUG-051 — `.filters` era `display: flex` sin `flex-wrap`, contenido combinado de 401px en un contenedor de 294px, cortado silenciosamente por el `overflow-x: hidden` de `.page-content`. El botón "Buscar" quedaba casi totalmente fuera de pantalla (`right: 439px` sobre 375px de viewport).
+**Archivos afectados:** `FRONTEND/src/app/features/admin/admin-users.component.ts`.
+**Solución:** `flex-wrap: wrap` en `.filters`, `min-width: 0` en `select`/`input`, e input de búsqueda de `flex: 1` a `flex: 1 1 160px`.
+**Prueba realizada:** `ng build`/`lint:css` limpios. Medido con `getBoundingClientRect()` a 375px: después del fix, el botón "Buscar" queda en `right: 332px`, dentro del viewport.
+**Estado:** Corregido.
+
+---
+
+### BUG-053 — Oferta laboral: el `<select>` de moneda ofrecía USD/EUR pero el backend solo aceptaba COP
+
+**Módulo:** Backend — `jobs-service` (`dto/create-job-offer.dto.ts`)
+**Descripción:** Encontrado durante la Fase 10 del panel administrativo (migración de `currency` a `SystemCatalog`), al probar el catálogo nuevo contra el formulario real de oferta laboral. `company-jobs.component.html` ya tenía un `<select formData.currency>` con 3 opciones (COP/USD/EUR) desde antes de esta fase — pero el DTO del backend tenía `@IsIn(['COP'])`, una lista de un solo valor. Cualquier empresa que intentara publicar una oferta en USD o EUR recibía un 400 ("currency must be one of the following values: COP") sin ninguna explicación visible de por qué, ya que el frontend nunca impedía elegir esas opciones. No relacionado a los cambios de esta fase — ya estaba así antes, se encontró al verificar el catálogo nuevo de punta a punta contra el formulario real en vez de solo contra el backend.
+**Causa:** Desincronización entre frontend y backend — el `<select>` se construyó (o se amplió) sin actualizar la validación del DTO que lo respalda.
+**Archivos afectados:** `BACKEND/apps/jobs-service/src/dto/create-job-offer.dto.ts`.
+**Solución:** Igual que el resto de Fase 10 — `@IsIn(['COP'])` reemplazado por `@IsString() @MaxLength(10)`, con la validación real movida a `JobsService.assertValidCatalogValue()` contra el catálogo `CURRENCY` (COP/USD/EUR) recién creado.
+**Prueba realizada:** `build:jobs` limpio. Verificado en vivo: crear una oferta con `currency: "MONEDA_FALSA"` (14 caracteres) rechazada por longitud; `currency: "XXX"` (pasa longitud, no existe en el catálogo) rechazada con "La moneda no es un valor válido"; `currency: "USD"` — antes rechazada, ahora aceptada y creada correctamente — verificada y luego eliminada (no quedó dato de prueba).
+**Estado:** Corregido.

@@ -40,6 +40,8 @@ services:
         value: http://assistant-service:3009
       - key: DASHBOARD_SERVICE_URL
         value: http://dashboard-service:3010
+      - key: ADMIN_SERVICE_URL
+        value: http://admin-service:3011
 
   - type: web
     name: chat-service
@@ -255,6 +257,36 @@ services:
         value: 3010
       - key: DASHBOARD_SERVICE_PORT
         value: 3010
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://talentbridge-v3.vercel.app
+
+  # Agregado en la Fase 13 (paridad de respaldo con Railway, que ya lo tiene
+  # desde el 2026-07-30) — mismo patrón que los otros 10, puerto 3011. Ojo:
+  # este bloque declara el servicio en el blueprint, pero Render no lo crea
+  # solo con este commit — hace falta un Blueprint Sync manual (o crear el
+  # servicio a mano) desde el dashboard de Render, con acceso que este
+  # agente no tiene (ver docs/DEPLOYMENT.md sección 8). Ver la entrada
+  # correspondiente en docs/plan-panel-administrativo.md, Fase 13.
+  - type: web
+    name: admin-service
+    runtime: docker
+    plan: free
+    rootDir: BACKEND
+    dockerfilePath: ./docker/admin-service.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3011
+      - key: ADMIN_SERVICE_PORT
+        value: 3011
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET

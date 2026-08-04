@@ -15,6 +15,12 @@ export class SkillsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('catalogs')
+  async getCatalogs() {
+    return this.skillsService.getSkillCatalogs();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addSkill(@CurrentUser() user: { sub: number }, @Body() dto: SkillDto) {
     return this.skillsService.addSkill(user.sub, dto);

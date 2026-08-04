@@ -43,7 +43,9 @@ export class AdminShellComponent implements OnInit, OnDestroy {
     { label: 'Parámetros del sistema', subtitle: 'Parámetros', icon: 'tune', route: '/admin/parameters' },
     { label: 'Catálogos de opciones', subtitle: 'Catálogos', icon: 'list_alt', route: '/admin/catalogs' },
     { label: 'Usuarios y empresas', subtitle: 'Usuarios', icon: 'group', route: '/admin/users' },
+    { label: 'Moderación', subtitle: 'Moderación', icon: 'flag', route: '/admin/moderation' },
     { label: 'Registro de cambios', subtitle: 'Auditoría', icon: 'history', route: '/admin/audit-log' },
+    { label: 'Seguridad', subtitle: 'Seguridad', icon: 'shield', route: '/admin/security' },
   ];
 
   constructor() {

@@ -1,8 +1,5 @@
-import { IsString, IsOptional, IsNotEmpty, IsArray, IsIn, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsArray, MaxLength } from 'class-validator';
 import { IsNotFutureDateString, IsAfterOrEqualDateString, IsValidUrl } from '@app/common';
-
-const PROJECT_TYPES = ['INDIVIDUAL', 'TEAM'] as const;
-const PROJECT_STATUSES = ['PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const;
 
 // Antes solo `name` era obligatorio -- un proyecto se podía guardar con un
 // solo campo lleno. Descripción/rol/tipo/estado/fecha de inicio ahora se
@@ -52,10 +49,12 @@ export class ProjectDto {
   @IsValidUrl()
   imageUrl?: string;
 
-  @IsIn(PROJECT_TYPES)
+  @IsString()
+  @MaxLength(50)
   projectType: string;
 
-  @IsIn(PROJECT_STATUSES)
+  @IsString()
+  @MaxLength(50)
   status: string;
 
   @IsString()

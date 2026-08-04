@@ -18,15 +18,19 @@ export class JobsService {
 
   constructor(private http: HttpClient) {}
 
-  /** Catálogos de opciones (modalidad/tipo de contrato/jornada) para el formulario de oferta y los filtros — administrables desde el panel admin, ver `SystemCatalog` (Fase 3). */
+  /** Catálogos de opciones (modalidad/tipo de contrato/jornada/moneda) para el formulario de oferta y los filtros — administrables desde el panel admin, ver `SystemCatalog` (Fase 3, `currency` agregada en Fase 10). */
   getJobCatalogs(): Observable<{
     modality: { value: string; label: string }[];
     contractType: { value: string; label: string }[];
     workload: { value: string; label: string }[];
+    currency: { value: string; label: string }[];
   }> {
-    return this.http.get<{ modality: { value: string; label: string }[]; contractType: { value: string; label: string }[]; workload: { value: string; label: string }[] }>(
-      `${this.api}/jobs/catalogs`,
-    );
+    return this.http.get<{
+      modality: { value: string; label: string }[];
+      contractType: { value: string; label: string }[];
+      workload: { value: string; label: string }[];
+      currency: { value: string; label: string }[];
+    }>(`${this.api}/jobs/catalogs`);
   }
 
   /** Búsqueda pública de ofertas publicadas, con filtros combinados y paginación (lado candidato). */
@@ -45,6 +49,11 @@ export class JobsService {
   /** El candidato autenticado se postula a una oferta, opcionalmente con un mensaje de presentación. */
   applyToJob(jobId: number, payload?: { coverMessage?: string }): Observable<JobApplication> {
     return this.http.post<JobApplication>(`${this.api}/jobs/${jobId}/apply`, payload || {});
+  }
+
+  /** Reporta una oferta laboral por contenido inapropiado (Fase 12 — moderación de contenido). */
+  reportJob(jobId: number, reason: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/jobs/${jobId}/report`, { reason });
   }
 
   /** Lista las postulaciones del candidato autenticado, con filtros opcionales de estado y rango de fechas. */

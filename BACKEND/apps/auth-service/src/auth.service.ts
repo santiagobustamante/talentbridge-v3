@@ -9,9 +9,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
 import { PrismaService, UserRole, Prisma, VerificationTokenType } from '@app/database';
 import { normalizeEmail, titleCaseText, trimText, EmailService } from '@app/common';
 import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto } from './dto/auth.dto';
+
+/** Emisor mostrado en la app autenticadora (Google Authenticator, Authy, etc.) junto al nombre de la cuenta. */
+const TOTP_ISSUER = 'TalentBridge Admin';
+/** Vigencia del token temporal de "falta 2FA" — corto a propósito, solo cubre el tiempo entre password correcto y código TOTP en el mismo intento de login. */
+const TWO_FACTOR_PENDING_TTL = '5m';
 
 /** Frase exacta que dispara, en el frontend, el botón "Reenviar correo" en el error de login — ver AllExceptionsFilter, que solo reenvía `message` (no un código de error aparte). */
 const EMAIL_NOT_VERIFIED_MESSAGE =
@@ -252,8 +258,106 @@ export class AuthService {
       throw new ForbiddenException(SUSPENDED_MESSAGE);
     }
 
+    // Fase 17: si la cuenta tiene 2FA activado, el password correcto no
+    // alcanza todavía — se devuelve un token temporal de vida corta (5 min,
+    // nunca sirve para autenticar contra ningún otro endpoint) que el
+    // frontend manda junto al código TOTP a `verifyTwoFactorLogin()`. No se
+    // emite cookie ni el JWT real en este punto.
+    if (user.twoFactorEnabled) {
+      const tempToken = this.jwtService.sign(
+        { sub: user.id, pending2FA: true },
+        { expiresIn: TWO_FACTOR_PENDING_TTL },
+      );
+      return { twoFactorRequired: true, tempToken };
+    }
+
     const token = this.generateToken(user.id, user.email, user.role);
     return { user: this.sanitizeUser(user), token };
+  }
+
+  /** Segundo paso del login admin cuando la cuenta tiene 2FA activado (Fase 17) — ver `loginAdmin()`. */
+  async verifyTwoFactorLogin(tempToken: string, code: string) {
+    let payload: { sub: number; pending2FA?: boolean };
+    try {
+      payload = this.jwtService.verify(tempToken);
+    } catch {
+      throw new UnauthorizedException('El token temporal venció o no es válido. Inicia sesión de nuevo.');
+    }
+    if (!payload.pending2FA) {
+      throw new UnauthorizedException('Token temporal no válido para este paso.');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    if (!user || user.role !== UserRole.ADMIN || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      throw new UnauthorizedException('Credenciales incorrectas');
+    }
+    if (user.suspended) {
+      throw new ForbiddenException(SUSPENDED_MESSAGE);
+    }
+
+    const { valid } = await verifyTotp({ token: code, secret: user.twoFactorSecret });
+    if (!valid) {
+      throw new UnauthorizedException('Código incorrecto');
+    }
+
+    const token = this.generateToken(user.id, user.email, user.role);
+    return { user: this.sanitizeUser(user), token };
+  }
+
+  /**
+   * Genera un secreto TOTP nuevo y lo guarda sin activar 2FA todavía — recién
+   * se activa (`twoFactorEnabled = true`) cuando `confirmTwoFactorSetup()`
+   * verifica el primer código, confirmando que el admin efectivamente cargó
+   * el secreto en su app autenticadora (Google Authenticator, Authy, etc.).
+   * Sin código manual/QR de por medio, `otpauthUrl` sirve para una futura
+   * pantalla con QR; por ahora el frontend muestra el secreto en texto para
+   * carga manual.
+   */
+  async setupTwoFactor(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Solo disponible para cuentas de administrador');
+    }
+    if (user.twoFactorEnabled) {
+      throw new BadRequestException('El 2FA ya está activado en esta cuenta');
+    }
+
+    const secret = generateSecret();
+    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorSecret: secret } });
+
+    return { secret, otpauthUrl: generateURI({ issuer: TOTP_ISSUER, label: user.email, secret }) };
+  }
+
+  /** Confirma el primer código TOTP y activa 2FA — ver `setupTwoFactor()`. */
+  async confirmTwoFactorSetup(userId: number, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN || !user.twoFactorSecret) {
+      throw new BadRequestException('No hay una configuración de 2FA en curso — pedí un secreto nuevo primero');
+    }
+
+    const { valid } = await verifyTotp({ token: code, secret: user.twoFactorSecret });
+    if (!valid) {
+      throw new BadRequestException('Código incorrecto');
+    }
+
+    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: true } });
+    return { message: '2FA activado correctamente' };
+  }
+
+  /** Exige el código TOTP vigente antes de desactivar — evita que un token de sesión robado alcance por sí solo para bajar esta protección. */
+  async disableTwoFactor(userId: number, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      throw new BadRequestException('El 2FA no está activado en esta cuenta');
+    }
+
+    const { valid } = await verifyTotp({ token: code, secret: user.twoFactorSecret });
+    if (!valid) {
+      throw new BadRequestException('Código incorrecto');
+    }
+
+    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: false, twoFactorSecret: null } });
+    return { message: '2FA desactivado' };
   }
 
   /**
@@ -440,13 +544,19 @@ export class AuthService {
     passwordHash?: string;
     role?: string;
     emailVerified?: boolean;
+    twoFactorSecret?: string | null;
     createdAt: Date;
     updatedAt: Date;
     profile?: unknown;
     companyProfile?: unknown;
   }) {
-    const { passwordHash, ...safe } = user;
+    // `twoFactorSecret` nunca debe salir en ninguna respuesta (Fase 17) —
+    // filtrarlo anularía el 2FA por completo, cualquiera que vea la
+    // respuesta podría generar códigos válidos indefinidamente. Mismo
+    // cuidado que ya se aplicaba con `passwordHash`.
+    const { passwordHash, twoFactorSecret, ...safe } = user;
     void passwordHash;
+    void twoFactorSecret;
     return safe;
   }
 

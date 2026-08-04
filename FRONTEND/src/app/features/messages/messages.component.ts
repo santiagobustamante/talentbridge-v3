@@ -5,11 +5,13 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription, finalize } from 'rxjs';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSocketService } from '../../core/services/chat-socket.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
+import { ReportDialogComponent } from '../../shared/components/report-dialog.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import type { ConversationDto, MessageDto } from '../../core/models/chat.models';
@@ -25,7 +27,7 @@ import type { ConversationDto, MessageDto } from '../../core/models/chat.models'
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIconModule, MatSnackBarModule, EmptyStateComponent, AppDatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, MatIconModule, MatSnackBarModule, MatTooltipModule, EmptyStateComponent, AppDatePipe],
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
@@ -332,6 +334,23 @@ export class MessagesComponent implements OnInit, OnDestroy {
         this.unblockLoading = false;
         this.snackBar.open(err?.error?.message || 'Error al desbloquear', 'Cerrar', { duration: 3000 });
       },
+    });
+  }
+
+  /** Reporta un mensaje recibido por contenido inapropiado (Fase 12 — moderación de contenido). */
+  reportMessage(messageId: number): void {
+    const ref = this.dialog.open(ReportDialogComponent, {
+      data: { title: 'Reportar mensaje', message: '¿Por qué querés reportar este mensaje? Un administrador lo va a revisar.' },
+    });
+    ref.afterClosed().subscribe((reason: string | null) => {
+      if (!reason) return;
+      this.chatService.reportMessage(messageId, reason).subscribe({
+        next: () => this.snackBar.open('Reporte enviado. Gracias por avisarnos.', 'Cerrar', { duration: 4000 }),
+        error: (err) => {
+          const msg = err?.error?.message || err?.message || 'Error al enviar el reporte';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 

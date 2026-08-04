@@ -14,6 +14,12 @@ export class EducationController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('catalogs')
+  async getCatalogs() {
+    return this.educationService.getEducationCatalogs();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addEducation(@CurrentUser() user: { sub: number }, @Body() dto: EducationDto) {
     return this.educationService.addEducation(user.sub, dto);

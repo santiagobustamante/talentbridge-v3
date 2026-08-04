@@ -1,6 +1,4 @@
-import { IsString, IsOptional, IsIn, MaxLength } from 'class-validator';
-
-const LEVELS = ['BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT'] as const;
+import { IsString, IsOptional, MaxLength } from 'class-validator';
 
 export class SkillDto {
   @IsOptional()
@@ -9,6 +7,7 @@ export class SkillDto {
   name?: string;
 
   @IsOptional()
-  @IsIn(LEVELS)
+  @IsString()
+  @MaxLength(50)
   level?: string;
 }

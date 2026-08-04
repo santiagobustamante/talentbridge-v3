@@ -102,8 +102,9 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                   <mat-label>Tipo de proyecto <span class="req">*</span></mat-label>
                   <mat-select formControlName="projectType">
                     <mat-option value="">—</mat-option>
-                    <mat-option value="INDIVIDUAL">Individual</mat-option>
-                    <mat-option value="TEAM">En equipo</mat-option>
+                    @for (t of projectTypes; track t.value) {
+                      <mat-option [value]="t.value">{{ t.label }}</mat-option>
+                    }
                   </mat-select>
                   <mat-error *ngIf="form.get('projectType')?.hasError('required')">Requerido</mat-error>
                 </mat-form-field>
@@ -167,9 +168,9 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
                 <mat-label>Estado <span class="req">*</span></mat-label>
                 <mat-select formControlName="status">
                   <mat-option value="">—</mat-option>
-                  <mat-option value="PLANNED">Planificado</mat-option>
-                  <mat-option value="IN_PROGRESS">En progreso</mat-option>
-                  <mat-option value="COMPLETED">Completado</mat-option>
+                  @for (s of projectStatuses; track s.value) {
+                    <mat-option [value]="s.value">{{ s.label }}</mat-option>
+                  }
                 </mat-select>
                 <mat-error *ngIf="form.get('status')?.hasError('required')">Requerido</mat-error>
               </mat-form-field>
@@ -218,7 +219,7 @@ import { validUrl } from '../../shared/utils/validators/valid-url.validator';
 
             <div class="project-body">
               <div class="project-badges">
-                <span class="proj-badge" *ngIf="p.projectType">{{ p.projectType === 'INDIVIDUAL' ? 'Individual' : 'En equipo' }}</span>
+                <span class="proj-badge" *ngIf="p.projectType">{{ projectTypeLabel(p.projectType) }}</span>
                 <span class="proj-badge status-badge" *ngIf="p.status">{{ statusLabel(p.status) }}</span>
               </div>
               <h3 class="project-name">{{ p.name }}</h3>
@@ -277,6 +278,19 @@ export class ProjectsComponent implements OnInit {
   filteredTechSuggestions: SkillCatalogEntry[] = [];
   readonly today = new Date();
 
+  // Valores iniciales de respaldo (por si `getCatalogs()` todavía no
+  // resolvió o falla) — la fuente de verdad real es `SystemCatalog`,
+  // administrable desde el panel admin sin redeploy (Fase 10).
+  projectTypes: { value: string; label: string }[] = [
+    { value: 'INDIVIDUAL', label: 'Individual' },
+    { value: 'TEAM', label: 'En equipo' },
+  ];
+  projectStatuses: { value: string; label: string }[] = [
+    { value: 'PLANNED', label: 'Planificado' },
+    { value: 'IN_PROGRESS', label: 'En progreso' },
+    { value: 'COMPLETED', label: 'Completado' },
+  ];
+
   form = this.fb.group({
     name: ['', [Validators.required, notBlank]],
     description: ['', [Validators.required, notBlank]],
@@ -298,6 +312,13 @@ export class ProjectsComponent implements OnInit {
    */
   ngOnInit() {
     this.load();
+    this.service.getCatalogs().subscribe({
+      next: (catalogs) => {
+        this.projectTypes = catalogs.projectType;
+        this.projectStatuses = catalogs.status;
+      },
+      error: () => {},
+    });
     this.profileService.getProfile().subscribe({
       next: (p) => { this.showProjects = p.showProjects ?? true; this.profileLoaded = true; },
       error: () => { this.profileLoaded = true; },
@@ -465,9 +486,13 @@ export class ProjectsComponent implements OnInit {
     });
   }
 
-  /** Traduce el código de estado del proyecto a una etiqueta legible en español. */
+  /** Traduce el código de estado del proyecto a su etiqueta (leída de `SystemCatalog`, Fase 10). */
   statusLabel(s: string): string {
-    const map: Record<string, string> = { PLANNED: 'Planificado', IN_PROGRESS: 'En progreso', COMPLETED: 'Completado' };
-    return map[s] || s;
+    return this.projectStatuses.find((p) => p.value === s)?.label || s;
+  }
+
+  /** Traduce el código de tipo de proyecto a su etiqueta (leída de `SystemCatalog`, Fase 10). */
+  projectTypeLabel(t: string): string {
+    return this.projectTypes.find((p) => p.value === t)?.label || t;
   }
 }

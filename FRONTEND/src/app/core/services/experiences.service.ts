@@ -30,4 +30,12 @@ export class ExperiencesService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
+
+  /** Catálogos de opciones (modalidad de trabajo/tipo de contrato) para el formulario — administrables desde el panel admin, ver `SystemCatalog` (Fase 10). */
+  getCatalogs(): Observable<{
+    workMode: { value: string; label: string }[];
+    contractType: { value: string; label: string }[];
+  }> {
+    return this.http.get<{ workMode: { value: string; label: string }[]; contractType: { value: string; label: string }[] }>(`${this.api}/catalogs`);
+  }
 }

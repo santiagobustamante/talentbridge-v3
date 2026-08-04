@@ -67,9 +67,9 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
     .admin-users { padding: 24px; max-width: 820px; }
     h1 { margin: 0 0 4px; font-size: 1.5rem; }
     .subtitle { margin: 0 0 24px; color: var(--text-secondary); }
-    .filters { display: flex; gap: 8px; margin-bottom: 20px; }
-    .filters select, .filters input { padding: 6px 10px; border: 1px solid var(--border, #d1d5db); border-radius: 8px; }
-    .filters input { flex: 1; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .filters select, .filters input { padding: 6px 10px; border: 1px solid var(--border, #d1d5db); border-radius: 8px; min-width: 0; }
+    .filters input { flex: 1 1 160px; }
     .user-card { margin-bottom: 10px; }
     .user-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-row > div:first-child { flex: 1; display: flex; flex-direction: column; }

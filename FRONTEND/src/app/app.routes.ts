@@ -231,6 +231,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/admin-audit-log.component').then((m) => m.AdminAuditLogComponent),
       },
+      {
+        path: 'security',
+        loadComponent: () =>
+          import('./features/admin/admin-security.component').then((m) => m.AdminSecurityComponent),
+      },
+      {
+        path: 'moderation',
+        loadComponent: () =>
+          import('./features/admin/admin-moderation.component').then((m) => m.AdminModerationComponent),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

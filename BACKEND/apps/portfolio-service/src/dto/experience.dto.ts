@@ -1,8 +1,5 @@
-import { IsString, IsOptional, IsBoolean, IsArray, IsIn, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, MaxLength } from 'class-validator';
 import { IsValidMunicipio, IsNotFutureDateString, IsAfterOrEqualDateString } from '@app/common';
-
-const WORK_MODES = ['ONSITE', 'REMOTE', 'HYBRID'] as const;
-const CONTRACT_TYPES = ['FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'INTERNSHIP', 'FREELANCE', 'TEMPORARY', 'OTHER'] as const;
 
 export class ExperienceDto {
   @IsString()
@@ -19,11 +16,13 @@ export class ExperienceDto {
   city?: string;
 
   @IsOptional()
-  @IsIn(WORK_MODES)
+  @IsString()
+  @MaxLength(50)
   workMode?: string;
 
   @IsOptional()
-  @IsIn(CONTRACT_TYPES)
+  @IsString()
+  @MaxLength(50)
   contractType?: string;
 
   @IsOptional()

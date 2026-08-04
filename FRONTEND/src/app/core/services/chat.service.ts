@@ -87,4 +87,9 @@ export class ChatService {
   unblockConversation(conversationId: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/chat/conversations/${conversationId}/block`);
   }
+
+  /** Reporta un mensaje de chat por contenido inapropiado (Fase 12 — moderación de contenido). */
+  reportMessage(messageId: number, reason: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/chat/messages/${messageId}/report`, { reason });
+  }
 }

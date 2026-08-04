@@ -4,12 +4,34 @@ import { normalizeSkillDisplay, normalizeSkillKey } from '@app/common';
 import { SkillDto } from './dto/skill.dto';
 import { CandidateAccessService } from './candidate-access.service';
 
+/** Clave de `SystemCatalog` para el nivel de habilidad (Fase 10). */
+const SKILL_LEVEL_CATALOG_KEY = 'SKILL_LEVEL';
+
 @Injectable()
 export class SkillsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly candidateAccess: CandidateAccessService,
   ) {}
+
+  private async assertValidCatalogValue(catalogKey: string, value: string | undefined, fieldLabel: string): Promise<void> {
+    if (value === undefined) return;
+    const entry = await this.prisma.systemCatalog.findUnique({
+      where: { catalogKey_value: { catalogKey, value } },
+    });
+    if (!entry || !entry.active) {
+      throw new BadRequestException(`${fieldLabel} no es un valor válido`);
+    }
+  }
+
+  /** Catálogo de niveles de habilidad (Fase 10). */
+  async getSkillCatalogs() {
+    const level = await this.prisma.systemCatalog.findMany({
+      where: { catalogKey: SKILL_LEVEL_CATALOG_KEY, active: true },
+      orderBy: { sortOrder: 'asc' },
+    });
+    return { level: level.map((r) => ({ value: r.value, label: r.label })) };
+  }
 
   async getSkills(userId: number) {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
@@ -42,6 +64,8 @@ export class SkillsService {
       where: { profileId_normalizedName: { profileId: profile.id, normalizedName: normalized } },
     });
     if (existing) throw new ConflictException('Esta habilidad ya existe en tu perfil');
+
+    await this.assertValidCatalogValue(SKILL_LEVEL_CATALOG_KEY, dto.level, 'El nivel');
 
     // El chequeo de `existing` es best-effort: dos requests simultáneas
     // agregando la misma habilidad pueden pasarlo las dos. La constraint
@@ -80,6 +104,7 @@ export class SkillsService {
     if (dto.name !== undefined && !dto.name.trim()) {
       throw new BadRequestException('El nombre de la habilidad no puede estar vacío');
     }
+    await this.assertValidCatalogValue(SKILL_LEVEL_CATALOG_KEY, dto.level, 'El nivel');
 
     const normalized = dto.name ? normalizeSkillKey(dto.name) : skill.normalizedName;
     return this.prisma.skill.update({

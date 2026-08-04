@@ -1,10 +1,36 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '@app/database';
 import { ProjectDto } from './dto/project.dto';
+
+/** Claves de `SystemCatalog` para las opciones de proyecto (Fase 10). */
+const PROJECT_CATALOG_KEYS = {
+  projectType: 'PROJECT_TYPE',
+  status: 'PROJECT_STATUS',
+} as const;
 
 @Injectable()
 export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private async assertValidCatalogValue(catalogKey: string, value: string | undefined, fieldLabel: string): Promise<void> {
+    if (value === undefined) return;
+    const entry = await this.prisma.systemCatalog.findUnique({
+      where: { catalogKey_value: { catalogKey, value } },
+    });
+    if (!entry || !entry.active) {
+      throw new BadRequestException(`${fieldLabel} no es un valor válido`);
+    }
+  }
+
+  /** Catálogos de opciones para el formulario de proyectos (Fase 10). */
+  async getProjectCatalogs() {
+    const [projectType, status] = await Promise.all([
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: PROJECT_CATALOG_KEYS.projectType, active: true }, orderBy: { sortOrder: 'asc' } }),
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: PROJECT_CATALOG_KEYS.status, active: true }, orderBy: { sortOrder: 'asc' } }),
+    ]);
+    const toOptions = (rows: { value: string; label: string }[]) => rows.map((r) => ({ value: r.value, label: r.label }));
+    return { projectType: toOptions(projectType), status: toOptions(status) };
+  }
 
   async getProjects(userId: number) {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
@@ -18,6 +44,9 @@ export class ProjectsService {
   async addProject(userId: number, dto: ProjectDto) {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
     if (!profile) throw new NotFoundException('Perfil no encontrado');
+
+    await this.assertValidCatalogValue(PROJECT_CATALOG_KEYS.projectType, dto.projectType, 'El tipo de proyecto');
+    await this.assertValidCatalogValue(PROJECT_CATALOG_KEYS.status, dto.status, 'El estado del proyecto');
 
     return this.prisma.project.create({
       data: {
@@ -46,6 +75,9 @@ export class ProjectsService {
       where: { id: projId, profileId: profile.id },
     });
     if (!proj) throw new NotFoundException('Proyecto no encontrado');
+
+    await this.assertValidCatalogValue(PROJECT_CATALOG_KEYS.projectType, dto.projectType, 'El tipo de proyecto');
+    await this.assertValidCatalogValue(PROJECT_CATALOG_KEYS.status, dto.status, 'El estado del proyecto');
 
     return this.prisma.project.update({
       where: { id: projId },

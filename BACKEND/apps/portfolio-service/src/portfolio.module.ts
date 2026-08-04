@@ -2,8 +2,8 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { PrismaModule } from '@app/database';
-import { AllExceptionsFilter, CommonModule, IpThrottlerGuard } from '@app/common';
+import { PrismaModule, PrismaService } from '@app/database';
+import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
 import { SkillsController } from './skills.controller';
 import { SkillsService } from './skills.service';
@@ -26,8 +26,15 @@ import { CandidateAccessService } from './candidate-access.service';
     CommonModule,
     AuthLibModule,
     // 300 req/min por IP — frena abuso/flood sin afectar uso normal. Mismo
-    // patrón que auth-service (barrido 2026-07-26).
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 300 }]),
+    // patrón que auth-service (barrido 2026-07-26). Límite dinámico
+    // (`RATE_LIMIT_DEFAULT`, Fase 11) — ver `getDynamicRateLimit`.
+    ThrottlerModule.forRootAsync({
+      imports: [PrismaModule],
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) => ({
+        throttlers: [{ name: 'default', ttl: 60000, limit: () => getDynamicRateLimit(prisma, 'RATE_LIMIT_DEFAULT', 300) }],
+      }),
+    }),
   ],
   controllers: [
     SkillsController,

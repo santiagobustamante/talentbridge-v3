@@ -30,4 +30,12 @@ export class ProjectsService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
+
+  /** Catálogos de opciones (tipo/estado de proyecto) para el formulario — administrables desde el panel admin, ver `SystemCatalog` (Fase 10). */
+  getCatalogs(): Observable<{
+    projectType: { value: string; label: string }[];
+    status: { value: string; label: string }[];
+  }> {
+    return this.http.get<{ projectType: { value: string; label: string }[]; status: { value: string; label: string }[] }>(`${this.api}/catalogs`);
+  }
 }

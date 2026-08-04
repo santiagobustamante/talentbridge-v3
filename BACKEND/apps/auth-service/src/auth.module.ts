@@ -5,8 +5,8 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 import type { StringValue } from 'ms';
-import { PrismaModule } from '@app/database';
-import { AllExceptionsFilter, CommonModule, IpThrottlerGuard } from '@app/common';
+import { PrismaModule, PrismaService } from '@app/database';
+import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { JwtStrategy, OptionalJwtAuthGuard } from '@app/auth';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -38,8 +38,15 @@ const jwtExpiresIn = (process.env['JWT_EXPIRES_IN'] || '1d') as StringValue;
     // Sin esto, nada frenaba intentos repetidos de login/registro por fuerza
     // bruta — 10 requests por minuto por IP contra todo el servicio (login,
     // register, login-company, register-company son los de mayor riesgo,
-    // pero el límite aplica parejo a todo el módulo por simplicidad).
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 10 }]),
+    // pero el límite aplica parejo a todo el módulo por simplicidad). Límite
+    // dinámico (`RATE_LIMIT_AUTH`, Fase 11) — ver `getDynamicRateLimit`.
+    ThrottlerModule.forRootAsync({
+      imports: [PrismaModule],
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) => ({
+        throttlers: [{ name: 'default', ttl: 60000, limit: () => getDynamicRateLimit(prisma, 'RATE_LIMIT_AUTH', 10) }],
+      }),
+    }),
   ],
   controllers: [AuthController],
   providers: [

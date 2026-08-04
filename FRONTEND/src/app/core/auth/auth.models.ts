@@ -12,6 +12,7 @@ export interface User {
   email: string;
   role?: 'CANDIDATE' | 'COMPANY' | 'ADMIN';
   emailVerified?: boolean;
+  twoFactorEnabled?: boolean;
   createdAt: string;
   updatedAt: string;
   profile?: Profile;

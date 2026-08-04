@@ -35,6 +35,13 @@ export class CvService {
     private readonly deepSeek: DeepSeekService,
   ) {}
 
+  /** Tamaño máximo de CV en MB, editable en caliente desde el panel admin (`SystemParameter` `MAX_PDF_SIZE_MB`, Fase 15) — respaldo en el env var si el parámetro todavía no existe. */
+  private async getMaxPdfSizeMb(): Promise<number> {
+    const param = await this.prisma.systemParameter.findUnique({ where: { key: 'MAX_PDF_SIZE_MB' } });
+    const value = Number(param?.value ?? process.env['MAX_PDF_SIZE_MB'] ?? 5);
+    return Number.isFinite(value) && value > 0 ? value : 5;
+  }
+
   async getCvs(userId: number) {
     return this.prisma.cvDocument.findMany({
       where: { userId },
@@ -55,9 +62,10 @@ export class CvService {
   async uploadCv(userId: number, file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No se proporcionó archivo');
 
-    const maxSize = parseInt(process.env['MAX_PDF_SIZE_MB'] || '5', 10) * 1024 * 1024;
+    const maxSizeMb = await this.getMaxPdfSizeMb();
+    const maxSize = maxSizeMb * 1024 * 1024;
     if (file.size > maxSize) {
-      throw new BadRequestException(`El archivo excede el tamaño máximo de ${process.env['MAX_PDF_SIZE_MB'] || 5}MB`);
+      throw new BadRequestException(`El archivo excede el tamaño máximo de ${maxSizeMb}MB`);
     }
 
     if (file.mimetype !== 'application/pdf') {

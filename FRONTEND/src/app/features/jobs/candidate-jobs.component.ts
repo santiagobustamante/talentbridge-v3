@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { JobsService } from '../../core/services/jobs.service';
 import { JobOffer, JobApplication } from '../../core/models/jobs.models';
 import { BadgeComponent, BadgeTone } from '../../shared/components/badge/badge.component';
@@ -15,6 +16,7 @@ import { AppDatePipe } from '../../shared/pipes/app-date.pipe';
 import { formatAppDate } from '../../shared/utils/format-date.util';
 import { formatSalaryRange } from '../../shared/utils/normalize';
 import { MunicipioInputComponent } from '../../shared/components/municipio-input/municipio-input.component';
+import { ReportDialogComponent } from '../../shared/components/report-dialog.component';
 
 /**
  * Bolsa de empleo para candidatos (ruta "/app/jobs"). Tiene dos pestañas:
@@ -41,6 +43,7 @@ export class CandidateJobsComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   /** Id de oferta a resaltar/hacer scroll cuando se llega desde el enlace de una notificación (?jobId=). */
   highlightedJobId = signal<number | null>(null);
@@ -437,6 +440,23 @@ export class CandidateJobsComponent implements OnInit {
         const msg = err?.error?.message || err?.message || 'Error al aplicar';
         this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
       },
+    });
+  }
+
+  /** Reporta una oferta por contenido inapropiado (Fase 12 — moderación de contenido). */
+  reportJob(jobId: number): void {
+    const ref = this.dialog.open(ReportDialogComponent, {
+      data: { title: 'Reportar oferta', message: '¿Por qué querés reportar esta oferta? Un administrador la va a revisar.' },
+    });
+    ref.afterClosed().subscribe((reason: string | null) => {
+      if (!reason) return;
+      this.jobsService.reportJob(jobId, reason).subscribe({
+        next: () => this.snackBar.open('Reporte enviado. Gracias por avisarnos.', 'Cerrar', { duration: 4000 }),
+        error: (err) => {
+          const msg = err?.error?.message || err?.message || 'Error al enviar el reporte';
+          this.snackBar.open(msg, 'Cerrar', { duration: 4000 });
+        },
+      });
     });
   }
 

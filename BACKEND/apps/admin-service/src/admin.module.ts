@@ -2,8 +2,8 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { PrismaModule } from '@app/database';
-import { AllExceptionsFilter, CommonModule, IpThrottlerGuard } from '@app/common';
+import { PrismaModule, PrismaService } from '@app/database';
+import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
 import { ParametersController } from './parameters.controller';
 import { ParametersService } from './parameters.service';
@@ -14,6 +14,10 @@ import { CatalogService } from './catalog.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { FeatureFlagsController } from './feature-flags.controller';
+import { DashboardController } from './dashboard.controller';
+import { DashboardService } from './dashboard.service';
+import { ModerationController } from './moderation.controller';
+import { ModerationService } from './moderation.service';
 
 @Module({
   imports: [
@@ -25,15 +29,24 @@ import { FeatureFlagsController } from './feature-flags.controller';
     // de los servicios: todo lo que cuelga de este servicio requiere rol
     // ADMIN y puede modificar configuración transversal del sistema, así
     // que conviene un límite más bajo desde el día 1, no solo cuando haga
-    // falta reaccionar a un abuso puntual.
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 60 }]),
+    // falta reaccionar a un abuso puntual. Límite dinámico (`RATE_LIMIT_ADMIN`,
+    // Fase 11) — ver `getDynamicRateLimit`.
+    ThrottlerModule.forRootAsync({
+      imports: [PrismaModule],
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) => ({
+        throttlers: [{ name: 'default', ttl: 60000, limit: () => getDynamicRateLimit(prisma, 'RATE_LIMIT_ADMIN', 60) }],
+      }),
+    }),
   ],
-  controllers: [ParametersController, AuditLogController, CatalogController, UsersController, FeatureFlagsController],
+  controllers: [ParametersController, AuditLogController, CatalogController, UsersController, FeatureFlagsController, DashboardController, ModerationController],
   providers: [
     ParametersService,
     AuditLogService,
     CatalogService,
     UsersService,
+    DashboardService,
+    ModerationService,
     {
       provide: APP_GUARD,
       useClass: IpThrottlerGuard,

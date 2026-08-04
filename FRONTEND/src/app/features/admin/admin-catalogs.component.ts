@@ -66,8 +66,8 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
     .entries-table td { padding: 6px 8px; border-bottom: 1px solid var(--border, #e5e7eb); font-size: 0.9rem; }
     .entries-table tr.inactive .value-cell { color: var(--text-secondary); text-decoration: line-through; }
     .actions-cell { text-align: right; }
-    .add-entry { display: flex; gap: 8px; margin-top: 12px; }
-    .add-entry input { flex: 1; padding: 6px 10px; border: 1px solid var(--border, #d1d5db); border-radius: 8px; }
+    .add-entry { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .add-entry input { flex: 1 1 140px; min-width: 0; padding: 6px 10px; border: 1px solid var(--border, #d1d5db); border-radius: 8px; }
   `],
 })
 export class AdminCatalogsComponent implements OnInit {

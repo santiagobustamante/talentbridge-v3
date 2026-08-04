@@ -2,8 +2,8 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { PrismaModule } from '@app/database';
-import { AllExceptionsFilter, CommonModule, IpThrottlerGuard } from '@app/common';
+import { PrismaModule, PrismaService } from '@app/database';
+import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
@@ -24,8 +24,15 @@ import { ChatGateway } from './chat.gateway';
     // 300 req/min por IP — frena abuso/flood sin afectar uso normal. Mismo
     // patrón que auth-service (barrido 2026-07-26). Solo cubre las rutas
     // HTTP del chat (historial, marcar leído, bloquear) — no los mensajes
-    // por WebSocket, que quedan fuera de alcance de este fix.
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 300 }]),
+    // por WebSocket, que quedan fuera de alcance de este fix. Límite
+    // dinámico (`RATE_LIMIT_DEFAULT`, Fase 11) — ver `getDynamicRateLimit`.
+    ThrottlerModule.forRootAsync({
+      imports: [PrismaModule],
+      inject: [PrismaService],
+      useFactory: (prisma: PrismaService) => ({
+        throttlers: [{ name: 'default', ttl: 60000, limit: () => getDynamicRateLimit(prisma, 'RATE_LIMIT_DEFAULT', 300) }],
+      }),
+    }),
   ],
   controllers: [ChatController],
   providers: [

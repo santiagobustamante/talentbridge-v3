@@ -117,3 +117,20 @@ export class ResendVerificationDto {
   @MaxLength(255)
   email: string;
 }
+
+/** Código TOTP de 6 dígitos — mismo formato en confirmación de setup, login y desactivación (Fase 17). */
+export class TwoFactorCodeDto {
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'El código debe tener 6 dígitos' })
+  code: string;
+}
+
+export class VerifyTwoFactorLoginDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El token temporal es requerido' })
+  tempToken: string;
+
+  @IsString()
+  @Matches(/^\d{6}$/, { message: 'El código debe tener 6 dígitos' })
+  code: string;
+}

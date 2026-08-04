@@ -28,11 +28,12 @@ function assertValidSalaryRange(salaryMin?: number, salaryMax?: number): void {
   }
 }
 
-/** Claves de `SystemCatalog` para las 3 listas de opciones de oferta laboral (editables desde el panel admin — Fase 3). */
+/** Claves de `SystemCatalog` para las listas de opciones de oferta laboral (editables desde el panel admin — Fase 3, `currency` agregada en Fase 10). */
 const JOB_CATALOG_KEYS = {
   modality: 'JOB_MODALITY',
   contractType: 'JOB_CONTRACT_TYPE',
   workload: 'JOB_WORKLOAD',
+  currency: 'CURRENCY',
 } as const;
 
 @Injectable()
@@ -101,15 +102,16 @@ export class JobsService {
     }
   }
 
-  /** Catálogos de opciones para el formulario de oferta laboral — leídos por candidato y empresa (Fase 3). */
+  /** Catálogos de opciones para el formulario de oferta laboral — leídos por candidato y empresa (Fase 3, `currency` agregada en Fase 10). */
   async getJobCatalogs() {
-    const [modality, contractType, workload] = await Promise.all([
+    const [modality, contractType, workload, currency] = await Promise.all([
       this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.modality, active: true }, orderBy: { sortOrder: 'asc' } }),
       this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.contractType, active: true }, orderBy: { sortOrder: 'asc' } }),
       this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.workload, active: true }, orderBy: { sortOrder: 'asc' } }),
+      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.currency, active: true }, orderBy: { sortOrder: 'asc' } }),
     ]);
     const toOptions = (rows: { value: string; label: string }[]) => rows.map((r) => ({ value: r.value, label: r.label }));
-    return { modality: toOptions(modality), contractType: toOptions(contractType), workload: toOptions(workload) };
+    return { modality: toOptions(modality), contractType: toOptions(contractType), workload: toOptions(workload), currency: toOptions(currency) };
   }
 
   async createJob(companyUserId: number, dto: CreateJobOfferDto) {
@@ -117,6 +119,7 @@ export class JobsService {
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.modality, dto.modality, 'La modalidad');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.contractType, dto.contractType, 'El tipo de contrato');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.workload, dto.workload, 'La jornada');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.currency, dto.currency, 'La moneda');
     return this.prisma.jobOffer.create({
       data: {
         companyId: companyUserId,
@@ -157,6 +160,7 @@ export class JobsService {
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.modality, dto.modality, 'La modalidad');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.contractType, dto.contractType, 'El tipo de contrato');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.workload, dto.workload, 'La jornada');
+    await this.assertValidCatalogValue(JOB_CATALOG_KEYS.currency, dto.currency, 'La moneda');
 
     const updateData: any = {};
     if (dto.title !== undefined) updateData.title = titleCaseText(dto.title);
@@ -406,5 +410,16 @@ export class JobsService {
       skillMatch: match,
       hasApplied: job.applications.length > 0,
     };
+  }
+
+  /** Reporta una oferta laboral (Fase 12 — moderación de contenido) — cualquier candidato autenticado, no solo quien ya se postuló. */
+  async reportJob(reporterId: number, jobId: number, reason: string) {
+    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId }, select: { id: true } });
+    if (!job) throw new NotFoundException('Oferta no encontrada');
+
+    await this.prisma.report.create({
+      data: { reporterId, targetType: 'JOB_OFFER', targetId: jobId, reason },
+    });
+    return { message: 'Reporte enviado. Un administrador lo va a revisar.' };
   }
 }

@@ -1,6 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { JobsService } from './jobs.service';
+import { ReportJobDto } from './dto/report-job.dto';
 
 @Controller('jobs')
 export class CandidateJobsController {
@@ -24,5 +25,11 @@ export class CandidateJobsController {
   @Get(':id')
   async getJobById(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
     return this.jobsService.getJobById(user.sub, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/report')
+  async reportJob(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() dto: ReportJobDto) {
+    return this.jobsService.reportJob(user.sub, id, dto.reason);
   }
 }

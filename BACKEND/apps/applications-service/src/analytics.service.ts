@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/database';
 
-const TREND_DAYS = 30;
-const TOP_JOBS_LIMIT = 5;
+/** Respaldo si `TREND_DAYS`/`TOP_JOBS_LIMIT` todavía no existen en `SystemParameter` — mismos valores que estaban hardcodeados antes de parametrizarlos (Fase 15). */
+const TREND_DAYS_FALLBACK = 30;
+const TOP_JOBS_LIMIT_FALLBACK = 5;
 
 /**
  * Analítica de postulaciones para el panel de empresa. Todo se calcula sobre
@@ -15,8 +16,22 @@ const TOP_JOBS_LIMIT = 5;
 export class AnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async getWindowParams(): Promise<{ trendDays: number; topJobsLimit: number }> {
+    const rows = await this.prisma.systemParameter.findMany({
+      where: { key: { in: ['TREND_DAYS', 'TOP_JOBS_LIMIT'] } },
+    });
+    const byKey = new Map(rows.map((r) => [r.key, Number(r.value)]));
+    const trendDays = byKey.get('TREND_DAYS');
+    const topJobsLimit = byKey.get('TOP_JOBS_LIMIT');
+    return {
+      trendDays: Number.isFinite(trendDays) && (trendDays as number) > 0 ? (trendDays as number) : TREND_DAYS_FALLBACK,
+      topJobsLimit: Number.isFinite(topJobsLimit) && (topJobsLimit as number) > 0 ? (topJobsLimit as number) : TOP_JOBS_LIMIT_FALLBACK,
+    };
+  }
+
   async getCompanyAnalytics(companyUserId: number) {
-    const [jobs, applications] = await Promise.all([
+    const [{ trendDays, topJobsLimit }, jobs, applications] = await Promise.all([
+      this.getWindowParams(),
       this.prisma.jobOffer.findMany({
         where: { companyId: companyUserId },
         select: { id: true, title: true, status: true, _count: { select: { applications: true } } },
@@ -32,12 +47,12 @@ export class AnalyticsService {
       statusFunnel[app.status] = (statusFunnel[app.status] || 0) + 1;
     }
 
-    const trend = this.buildTrend(applications.map((a) => a.createdAt));
+    const trend = this.buildTrend(applications.map((a) => a.createdAt), trendDays);
 
     const topJobs = jobs
       .map((j) => ({ id: j.id, title: j.title, status: j.status, applicationsCount: j._count.applications }))
       .sort((a, b) => b.applicationsCount - a.applicationsCount)
-      .slice(0, TOP_JOBS_LIMIT);
+      .slice(0, topJobsLimit);
 
     const preselectedOrHired = (statusFunnel['PRESELECTED'] || 0) + (statusFunnel['HIRED'] || 0);
 
@@ -52,11 +67,11 @@ export class AnalyticsService {
     };
   }
 
-  /** Cuenta de postulaciones por día para los últimos `TREND_DAYS` días, con los días sin datos en cero (no se omiten, para que el gráfico no tenga huecos). */
-  private buildTrend(createdAtDates: Date[]): { date: string; count: number }[] {
+  /** Cuenta de postulaciones por día para los últimos `trendDays` días, con los días sin datos en cero (no se omiten, para que el gráfico no tenga huecos). */
+  private buildTrend(createdAtDates: Date[], trendDays: number): { date: string; count: number }[] {
     const days: { date: string; count: number }[] = [];
     const now = new Date();
-    for (let i = TREND_DAYS - 1; i >= 0; i--) {
+    for (let i = trendDays - 1; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       days.push({ date: d.toISOString().slice(0, 10), count: 0 });

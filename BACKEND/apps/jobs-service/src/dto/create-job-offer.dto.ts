@@ -1,10 +1,6 @@
-import { IsString, IsOptional, IsInt, IsIn, Min, Max, MaxLength, ValidateBy, buildMessage, ValidationOptions } from 'class-validator';
+import { IsString, IsOptional, IsInt, Min, Max, MaxLength, ValidateBy, buildMessage, ValidationOptions } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { IsValidMunicipio, IsGreaterOrEqual } from '@app/common';
-
-/** Única moneda que la app maneja hoy (ver `formatSalaryRange` en el frontend) — antes
- *  `currency` solo tenía `@MaxLength(10)`, así que cualquier string corto pasaba. */
-const CURRENCIES = ['COP'] as const;
 
 /** El frontend siempre manda un string ya serializado ("Angular:ADVANCED,SQL"), pero el
  *  service también acepta un array de strings (una skill por elemento) por flexibilidad
@@ -92,8 +88,14 @@ export class CreateJobOfferDto {
   @IsGreaterOrEqual('salaryMin')
   salaryMax?: number;
 
+  // Antes @IsIn(['COP']) — bloqueaba silenciosamente USD/EUR aunque el
+  // <select> del frontend ya los ofrecía (bug real, encontrado durante la
+  // Fase 10). Mismo patrón que modality/contractType/workload: solo forma
+  // a nivel de DTO, JobsService.assertValidCatalogValue valida en tiempo
+  // real contra SystemCatalog (catálogo CURRENCY).
   @IsOptional()
-  @IsIn(CURRENCIES)
+  @IsString()
+  @MaxLength(10)
   currency?: string;
 
   @IsOptional()

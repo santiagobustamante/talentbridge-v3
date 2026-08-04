@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '@app/database';
 
 export interface SendMailParams {
   to: string;
@@ -28,13 +29,18 @@ const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
-  private getSender(): { name: string; email: string } {
-    const raw = process.env['BREVO_FROM_EMAIL'] || 'TalentBridge <no-reply@talentbridge.local>';
+  constructor(private readonly prisma: PrismaService) {}
+
+  /** Remitente editable en caliente desde el panel admin (`SystemParameter` `BREVO_FROM_EMAIL`, Fase 15) — respaldo en el env var si el parámetro todavía no existe. */
+  private async getSender(): Promise<{ name: string; email: string }> {
+    const param = await this.prisma.systemParameter.findUnique({ where: { key: 'BREVO_FROM_EMAIL' } });
+    const raw = param?.value || process.env['BREVO_FROM_EMAIL'] || 'TalentBridge <no-reply@talentbridge.local>';
     const match = raw.match(/^(.*?)\s*<(.+)>$/);
     return match ? { name: match[1].trim(), email: match[2].trim() } : { name: 'TalentBridge', email: raw.trim() };
   }
 
   async sendMail(params: SendMailParams): Promise<void> {
+    const sender = await this.getSender();
     const response = await fetch(BREVO_SEND_URL, {
       method: 'POST',
       headers: {
@@ -43,7 +49,7 @@ export class EmailService {
         'api-key': process.env['BREVO_API_KEY'] || '',
       },
       body: JSON.stringify({
-        sender: this.getSender(),
+        sender,
         to: [{ email: params.to }],
         subject: params.subject,
         htmlContent: params.html,

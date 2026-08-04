@@ -4,6 +4,7 @@ export { IpThrottlerGuard } from './guards/ip-throttler.guard';
 export { getClientIp } from './http/client-ip.util';
 export { getPaginationLimits, clampLimit } from './pagination/pagination.util';
 export type { PaginationLimits } from './pagination/pagination.util';
+export { getDynamicRateLimit } from './rate-limit/dynamic-rate-limit.util';
 export { ResponseHelper } from './response.helper';
 export { DeepSeekService } from './ai/deepseek.service';
 export type { DeepSeekChatMessage } from './ai/deepseek.service';

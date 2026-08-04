@@ -30,4 +30,12 @@ export class EducationService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.api}/${id}`);
   }
+
+  /** Catálogos de opciones (tipo/nivel de formación) para el formulario — administrables desde el panel admin, ver `SystemCatalog` (Fase 10). */
+  getCatalogs(): Observable<{
+    educationType: { value: string; label: string }[];
+    formationLevel: { value: string; label: string }[];
+  }> {
+    return this.http.get<{ educationType: { value: string; label: string }[]; formationLevel: { value: string; label: string }[] }>(`${this.api}/catalogs`);
+  }
 }

@@ -191,6 +191,10 @@
                         <mat-icon class="message-read__icon">check</mat-icon>
                       }
                     </span>
+                  } @else {
+                    <button type="button" class="message-report-btn" matTooltip="Reportar mensaje" (click)="reportMessage(msg.id)">
+                      <mat-icon>flag</mat-icon>
+                    </button>
                   }
                 </div>
               </div>

@@ -14,6 +14,12 @@ export class ProjectsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('catalogs')
+  async getCatalogs() {
+    return this.projectsService.getProjectCatalogs();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addProject(@CurrentUser() user: { sub: number }, @Body() dto: ProjectDto) {
     return this.projectsService.addProject(user.sub, dto);

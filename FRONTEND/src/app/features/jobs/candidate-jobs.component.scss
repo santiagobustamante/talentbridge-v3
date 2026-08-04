@@ -742,6 +742,8 @@ app-municipio-input.filter-select {
   border-top: 1px solid var(--border-soft);
 }
 
+.report-job-btn { margin-top: 0.75rem; color: var(--text-muted); }
+
 .apply-form-full {
   textarea {
     @include forms.textarea;

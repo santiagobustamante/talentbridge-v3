@@ -85,28 +85,17 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
               <mat-form-field appearance="outline">
                 <mat-label>Tipo de educación</mat-label>
                 <mat-select formControlName="educationType">
-                  <mat-option value="FORMAL">Formal</mat-option>
-                  <mat-option value="NON_FORMAL">No formal</mat-option>
+                  @for (t of educationTypes; track t.value) {
+                    <mat-option [value]="t.value">{{ t.label }}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
               <mat-form-field appearance="outline" class="span-full">
                 <mat-label>Nivel de formación</mat-label>
                 <mat-select formControlName="formationLevel">
-                  <ng-container *ngIf="form.get('educationType')?.value === 'NON_FORMAL'">
-                    <mat-option value="Curso">Curso</mat-option>
-                    <mat-option value="Certificación">Certificación</mat-option>
-                    <mat-option value="Diplomado">Diplomado</mat-option>
-                    <mat-option value="Seminario">Seminario</mat-option>
-                    <mat-option value="Bootcamp">Bootcamp</mat-option>
-                  </ng-container>
-                  <ng-container *ngIf="form.get('educationType')?.value !== 'NON_FORMAL'">
-                    <mat-option value="Bachillerato">Bachillerato</mat-option>
-                    <mat-option value="Técnico">Técnico</mat-option>
-                    <mat-option value="Tecnólogo">Tecnólogo</mat-option>
-                    <mat-option value="Universidad">Universidad</mat-option>
-                    <mat-option value="Posgrado">Posgrado</mat-option>
-                  </ng-container>
-                  <mat-option value="Otro">Otro</mat-option>
+                  @for (l of visibleFormationLevels; track l.value) {
+                    <mat-option [value]="l.value">{{ l.label }}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
               <mat-form-field appearance="outline" class="span-full" *ngIf="form.get('formationLevel')?.value === 'Otro'">
@@ -156,7 +145,7 @@ import { notBlank } from '../../shared/utils/validators/not-blank.validator';
             </div>
             <div class="edu-body">
               <div class="edu-badges">
-                <span class="edu-type-badge" *ngIf="e.educationType">{{ e.educationType === 'FORMAL' ? 'Formal' : 'No formal' }}</span>
+                <span class="edu-type-badge" *ngIf="e.educationType">{{ educationTypeLabel(e.educationType) }}</span>
                 <span class="edu-level-badge" *ngIf="e.formationLevel">{{ formationLevelLabel(e) }}</span>
               </div>
               <h3 class="degree-title">{{ e.degree }}</h3>
@@ -212,9 +201,38 @@ export class EducationComponent implements OnInit {
     educationType: [''], formationLevel: [''], customFormationLevel: [''], description: [''],
   });
 
-  /** Carga las entradas de formacion existentes y el flag de visibilidad guardado en el perfil. */
+  // Valores iniciales de respaldo (por si `getCatalogs()` todavía no
+  // resolvió o falla) — la fuente de verdad real es `SystemCatalog`,
+  // administrable desde el panel admin sin redeploy (Fase 10).
+  educationTypes: { value: string; label: string }[] = [
+    { value: 'FORMAL', label: 'Formal' },
+    { value: 'NON_FORMAL', label: 'No formal' },
+  ];
+  formationLevels: { value: string; label: string }[] = [
+    { value: 'Curso', label: 'Curso' }, { value: 'Certificación', label: 'Certificación' },
+    { value: 'Diplomado', label: 'Diplomado' }, { value: 'Seminario', label: 'Seminario' }, { value: 'Bootcamp', label: 'Bootcamp' },
+    { value: 'Bachillerato', label: 'Bachillerato' }, { value: 'Técnico', label: 'Técnico' }, { value: 'Tecnólogo', label: 'Tecnólogo' },
+    { value: 'Universidad', label: 'Universidad' }, { value: 'Posgrado', label: 'Posgrado' }, { value: 'Otro', label: 'Otro' },
+  ];
+  /** Valores de `formationLevel` que aplican a educación no formal — el resto (+ "Otro", siempre visible) son de educación formal. División fija en el frontend porque `SystemCatalog` no tiene un campo de agrupación (mismo motivo que dejó fuera el catálogo de habilidades en la Fase 3). */
+  private readonly nonFormalLevelValues = new Set(['Curso', 'Certificación', 'Diplomado', 'Seminario', 'Bootcamp']);
+
+  /** Subconjunto de `formationLevels` que corresponde al `educationType` elegido, más "Otro" siempre disponible. */
+  get visibleFormationLevels(): { value: string; label: string }[] {
+    const isNonFormal = this.form.get('educationType')?.value === 'NON_FORMAL';
+    return this.formationLevels.filter((l) => l.value === 'Otro' || this.nonFormalLevelValues.has(l.value) === isNonFormal);
+  }
+
+  /** Carga las entradas de formacion existentes, los catálogos del formulario y el flag de visibilidad guardado en el perfil. */
   ngOnInit() {
     this.load();
+    this.service.getCatalogs().subscribe({
+      next: (catalogs) => {
+        this.educationTypes = catalogs.educationType;
+        this.formationLevels = catalogs.formationLevel;
+      },
+      error: () => {},
+    });
     this.profileService.getProfile().subscribe({
       next: (p) => { this.showEducation = p.showEducation ?? true; this.profileLoaded = true; },
       error: () => { this.profileLoaded = true; },
@@ -284,7 +302,12 @@ export class EducationComponent implements OnInit {
   /** Etiqueta de nivel de formación a mostrar, usando el valor personalizado si aplica (mismo patrón que contractTypeLabel/workloadLabel en ofertas). */
   formationLevelLabel(e: Education): string {
     if (e.formationLevel === 'Otro' && e.customFormationLevel) return e.customFormationLevel;
-    return e.formationLevel || '';
+    return this.formationLevels.find((l) => l.value === e.formationLevel)?.label || e.formationLevel || '';
+  }
+
+  /** Etiqueta de tipo de educación (leída de `SystemCatalog`, Fase 10). */
+  educationTypeLabel(type: string): string {
+    return this.educationTypes.find((t) => t.value === type)?.label || type;
   }
 
   /** Pide confirmacion y, si se acepta, elimina la entrada de formacion del backend y recarga la lista. */

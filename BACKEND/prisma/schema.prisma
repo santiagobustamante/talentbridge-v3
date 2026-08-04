@@ -92,6 +92,44 @@ model AdminAuditLog {
   @@map("admin_audit_logs")
 }
 
+enum ReportTargetType {
+  JOB_OFFER
+  CHAT_MESSAGE
+  USER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTION_TAKEN
+}
+
+/**
+ * Reporte de contenido (Fase 12 del panel admin) — la Fase 7 ya había dejado
+ * esto explícitamente fuera de alcance ("necesitan flujo de reporte que hoy
+ * no existe en absoluto"). `targetId` no tiene FK real a propósito: apunta a
+ * `JobOffer`/`ChatMessage`/`User` según `targetType`, tres tablas distintas,
+ * así que la integridad referencial la valida el service, no la base.
+ */
+model Report {
+  id           Int              @id @default(autoincrement())
+  reporterId   Int              @map("reporter_id")
+  reporter     User             @relation("ReportsMade", fields: [reporterId], references: [id])
+  targetType   ReportTargetType @map("target_type")
+  targetId     Int              @map("target_id")
+  reason       String
+  status       ReportStatus     @default(PENDING)
+  reviewedById Int?             @map("reviewed_by_id")
+  reviewedBy   User?            @relation("ReportsReviewed", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?        @map("reviewed_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  @@index([targetType, targetId])
+  @@index([status])
+  @@map("reports")
+}
+
 /**
  * Catálogo de los 1.122 municipios de Colombia (codificación oficial DIVIPOLA
  * del DANE, incluye Bogotá D.C.). Poblada una sola vez por `seed-municipalities.ts`
@@ -121,6 +159,8 @@ model User {
   role           UserRole        @default(CANDIDATE)
   emailVerified  Boolean         @default(false) @map("email_verified")
   suspended      Boolean         @default(false)
+  twoFactorSecret  String?  @map("two_factor_secret")
+  twoFactorEnabled Boolean  @default(false) @map("two_factor_enabled")
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
   profile        Profile?
@@ -140,6 +180,8 @@ model User {
   verificationTokens     VerificationToken[]
   parametersUpdated      SystemParameter[] @relation("ParameterUpdatedBy")
   adminAuditLogs         AdminAuditLog[]   @relation("AdminAuditLogs")
+  reportsMade            Report[]          @relation("ReportsMade")
+  reportsReviewed        Report[]          @relation("ReportsReviewed")
 
   @@map("users")
 }

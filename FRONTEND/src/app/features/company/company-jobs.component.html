@@ -225,9 +225,9 @@
           <div class="form-group">
             <label>Moneda</label>
             <select [(ngModel)]="formData.currency">
-              <option value="COP">COP</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
+              @for (c of currencies; track c.value) {
+                <option [value]="c.value">{{ c.label }}</option>
+              }
             </select>
           </div>
         </div>

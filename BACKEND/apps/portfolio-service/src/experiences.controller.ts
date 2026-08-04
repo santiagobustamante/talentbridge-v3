@@ -14,6 +14,12 @@ export class ExperiencesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('catalogs')
+  async getCatalogs() {
+    return this.experiencesService.getExperienceCatalogs();
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post()
   async addExperience(@CurrentUser() user: { sub: number }, @Body() dto: ExperienceDto) {
     return this.experiencesService.addExperience(user.sub, dto);

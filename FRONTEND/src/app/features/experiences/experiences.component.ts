@@ -91,22 +91,18 @@ import { DepartamentoCiudadInputComponent } from '../../shared/components/depart
                   <mat-label>Modalidad de trabajo</mat-label>
                   <mat-select formControlName="workMode">
                     <mat-option value="">—</mat-option>
-                    <mat-option value="ONSITE">Presencial</mat-option>
-                    <mat-option value="REMOTE">Remoto</mat-option>
-                    <mat-option value="HYBRID">Híbrido</mat-option>
+                    @for (w of workModes; track w.value) {
+                      <mat-option [value]="w.value">{{ w.label }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Tipo de contrato</mat-label>
                   <mat-select formControlName="contractType">
                     <mat-option value="">—</mat-option>
-                    <mat-option value="FULL_TIME">Tiempo completo</mat-option>
-                    <mat-option value="PART_TIME">Medio tiempo</mat-option>
-                    <mat-option value="CONTRACTOR">Contratista</mat-option>
-                    <mat-option value="INTERNSHIP">Prácticas</mat-option>
-                    <mat-option value="FREELANCE">Freelance</mat-option>
-                    <mat-option value="TEMPORARY">Temporal</mat-option>
-                    <mat-option value="OTHER">Otro</mat-option>
+                    @for (c of contractTypes; track c.value) {
+                      <mat-option [value]="c.value">{{ c.label }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="span-full" *ngIf="form.get('contractType')?.value === 'OTHER'">
@@ -256,6 +252,24 @@ export class ExperiencesComponent implements OnInit {
   skillInputCtrl = this.fb.control('');
   filteredSkillSuggestions: SkillCatalogEntry[] = [];
 
+  // Valores iniciales de respaldo (por si `getCatalogs()` todavía no
+  // resolvió o falla) — la fuente de verdad real es `SystemCatalog`,
+  // administrable desde el panel admin sin redeploy (Fase 10).
+  workModes: { value: string; label: string }[] = [
+    { value: 'ONSITE', label: 'Presencial' },
+    { value: 'REMOTE', label: 'Remoto' },
+    { value: 'HYBRID', label: 'Híbrido' },
+  ];
+  contractTypes: { value: string; label: string }[] = [
+    { value: 'FULL_TIME', label: 'Tiempo completo' },
+    { value: 'PART_TIME', label: 'Medio tiempo' },
+    { value: 'CONTRACTOR', label: 'Contratista' },
+    { value: 'INTERNSHIP', label: 'Prácticas' },
+    { value: 'FREELANCE', label: 'Freelance' },
+    { value: 'TEMPORARY', label: 'Temporal' },
+    { value: 'OTHER', label: 'Otro' },
+  ];
+
   form = this.fb.group({
     company: ['', [Validators.required, notBlank]],
     position: ['', [Validators.required, notBlank]],
@@ -278,6 +292,13 @@ export class ExperiencesComponent implements OnInit {
    */
   ngOnInit() {
     this.load();
+    this.service.getCatalogs().subscribe({
+      next: (catalogs) => {
+        this.workModes = catalogs.workMode;
+        this.contractTypes = catalogs.contractType;
+      },
+      error: () => {},
+    });
     this.profileService.getProfile().subscribe({
       next: (p) => { this.showExperience = p.showExperience ?? true; this.profileLoaded = true; },
       error: () => { this.profileLoaded = true; },
@@ -432,19 +453,14 @@ export class ExperiencesComponent implements OnInit {
     });
   }
 
-  /** Traduce el codigo de modalidad de trabajo a una etiqueta legible en español. */
+  /** Traduce el codigo de modalidad de trabajo a su etiqueta (leída de `SystemCatalog`, Fase 10 — así una relabeled desde el panel admin se refleja acá también). */
   workModeLabel(m: string): string {
-    const map: Record<string, string> = { ONSITE: 'Presencial', REMOTE: 'Remoto', HYBRID: 'Híbrido' };
-    return map[m] || m;
+    return this.workModes.find((w) => w.value === m)?.label || m;
   }
 
-  /** Traduce el codigo de tipo de contrato a una etiqueta legible en español — si es "Otro" y hay texto custom, muestra ese texto en vez de la palabra "Otro". */
+  /** Traduce el codigo de tipo de contrato a su etiqueta — si es "Otro" y hay texto custom, muestra ese texto en vez de la palabra "Otro". */
   contractTypeLabel(e: Pick<Experience, 'contractType' | 'customContractType'>): string {
     if (e.contractType === 'OTHER' && e.customContractType) return e.customContractType;
-    const map: Record<string, string> = {
-      FULL_TIME: 'Tiempo completo', PART_TIME: 'Medio tiempo', CONTRACTOR: 'Contratista',
-      INTERNSHIP: 'Prácticas', FREELANCE: 'Freelance', TEMPORARY: 'Temporal', OTHER: 'Otro',
-    };
-    return map[e.contractType || ''] || e.contractType || '';
+    return this.contractTypes.find((c) => c.value === e.contractType)?.label || e.contractType || '';
   }
 }

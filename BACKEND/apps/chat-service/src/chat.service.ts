@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService, Prisma } from '@app/database';
 import { ChatGateway } from './chat.gateway';
 
@@ -292,6 +292,24 @@ export class ChatService {
     await this.chatGateway.notifyUnreadCount(otherId);
 
     return { markedAsRead: result.count };
+  }
+
+  /** Reporta un mensaje de chat (Fase 12 — moderación de contenido) — solo un participante de esa conversación, y no el propio autor del mensaje. */
+  async reportMessage(userId: number, messageId: number, reason: string) {
+    const message = await this.prisma.chatMessage.findUnique({
+      where: { id: messageId },
+      include: { conversation: { select: { candidateId: true, companyId: true } } },
+    });
+    if (!message) throw new NotFoundException('Mensaje no encontrado');
+
+    const isParticipant = message.conversation.candidateId === userId || message.conversation.companyId === userId;
+    if (!isParticipant) throw new ForbiddenException('No autorizado');
+    if (message.senderId === userId) throw new BadRequestException('No podés reportar tu propio mensaje');
+
+    await this.prisma.report.create({
+      data: { reporterId: userId, targetType: 'CHAT_MESSAGE', targetId: messageId, reason },
+    });
+    return { message: 'Reporte enviado. Un administrador lo va a revisar.' };
   }
 
   /** Total de mensajes sin leer del usuario autenticado, sumando todas sus conversaciones — usado para el badge de notificaciones del chat. */

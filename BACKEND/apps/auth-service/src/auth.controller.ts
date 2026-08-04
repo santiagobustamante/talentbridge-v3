@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto, TwoFactorCodeDto, VerifyTwoFactorLoginDto } from './dto/auth.dto';
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 
 @Controller('auth')
@@ -40,14 +40,48 @@ export class AuthController {
     return { user: result.user, token: result.token };
   }
 
+  // Puede devolver `{ user, token }` (login completo) o `{ twoFactorRequired:
+  // true, tempToken }` si la cuenta tiene 2FA activado (Fase 17) — en ese
+  // caso no se emite cookie todavía, falta el segundo paso (`/2fa/verify-login`).
   @Post('login-admin')
   async loginAdmin(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.authService.loginAdmin(dto);
+    if ('twoFactorRequired' in result) {
+      return result;
+    }
     this.setAuthCookie(res, result.token);
     return { user: result.user, token: result.token };
+  }
+
+  @Post('2fa/verify-login')
+  async verifyTwoFactorLogin(
+    @Body() dto: VerifyTwoFactorLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.verifyTwoFactorLogin(dto.tempToken, dto.code);
+    this.setAuthCookie(res, result.token);
+    return { user: result.user, token: result.token };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('2fa/setup')
+  async setupTwoFactor(@CurrentUser() user: { sub: number }) {
+    return this.authService.setupTwoFactor(user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('2fa/verify-setup')
+  async confirmTwoFactorSetup(@CurrentUser() user: { sub: number }, @Body() dto: TwoFactorCodeDto) {
+    return this.authService.confirmTwoFactorSetup(user.sub, dto.code);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('2fa/disable')
+  async disableTwoFactor(@CurrentUser() user: { sub: number }, @Body() dto: TwoFactorCodeDto) {
+    return this.authService.disableTwoFactor(user.sub, dto.code);
   }
 
   @Post('forgot-password')

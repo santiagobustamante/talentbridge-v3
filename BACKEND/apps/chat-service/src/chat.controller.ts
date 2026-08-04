@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, ParseIntPipe, Query,
 import { JwtAuthGuard, CurrentUser } from '@app/auth';
 import { ChatService } from './chat.service';
 import { CreateConversationDto, SendMessageDto, BlockConversationDto } from './dto/chat.dto';
+import { ReportMessageDto } from './dto/report-message.dto';
 
 /**
  * Controller HTTP del chat candidato↔empresa. Maneja todo lo que es CRUD y
@@ -91,5 +92,12 @@ export class ChatController {
   @Delete('conversations/:id/block')
   async unblockConversation(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number) {
     return this.chatService.unblockConversation(user.sub, id);
+  }
+
+  /** POST /api/chat/messages/:id/report — reporta un mensaje puntual (Fase 12, moderación de contenido). */
+  @UseGuards(JwtAuthGuard)
+  @Post('messages/:id/report')
+  async reportMessage(@CurrentUser() user: { sub: number }, @Param('id', ParseIntPipe) id: number, @Body() dto: ReportMessageDto) {
+    return this.chatService.reportMessage(user.sub, id, dto.reason);
   }
 }

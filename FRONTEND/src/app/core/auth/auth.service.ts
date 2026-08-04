@@ -115,11 +115,49 @@ export class AuthService {
       .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
   }
 
-  /** Login del panel de administración; ruta separada de candidato/empresa a propósito (ver auth.service.ts del backend). */
-  loginAdmin(email: string, password: string): Observable<{ user: User; token: string }> {
+  /**
+   * Login del panel de administración; ruta separada de candidato/empresa a
+   * propósito (ver auth.service.ts del backend). Puede devolver la sesión
+   * completa, o — si la cuenta tiene 2FA activado (Fase 17) — un
+   * `twoFactorRequired`/`tempToken` que todavía no abre sesión; en ese caso
+   * el segundo paso es `verifyTwoFactorLogin()`.
+   */
+  loginAdmin(email: string, password: string): Observable<{ user: User; token: string } | { twoFactorRequired: true; tempToken: string }> {
     return this.http
-      .post<{ user: User; token: string }>(`${this.api}/auth/login-admin`, { email, password }, { withCredentials: true })
+      .post<{ user: User; token: string } | { twoFactorRequired: true; tempToken: string }>(
+        `${this.api}/auth/login-admin`,
+        { email, password },
+        { withCredentials: true },
+      )
+      .pipe(tap((res) => {
+        if ('token' in res) {
+          this.clearCrossSessionState();
+          this._currentUser.set(res.user);
+          this.setToken(res.token);
+        }
+      }));
+  }
+
+  /** Segundo paso del login admin con 2FA activado — ver `loginAdmin()`. */
+  verifyTwoFactorLogin(tempToken: string, code: string): Observable<{ user: User; token: string }> {
+    return this.http
+      .post<{ user: User; token: string }>(`${this.api}/auth/2fa/verify-login`, { tempToken, code }, { withCredentials: true })
       .pipe(tap((res) => { this.clearCrossSessionState(); this._currentUser.set(res.user); this.setToken(res.token); }));
+  }
+
+  /** Genera un secreto TOTP nuevo para la cuenta ADMIN autenticada — todavía no activa 2FA (Fase 17, ver `confirmTwoFactorSetup`). */
+  setupTwoFactor(): Observable<{ secret: string; otpauthUrl: string }> {
+    return this.http.post<{ secret: string; otpauthUrl: string }>(`${this.api}/auth/2fa/setup`, {});
+  }
+
+  /** Confirma el primer código TOTP y activa 2FA. */
+  confirmTwoFactorSetup(code: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/2fa/verify-setup`, { code });
+  }
+
+  /** Desactiva 2FA — exige el código vigente como prueba de posesión. */
+  disableTwoFactor(code: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.api}/auth/2fa/disable`, { code });
   }
 
   /** Registro de empresa, con los campos propios de su perfil (nombre, sector, ciudad) además de las credenciales. Igual que `register()`, ya no establece sesión — ver ese comentario. */

@@ -147,6 +147,12 @@ export class CompanyJobsComponent implements OnInit {
     { value: 'Presencial', label: 'Presencial' },
   ];
 
+  currencies = [
+    { value: 'COP', label: 'COP' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EUR', label: 'EUR' },
+  ];
+
   // Filtro/orden/paginación de la tabla de ofertas — client-side: las ofertas
   // de una sola empresa ya se traen todas de una (getCompanyJobs() no pagina),
   // así que no hace falta ida y vuelta al backend por cada filtro.
@@ -264,6 +270,7 @@ export class CompanyJobsComponent implements OnInit {
         this.modalities = catalogs.modality;
         this.contractTypes = catalogs.contractType;
         this.workloads = catalogs.workload;
+        this.currencies = catalogs.currency;
       },
       error: () => {},
     });

@@ -1,11 +1,5 @@
-import { IsString, IsOptional, IsBoolean, IsIn, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength } from 'class-validator';
 import { IsNotFutureDateString, IsAfterOrEqualDateString } from '@app/common';
-
-const EDUCATION_TYPES = ['FORMAL', 'NON_FORMAL'] as const;
-const FORMATION_LEVELS = [
-  'Curso', 'Certificación', 'Diplomado', 'Seminario', 'Bootcamp',
-  'Bachillerato', 'Técnico', 'Tecnólogo', 'Universidad', 'Posgrado', 'Otro',
-] as const;
 
 export class EducationDto {
   @IsString()
@@ -22,11 +16,13 @@ export class EducationDto {
   fieldOfStudy?: string;
 
   @IsOptional()
-  @IsIn(EDUCATION_TYPES)
+  @IsString()
+  @MaxLength(50)
   educationType?: string;
 
   @IsOptional()
-  @IsIn(FORMATION_LEVELS)
+  @IsString()
+  @MaxLength(50)
   formationLevel?: string;
 
   @IsOptional()

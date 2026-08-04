@@ -24,10 +24,16 @@ export class CvController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      // Techo real a nivel de Multer — sin esto, un archivo por encima del
-      // límite se buffereaba entero en memoria antes de que uploadCv() llegara
-      // a rechazarlo por tamaño.
-      limits: { fileSize: parseInt(process.env['MAX_PDF_SIZE_MB'] || '5', 10) * 1024 * 1024 },
+      // Techo físico fijo a nivel de Multer (20MB) — sin esto, un archivo
+      // arbitrariamente grande se buffereaba entero en memoria antes de que
+      // uploadCv() llegara a rechazarlo por tamaño. No lee `MAX_PDF_SIZE_MB`
+      // de `SystemParameter` acá porque este decorador se evalúa una sola vez
+      // al cargar el módulo, no por request — el límite real y editable en
+      // caliente (Fase 15) vive en `CvService.uploadCv()`. Este techo solo
+      // existe para protección de memoria y debe quedar por encima del
+      // `maxValue` que el panel admin permite para `MAX_PDF_SIZE_MB` (20),
+      // si no, subir el parámetro por encima de este número no tendría efecto.
+      limits: { fileSize: 20 * 1024 * 1024 },
     }),
   )
   async uploadCv(@CurrentUser() user: { sub: number }, @UploadedFile() file: Express.Multer.File) {
