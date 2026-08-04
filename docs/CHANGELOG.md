@@ -1001,4 +1001,15 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Causa:** Variante distinta de BUG-054 — acá `.stat-card { display: flex; ... }` se aplicaba directamente sobre la clase del `<app-card>` (el host), pero el contenido proyectado vive dentro del `<div>` propio de `CardComponent`, un nivel más adentro — el flex del host nunca llegaba a los dos `<span>` reales. Ver detalle completo en `BUGS_AND_FIXES.md` (BUG-056).
 **Solución:** `.stat-value`/`.stat-label` pasaron a `display: block` (con `margin-top: 4px` en la etiqueta), efectivos porque esos sí son hijos directos del div interno.
 **Cómo se probó:** `lint:css` + `ng build` limpios. Verificado en navegador real: 4px de separación real confirmada con `getBoundingClientRect` (antes, 0px).
-**Pendientes:** Ninguno para este fix puntual. Sigue pendiente el auto-deploy de `admin-service` (ver entrada anterior).
+**Pendientes:** Ninguno para este fix puntual.
+
+---
+
+### 2026-08-04 (continuación) — Arreglado el auto-deploy de `admin-service` en Railway
+
+**Módulo:** Infraestructura — Railway (dashboard, no repo)
+**Tipo de cambio:** Fix de configuración (no hay cambio de código)
+**Causa raíz encontrada:** a diferencia de los otros 10 servicios, `admin-service` nunca tuvo su entorno de producción conectado a ninguna rama de GitHub — la sección "Branch connected to production" en Settings → Source estaba vacía, con el botón "Connect Environment to Branch" en vez de mostrar una rama activa. Sin rama conectada, ningún push podía dispararle un deploy, sin importar qué tan bien configurado estuviera el resto (`source.repo`, Dockerfile, root directory — todo eso sí estaba bien, por lo que la CLI de Railway (`railway status --json`) no mostraba ninguna diferencia respecto a los otros 10 servicios; el campo que faltaba no es parte de lo que esa consulta expone). Esto explica por qué el servicio quedó fijo en el deploy manual del 30/07 (cuando se creó) pese a los pushes posteriores.
+**Solución:** Conectado el entorno `production` a la rama `master` y habilitado "Auto deploys when pushed to GitHub" desde el dashboard de Railway (Settings → admin-service → Source), con autorización explícita del usuario. Guardar el cambio disparó un redeploy inmediato que sirvió como verificación en el momento.
+**Cómo se probó:** Confirmado con `railway status --json` que el deploy disparado por el cambio de configuración coincide exactamente con el HEAD real de `master` (`9e3a4f0`) — la conexión funciona de punta a punta, no solo se guardó la config. `GET /api/admin/dashboard` contra producción sigue respondiendo `200` con datos reales después del redeploy.
+**Pendientes:** Ninguno — los 11 servicios de Railway ahora tienen auto-deploy activo de forma consistente.
