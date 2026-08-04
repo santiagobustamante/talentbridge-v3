@@ -990,3 +990,15 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos modificados:** `FRONTEND/src/app/shared/components/card/card.component.scss`, `FRONTEND/src/app/features/admin/admin-dashboard.component.ts`, `BACKEND/prisma/reset-admin-password.ts` (nuevo).
 **Cómo se probó:** `lint:css` + `ng build` limpios (sin warnings nuevos respecto a la línea base). Verificado en vivo en navegador real (Angular DevTools, ya que el pane de screenshot no compositaba en esta sesión): tarjetas de Parámetros con 12px de separación real (antes 0px, confirmado con `getBoundingClientRect`); dashboard con datos reales tanto local (104 candidatos, 61 empresas, 112 ofertas publicadas) como en producción (110 candidatos, 61 empresas, 232 ofertas publicadas). Login admin de producción confirmado con la contraseña ya corregida.
 **Pendientes:** Corregir el auto-deploy de `admin-service` en el dashboard de Railway (no se pudo diagnosticar ni arreglar vía CLI).
+
+---
+
+### 2026-08-04 (continuación) — Panel admin: BUG-056, números del dashboard pegados a su etiqueta
+
+**Módulo:** Frontend — `features/admin/admin-dashboard.component.ts`
+**Tipo de cambio:** Fix
+**Problema:** Reportado por el usuario con captura de pantalla ya en producción (después del despliegue del fix anterior): cada tarjeta del dashboard mostraba el número y la etiqueta pegados en una sola línea ("110Candidatos") en vez de en dos renglones con espacio.
+**Causa:** Variante distinta de BUG-054 — acá `.stat-card { display: flex; ... }` se aplicaba directamente sobre la clase del `<app-card>` (el host), pero el contenido proyectado vive dentro del `<div>` propio de `CardComponent`, un nivel más adentro — el flex del host nunca llegaba a los dos `<span>` reales. Ver detalle completo en `BUGS_AND_FIXES.md` (BUG-056).
+**Solución:** `.stat-value`/`.stat-label` pasaron a `display: block` (con `margin-top: 4px` en la etiqueta), efectivos porque esos sí son hijos directos del div interno.
+**Cómo se probó:** `lint:css` + `ng build` limpios. Verificado en navegador real: 4px de separación real confirmada con `getBoundingClientRect` (antes, 0px).
+**Pendientes:** Ninguno para este fix puntual. Sigue pendiente el auto-deploy de `admin-service` (ver entrada anterior).

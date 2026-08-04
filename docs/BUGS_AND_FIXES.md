@@ -667,3 +667,15 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** Agregado estado `error: boolean` seteado en el callback de error, con una rama `@else if (error)` en el template que muestra un mensaje claro en vez de dejar la pantalla vacía.
 **Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en navegador real con servidores arriba: dashboard muestra datos reales (104 candidatos, 61 empresas, 112 ofertas publicadas en local; 110/61/232 en producción). No se forzó el escenario de error en vivo (requeriría tumbar el backend a propósito), pero la lógica del nuevo estado es la misma ya usada en `admin-parameters.component.ts` para su propio caso de error.
 **Estado:** Corregido.
+
+---
+
+### BUG-056 — Panel admin: números del dashboard pegados al texto de la etiqueta (reportado por el usuario con captura de pantalla)
+
+**Módulo:** Frontend — `features/admin/admin-dashboard.component.ts`
+**Descripción:** En `/admin/dashboard`, cada tarjeta mostraba el número y su etiqueta pegados en una sola línea sin ningún espacio (ej. "110Candidatos" en vez de "110" arriba y "Candidatos" debajo).
+**Causa:** Variante del mismo problema estructural que BUG-054, pero con un mecanismo distinto: `.stat-card { display: flex; flex-direction: column; gap: 4px }` se aplicaba a la clase puesta sobre el propio `<app-card>` (el host), esperando que ese flex/gap acomodara el número y la etiqueta. Pero `CardComponent` envuelve `<ng-content>` en su **propio** `<div>` interno — el contenido proyectado (los dos `<span>`) es hijo de ese div interno, no hijo directo del host. El `display: flex` del host solo afectaba a su único hijo real (el div interno), sin ningún efecto sobre el número y la etiqueta, que quedaban como dos `<span>` inline uno al lado del otro sin espacio. Confirmado con `getComputedStyle`: el host tenía `display: flex` pero el div interno seguía en `display: block`. A diferencia de BUG-054, este patrón es específico de `admin-dashboard` — las demás páginas del panel aplican su `display: flex` a un `<div>` propio dentro del contenido proyectado (ej. `.param-header`, `.user-row`), no al `app-card` mismo, así que no comparten este bug.
+**Archivos afectados:** `FRONTEND/src/app/features/admin/admin-dashboard.component.ts`.
+**Solución:** En vez de depender de un flex container que nunca envuelve al contenido real, se le dio `display: block` a `.stat-value` y `.stat-label` directamente (con `margin-top: 4px` en la etiqueta) — ambos ya son hijos reales del div interno de `CardComponent`, así que el bloque sí surte efecto ahí. Se quitó el `display: flex` inútil de `.stat-card`.
+**Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en navegador real: `getBoundingClientRect()` confirmó 4px de separación real entre número y etiqueta (antes, 0px — misma línea).
+**Estado:** Corregido.

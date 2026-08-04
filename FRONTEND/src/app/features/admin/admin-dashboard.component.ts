@@ -85,10 +85,9 @@ import { CardComponent } from '../../shared/components/card/card.component';
     .subtitle { margin: 0 0 24px; color: var(--text-secondary); }
     .section-title { margin: 0 0 12px; font-size: 1rem; color: var(--text-secondary); }
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
-    .stat-card { display: flex; flex-direction: column; gap: 4px; }
     .stat-card--wide { grid-column: 1 / -1; max-width: 220px; }
-    .stat-value { font-size: 1.75rem; font-weight: 700; line-height: 1; }
-    .stat-label { font-size: 0.85rem; color: var(--text-secondary); }
+    .stat-value { display: block; font-size: 1.75rem; font-weight: 700; line-height: 1; }
+    .stat-label { display: block; margin-top: 4px; font-size: 0.85rem; color: var(--text-secondary); }
     .stat-card--warn .stat-value { color: var(--danger, #dc2626); }
   `],
 })
