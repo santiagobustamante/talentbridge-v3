@@ -24,7 +24,7 @@ export interface SystemParameter {
 export interface AdminAuditLogEntry {
   id: number;
   adminId: number;
-  admin: { email: string };
+  admin: { email: string; name: string | null };
   action: string;
   entityType: string;
   entityId: string | null;

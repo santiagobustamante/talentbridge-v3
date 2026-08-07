@@ -7,7 +7,7 @@ export interface SendMailParams {
   html: string;
 }
 
-const BREVO_SEND_URL = 'https://api.brevo.com/v3/smtp/email';
+const BREVO_SEND_URL = process.env['BREVO_API_URL'] || 'https://api.brevo.com/v3/smtp/email';
 
 /**
  * Cliente compartido de correo (Brevo, vía su API REST directa — no hace

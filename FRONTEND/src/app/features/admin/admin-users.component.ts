@@ -44,8 +44,9 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
               <div>
                 <strong>{{ displayName(u) }}</strong>
                 <span class="user-email">{{ u.email }}</span>
+                <span class="user-id">ID {{ u.id }}</span>
               </div>
-              <app-badge tone="neutral">{{ u.role }}</app-badge>
+              <app-badge tone="neutral">{{ roleLabel(u.role) }}</app-badge>
               <app-badge [tone]="u.suspended ? 'danger' : 'success'">{{ u.suspended ? 'Suspendida' : 'Activa' }}</app-badge>
               @if (u.role !== 'ADMIN') {
                 <button appButton="ghost" size="sm" (click)="toggleSuspend(u)">
@@ -74,6 +75,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.c
     .user-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .user-row > div:first-child { flex: 1; display: flex; flex-direction: column; }
     .user-email { font-size: 0.85rem; color: var(--text-secondary); }
+    .user-id { font-size: 0.75rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
     .pagination { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
   `],
 })
@@ -95,6 +97,12 @@ export class AdminUsersComponent implements OnInit {
 
   displayName(u: AdminUser): string {
     return u.profile?.fullName || u.companyProfile?.companyName || u.email;
+  }
+
+  /** Mismas tres etiquetas que ya usa el filtro de rol de esta pantalla — no duplicar la traducción. */
+  roleLabel(role: string): string {
+    const map: Record<string, string> = { CANDIDATE: 'Candidato', COMPANY: 'Empresa', ADMIN: 'Admin' };
+    return map[role] || role;
   }
 
   goToPage(page: number): void {

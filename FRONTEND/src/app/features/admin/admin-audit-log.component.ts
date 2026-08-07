@@ -26,7 +26,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
         <select [(ngModel)]="entityTypeFilter" (change)="onFilterChange()">
           <option value="">Todas las entidades</option>
           @for (type of entityTypes; track type) {
-            <option [value]="type">{{ type }}</option>
+            <option [value]="type">{{ entityTypeLabel(type) }}</option>
           }
         </select>
         <label>
@@ -50,11 +50,11 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
         @for (entry of entries; track entry.id) {
           <app-card variant="flat" padding="md" class="log-card">
             <div class="log-header">
-              <strong>{{ entry.action }}</strong>
+              <strong>{{ actionLabel(entry.action) }}</strong>
               <span class="log-date">{{ entry.createdAt | date: 'short' }}</span>
             </div>
             <p class="log-meta">
-              {{ entry.admin.email }} · {{ entry.entityType }}@if (entry.entityId) { ({{ entry.entityId }}) } · IP {{ entry.ipAddress || 'desconocida' }}
+              {{ entry.admin.name || entry.admin.email }} · {{ entityTypeLabel(entry.entityType) }}@if (entry.entityId) { ({{ entry.entityId }}) } · IP {{ entry.ipAddress || 'desconocida' }}
             </p>
             @if (entry.before || entry.after) {
               <div class="log-diff">
@@ -127,6 +127,31 @@ export class AdminAuditLogComponent implements OnInit {
     this.fromFilter = '';
     this.toFilter = '';
     this.onFilterChange();
+  }
+
+  /** Si se agrega una acción nueva a `auditLog.record(...)` en el backend, sumarla acá también. */
+  actionLabel(action: string): string {
+    const map: Record<string, string> = {
+      SUSPEND_USER: 'Usuario suspendido',
+      REACTIVATE_USER: 'Usuario reactivado',
+      UPDATE_PARAMETER: 'Parámetro actualizado',
+      DISMISS_REPORT: 'Reporte descartado',
+      RESOLVE_REPORT: 'Reporte resuelto',
+      CREATE_CATALOG_ENTRY: 'Valor de catálogo creado',
+      UPDATE_CATALOG_ENTRY: 'Valor de catálogo actualizado',
+    };
+    return map[action] || action;
+  }
+
+  /** Si se agrega un entityType nuevo a `auditLog.record(...)` en el backend, sumarlo acá también. */
+  entityTypeLabel(entityType: string): string {
+    const map: Record<string, string> = {
+      User: 'Usuario',
+      SystemParameter: 'Parámetro',
+      Report: 'Reporte',
+      SystemCatalog: 'Catálogo',
+    };
+    return map[entityType] || entityType;
   }
 
   formatJson(value: unknown): string {

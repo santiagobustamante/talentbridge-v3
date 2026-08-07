@@ -155,6 +155,7 @@ model Municipality {
 model User {
   id             Int             @id @default(autoincrement())
   email          String          @unique
+  name           String?
   passwordHash   String          @map("password_hash")
   role           UserRole        @default(CANDIDATE)
   emailVerified  Boolean         @default(false) @map("email_verified")

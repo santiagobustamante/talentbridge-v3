@@ -13,10 +13,10 @@ const prisma = new PrismaClient({ adapter });
  * ni debe existir nunca, un endpoint público de registro para este rol. Se
  * corre a mano, una vez, contra la base que corresponda (local o producción).
  *
- * Uso: npx ts-node prisma/create-admin.ts <email> <password>
+ * Uso: npx ts-node prisma/create-admin.ts <email> <password> [nombre]
  */
 async function main() {
-  const [email, password] = process.argv.slice(2);
+  const [email, password, name] = process.argv.slice(2);
 
   if (!email || !password) {
     console.error('Uso: npx ts-node prisma/create-admin.ts <email> <password>');
@@ -50,6 +50,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: normalizedEmail,
+      name: name || null,
       passwordHash,
       role: UserRole.ADMIN,
       emailVerified: true,
