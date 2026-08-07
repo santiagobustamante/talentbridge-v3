@@ -1025,3 +1025,15 @@ Registro cronológico de cambios reales hechos al proyecto (no de features plane
 **Archivos modificados:** `BACKEND/libs/common/src/email/email.service.ts`, `BACKEND/.env.example`, `BACKEND/prisma/schema.prisma` + migración aditiva, `BACKEND/prisma/create-admin.ts`, `BACKEND/apps/admin-service/src/audit-log.service.ts`, `FRONTEND/src/app/core/services/admin.service.ts`, `FRONTEND/src/app/features/admin/admin-users.component.ts`, `FRONTEND/src/app/features/admin/admin-audit-log.component.ts`.
 **Cómo se probó:** `npm run build` completo (11 servicios + 5 libs) limpio — se tocó `schema.prisma` y `libs/common`. `ng build`/`lint:css` limpios, sin warnings nuevos. Brevo: con `BREVO_API_URL` seteada a una URL inválida y `auth-service` reiniciado, `forgot-password` generó `Fallo el envío de correo... fetch failed` en el log (confirma lectura real de la variable), revertido sin gastar cuota de Brevo. Nombre en auditoría: probado con una cuenta ADMIN de prueba descartable (`admin-prueba-nombre@local.test`, nunca la cuenta real) — generó una entrada real, se vio "Ana Prueba" en vez del email, cuenta y sus filas de auditoría borradas al terminar (conteo de `users` idéntico antes/después: 166). ID/rol confirmados en vivo en `/admin/users`, sin overflow en mobile (375px). Acción/entidad confirmados en vivo en `/admin/audit-log` contra las 7 acciones/4 entidades reales ya existentes en la base.
 **Pendientes:** Mejora opcional identificada (`displayName()` en Usuarios podría sumar `u.name` como primer fallback para que un ADMIN listado ahí también muestre nombre) — no implementada, no fue pedida explícitamente.
+
+---
+
+### 2026-08-07 (continuación) — Auditoría: BUG-057, mostrar a quién afectó el cambio en vez del ID crudo
+
+**Módulo:** Backend — `admin-service` (audit log). Frontend — `admin-audit-log`.
+**Tipo de cambio:** Fix
+**Problema:** Reportado por el usuario con captura de pantalla: las entradas "Usuario suspendido"/"reactivado" mostraban `Usuario (175)` — un ID sin ningún contexto de a quién correspondía.
+**Solución:** `AuditLogService.list()` resuelve el `entityId` contra la tabla `users` cuando `entityType === 'User'` (mismo patrón de lookup separado que ya usaba `ModerationService` para el target de un reporte, ya que `entityId` no tiene una FK real posible) y adjunta `targetUser: {email, name}`. El frontend muestra ese nombre/email en vez del ID crudo. Ver `BUGS_AND_FIXES.md` (BUG-057) para el detalle completo.
+**Archivos modificados:** `BACKEND/apps/admin-service/src/audit-log.service.ts`, `FRONTEND/src/app/core/services/admin.service.ts`, `FRONTEND/src/app/features/admin/admin-audit-log.component.ts`.
+**Cómo se probó:** `build:admin` limpio, `ng build`/`lint:css` limpios. Verificado en vivo: `targetUser` presente en la respuesta real, UI muestra "Usuario (candidato001@demo.com)" en vez de "Usuario (4)".
+**Pendientes:** Reportes (`Reporte (3)`) tiene la misma limitación de raíz — fuera de alcance, no fue lo pedido.

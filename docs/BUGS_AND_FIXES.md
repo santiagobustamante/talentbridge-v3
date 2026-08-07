@@ -679,3 +679,15 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Solución:** En vez de depender de un flex container que nunca envuelve al contenido real, se le dio `display: block` a `.stat-value` y `.stat-label` directamente (con `margin-top: 4px` en la etiqueta) — ambos ya son hijos reales del div interno de `CardComponent`, así que el bloque sí surte efecto ahí. Se quitó el `display: flex` inútil de `.stat-card`.
 **Prueba realizada:** `lint:css` + `ng build` limpios. Verificado en navegador real: `getBoundingClientRect()` confirmó 4px de separación real entre número y etiqueta (antes, 0px — misma línea).
 **Estado:** Corregido.
+
+---
+
+### BUG-057 — Auditoría: entradas de usuario mostraban un ID pelado en vez de a quién afectó el cambio (reportado por el usuario con captura de pantalla)
+
+**Módulo:** Backend — `admin-service/src/audit-log.service.ts`. Frontend — `admin-audit-log.component.ts`.
+**Descripción:** Las entradas "Usuario suspendido"/"Usuario reactivado" mostraban `Usuario (175)` — el ID numérico crudo de la fila, sin ninguna forma de saber quién era esa cuenta sin ir a buscarla a mano.
+**Causa:** `entityId` en `AdminAuditLog` es genérico (aplica a User/SystemParameter/Report/SystemCatalog, sin FK real a ninguna tabla específica) — para Parámetros y Catálogos ese campo ya es humanamente legible (`RATE_LIMIT_AUTH`, `catalogKey:value`), pero para Usuario es el `id` numérico de la tabla `users`, que no dice nada por sí solo.
+**Solución:** Mismo patrón que `ModerationService.list()` ya usaba para el `target` de un reporte (resolución por lookup separado, ya que no hay una única FK posible): `AuditLogService.list()` junta los `entityId` de las filas con `entityType === 'User'`, busca esos usuarios en un solo `findMany` y adjunta `targetUser: { email, name }` a cada entrada. El frontend muestra `targetUser.name || targetUser.email` en vez del ID crudo cuando está disponible.
+**Archivos afectados:** `BACKEND/apps/admin-service/src/audit-log.service.ts`, `FRONTEND/src/app/core/services/admin.service.ts`, `FRONTEND/src/app/features/admin/admin-audit-log.component.ts`.
+**Prueba realizada:** `build:admin` limpio. `lint:css`/`ng build` limpios. Verificado en vivo: `GET /admin/audit-log?entityType=User` devuelve `targetUser: {email: "candidato001@demo.com", name: null}`; en la UI real se ve "Usuario (candidato001@demo.com)" en vez de "Usuario (4)".
+**Estado:** Corregido. Reportes (`Reporte (3)`) tiene la misma limitación de raíz y quedó fuera de alcance — no fue lo pedido.

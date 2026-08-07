@@ -39,7 +39,7 @@ export class AuditLogService {
       };
     }
 
-    const [data, total] = await Promise.all([
+    const [rows, total] = await Promise.all([
       this.prisma.adminAuditLog.findMany({
         where,
         orderBy: { createdAt: 'desc' },
@@ -49,6 +49,22 @@ export class AuditLogService {
       }),
       this.prisma.adminAuditLog.count({ where }),
     ]);
+
+    // `entityId` no tiene FK real (es genérico entre User/SystemParameter/Report/SystemCatalog) —
+    // se resuelve por separado, mismo patrón que ModerationService.list() para el target de un reporte.
+    const userIds = rows
+      .filter((r) => r.entityType === 'User' && r.entityId)
+      .map((r) => Number(r.entityId))
+      .filter((id) => !Number.isNaN(id));
+    const users = userIds.length
+      ? await this.prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, email: true, name: true } })
+      : [];
+    const userById = new Map(users.map((u) => [u.id, u]));
+
+    const data = rows.map((r) => ({
+      ...r,
+      targetUser: r.entityType === 'User' && r.entityId ? userById.get(Number(r.entityId)) || null : null,
+    }));
 
     return { data, total, page: params.page, limit: params.limit };
   }

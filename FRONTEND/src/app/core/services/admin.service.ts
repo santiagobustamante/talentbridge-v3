@@ -32,6 +32,8 @@ export interface AdminAuditLogEntry {
   after: unknown;
   ipAddress: string | null;
   createdAt: string;
+  /** Solo presente cuando entityType es 'User' — el usuario afectado por la acción (suspender/reactivar), no quien la hizo. */
+  targetUser: { email: string; name: string | null } | null;
 }
 
 export interface PaginatedAuditLog {

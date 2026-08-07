@@ -54,7 +54,7 @@ import { ButtonDirective } from '../../shared/components/button/button.directive
               <span class="log-date">{{ entry.createdAt | date: 'short' }}</span>
             </div>
             <p class="log-meta">
-              {{ entry.admin.name || entry.admin.email }} · {{ entityTypeLabel(entry.entityType) }}@if (entry.entityId) { ({{ entry.entityId }}) } · IP {{ entry.ipAddress || 'desconocida' }}
+              {{ entry.admin.name || entry.admin.email }} · {{ entityTypeLabel(entry.entityType) }}@if (entry.targetUser) { ({{ entry.targetUser.name || entry.targetUser.email }}) } @else if (entry.entityId) { ({{ entry.entityId }}) } · IP {{ entry.ipAddress || 'desconocida' }}
             </p>
             @if (entry.before || entry.after) {
               <div class="log-diff">
