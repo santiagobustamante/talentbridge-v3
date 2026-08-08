@@ -5,12 +5,12 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule, PrismaService } from '@app/database';
 import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
-import { ApplicationsController } from './applications.controller';
-import { ApplicationsService } from './applications.service';
-import { NotificationsController } from './notifications.controller';
-import { NotificationsService } from './notifications.service';
-import { AnalyticsController } from './analytics.controller';
-import { AnalyticsService } from './analytics.service';
+import { ApplicationsController } from './applications/applications.controller';
+import { ApplicationsService } from './applications/applications.service';
+import { NotificationsController } from './notifications/notifications.controller';
+import { NotificationsService } from './notifications/notifications.service';
+import { AnalyticsController } from './analytics/analytics.controller';
+import { AnalyticsService } from './analytics/analytics.service';
 
 /**
  * Módulo raíz del microservicio de Postulaciones (Applications Service).

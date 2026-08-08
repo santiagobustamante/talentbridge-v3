@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule, PrismaService } from '@app/database';
 import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
+import { RepositoryModule } from '@app/repository';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
@@ -21,6 +22,7 @@ import { ChatGateway } from './chat.gateway';
     PrismaModule,
     CommonModule,
     AuthLibModule,
+    RepositoryModule,
     // 300 req/min por IP — frena abuso/flood sin afectar uso normal. Mismo
     // patrón que auth-service (barrido 2026-07-26). Solo cubre las rutas
     // HTTP del chat (historial, marcar leído, bloquear) — no los mensajes

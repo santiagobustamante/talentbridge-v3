@@ -5,19 +5,20 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule, PrismaService } from '@app/database';
 import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
-import { ParametersController } from './parameters.controller';
-import { ParametersService } from './parameters.service';
-import { AuditLogController } from './audit-log.controller';
-import { AuditLogService } from './audit-log.service';
-import { CatalogController } from './catalog.controller';
-import { CatalogService } from './catalog.service';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { FeatureFlagsController } from './feature-flags.controller';
-import { DashboardController } from './dashboard.controller';
-import { DashboardService } from './dashboard.service';
-import { ModerationController } from './moderation.controller';
-import { ModerationService } from './moderation.service';
+import { RepositoryModule } from '@app/repository';
+import { ParametersController } from './parameters/parameters.controller';
+import { ParametersService } from './parameters/parameters.service';
+import { AuditLogController } from './audit-log/audit-log.controller';
+import { AuditLogService } from './audit-log/audit-log.service';
+import { CatalogController } from './catalog/catalog.controller';
+import { CatalogService } from './catalog/catalog.service';
+import { UsersController } from './users/users.controller';
+import { UsersService } from './users/users.service';
+import { FeatureFlagsController } from './feature-flags/feature-flags.controller';
+import { DashboardController } from './dashboard/dashboard.controller';
+import { DashboardService } from './dashboard/dashboard.service';
+import { ModerationController } from './moderation/moderation.controller';
+import { ModerationService } from './moderation/moderation.service';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ModerationService } from './moderation.service';
     PrismaModule,
     CommonModule,
     AuthLibModule,
+    RepositoryModule,
     // 60 req/min por IP — más estricto que el default de 300/min del resto
     // de los servicios: todo lo que cuelga de este servicio requiere rol
     // ADMIN y puede modificar configuración transversal del sistema, así

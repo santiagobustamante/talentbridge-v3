@@ -691,3 +691,15 @@ Un ID por bug, formato: ID / Módulo / Descripción / Causa / Archivos afectados
 **Archivos afectados:** `BACKEND/apps/admin-service/src/audit-log.service.ts`, `FRONTEND/src/app/core/services/admin.service.ts`, `FRONTEND/src/app/features/admin/admin-audit-log.component.ts`.
 **Prueba realizada:** `build:admin` limpio. `lint:css`/`ng build` limpios. Verificado en vivo: `GET /admin/audit-log?entityType=User` devuelve `targetUser: {email: "candidato001@demo.com", name: null}`; en la UI real se ve "Usuario (candidato001@demo.com)" en vez de "Usuario (4)".
 **Estado:** Corregido. Reportes (`Reporte (3)`) tiene la misma limitación de raíz y quedó fuera de alcance — no fue lo pedido.
+
+---
+
+### BUG-058 — `jobs.service.spec.ts` fallaba en silencio en 3 de sus 5 casos (encontrado durante la Fase 4 del patrón repositorio, no reportado por el usuario)
+
+**Módulo:** Backend — `apps/jobs-service/src/jobs.service.spec.ts`.
+**Descripción:** De los 5 tests de `JobsService.publishJob`, los 3 que ejercitaban el flujo de notificación por match de skills (`notifica solo a los candidatos...`, `no notifica si no pide skills`, `no llama a createMany si nadie matchea`) fallaban con un `TypeError` que no tenía nada que ver con lo que decían probar.
+**Causa:** Dos gaps preexistentes en el mock, independientes entre sí: (1) el objeto `prisma` mockeado nunca incluía la clave `systemParameter` — cuando `getMatchThreshold()` llamaba a `this.prisma.systemParameter.findUnique(...)`, `this.prisma.systemParameter` era `undefined` y explotaba con `Cannot read properties of undefined`; (2) el fixture `draftJob` nunca tuvo un campo `status`, así que el chequeo de transición de estado en `publishJob` (`if (job.status !== DRAFT && job.status !== CLOSED) throw ...`, código no tocado por este refactor) lo rechazaba antes de llegar siquiera a la lógica de notificación. Ninguno de los dos gaps es nuevo — probablemente quedaron así desde que se agregó `JOB_MATCH_ALERT_THRESHOLD` como `SystemParameter` real, sin actualizar el test. Se detectaron porque la Fase 4 del patrón repositorio (ver `docs/plan-repository-pattern.md`) obligó a reescribir el archivo completo (el constructor de `JobsService` pasó de una sola dependencia a ocho), momento en el que correr el spec expuso ambos problemas.
+**Archivos afectados:** `BACKEND/apps/jobs-service/src/jobs.service.spec.ts`.
+**Solución:** Reescrito para mockear los repositorios (`JobOfferRepository`, `ProfileRepository`, `NotificationRepository`, `SystemParameterRepository`, etc., cada método un `jest.fn()` independiente) en vez de un objeto `PrismaService` plano — de paso, un método no mockeado devuelve `undefined` en vez de explotar, así que ya no hace falta acordarse de mockear cada tabla que toque el código. Agregado `status: 'DRAFT'` a `draftJob`.
+**Prueba realizada:** `npx jest apps/jobs-service/src/jobs.service.spec.ts` → 5/5 pasan. `npx jest` (suite completa del backend) → mismas 3 fallas preexistentes de siempre en `applications-service`/`auth-service` (ninguna relacionada), ninguna nueva.
+**Estado:** Corregido.

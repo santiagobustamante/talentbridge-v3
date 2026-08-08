@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtUtil } from '@app/auth';
-import { PrismaService } from '@app/database';
+import { UserRepository, ConversationRepository, ChatMessageRepository } from '@app/repository';
 
 /** Extiende el Socket de socket.io con el id de usuario ya autenticado, seteado en `handleConnection`. */
 interface AuthenticatedSocket extends Socket {
@@ -42,7 +42,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /** Sockets activos por usuario (un usuario puede tener varias pestañas/dispositivos abiertos). */
   private userSockets = new Map<number, Set<string>>();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly chatMessageRepository: ChatMessageRepository,
+  ) {}
 
   /**
    * Se ejecuta en cada nueva conexión de socket. Autentica leyendo el JWT
@@ -78,14 +82,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       await client.join(`user:${payload.sub}`);
 
-      const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+      const user = await this.userRepository.findById(payload.sub);
       if (user) {
-        const conversations = await this.prisma.conversation.findMany({
-          where: user.role === 'CANDIDATE'
-            ? { candidateId: payload.sub }
-            : { companyId: payload.sub },
-          select: { id: true },
-        });
+        const conversations = await this.conversationRepository.findIdsForUser(payload.sub, user.role);
         for (const conv of conversations) {
           await client.join(`conversation:${conv.id}`);
         }
@@ -176,20 +175,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const sockets = this.userSockets.get(userId);
     if (!sockets || sockets.size === 0) return;
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user) return;
 
-    const conversations = await this.prisma.conversation.findMany({
-      where: user.role === 'CANDIDATE' ? { candidateId: userId } : { companyId: userId },
-      select: { id: true },
-    });
-
+    const conversations = await this.conversationRepository.findIdsForUser(userId, user.role);
     const conversationIds = conversations.map((c) => c.id);
 
     const count = conversationIds.length > 0
-      ? await this.prisma.chatMessage.count({
-          where: { conversationId: { in: conversationIds }, senderId: { not: userId }, readAt: null },
-        })
+      ? await this.chatMessageRepository.countUnreadAcrossConversations(conversationIds, userId)
       : 0;
 
     this.server.to(`user:${userId}`).emit('chat:unread-count', { count });

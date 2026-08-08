@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, ConflictException, BadRequestException } from '@nestjs/common';
-import { PrismaService, Prisma } from '@app/database';
+import { Prisma } from '@app/database';
+import { UserRepository, ConversationRepository, ChatMessageRepository, ChatBlockRepository, ReportRepository } from '@app/repository';
 import { ChatGateway } from './chat.gateway';
 
 /**
@@ -14,7 +15,11 @@ import { ChatGateway } from './chat.gateway';
 @Injectable()
 export class ChatService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly chatMessageRepository: ChatMessageRepository,
+    private readonly chatBlockRepository: ChatBlockRepository,
+    private readonly reportRepository: ReportRepository,
     private readonly chatGateway: ChatGateway,
   ) {}
 
@@ -25,48 +30,14 @@ export class ChatService {
    * de entrada del chat sin queries adicionales por conversación.
    */
   async getConversations(userId: number) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    const where = user.role === 'CANDIDATE'
-      ? { candidateId: userId }
-      : { companyId: userId };
-
-    const conversations = await this.prisma.conversation.findMany({
-      where,
-      include: {
-        candidate: {
-          select: {
-            id: true,
-            profile: { select: { fullName: true, professionalTitle: true, photoUrl: true, slug: true, city: true } },
-          },
-        },
-        company: {
-          select: {
-            id: true,
-            companyProfile: { select: { companyName: true, logoUrl: true, sector: true, city: true } },
-          },
-        },
-        messages: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-        },
-        blocks: {
-          select: { blockerId: true, blockedId: true },
-        },
-      },
-      orderBy: { lastMessageAt: 'desc' },
-    });
+    const conversations = await this.conversationRepository.findManyForUserWithDetails(userId, user.role);
 
     const enriched = await Promise.all(
       conversations.map(async (conv) => {
-        const unreadCount = await this.prisma.chatMessage.count({
-          where: {
-            conversationId: conv.id,
-            senderId: { not: userId },
-            readAt: null,
-          },
-        });
+        const unreadCount = await this.chatMessageRepository.countUnreadForUser(conv.id, userId);
 
         const blockedByMe = conv.blocks.some((b) => b.blockerId === userId);
         const blockedByOther = conv.blocks.some((b) => b.blockedId === userId);
@@ -109,33 +80,14 @@ export class ChatService {
    * tercero, aunque conozca el id).
    */
   async getConversation(userId: number, conversationId: number) {
-    const conv = await this.prisma.conversation.findUnique({
-      where: { id: conversationId },
-      include: {
-        candidate: {
-          select: {
-            id: true,
-            profile: { select: { fullName: true, professionalTitle: true, photoUrl: true, slug: true, city: true } },
-          },
-        },
-        company: {
-          select: {
-            id: true,
-            companyProfile: { select: { companyName: true, logoUrl: true, sector: true, city: true } },
-          },
-        },
-        blocks: { select: { blockerId: true, blockedId: true } },
-      },
-    });
+    const conv = await this.conversationRepository.findByIdWithChatDetails(conversationId);
 
     if (!conv) throw new NotFoundException('Conversación no encontrada');
     if (conv.candidateId !== userId && conv.companyId !== userId) {
       throw new ForbiddenException('No autorizado');
     }
 
-    const unreadCount = await this.prisma.chatMessage.count({
-      where: { conversationId, senderId: { not: userId }, readAt: null },
-    });
+    const unreadCount = await this.chatMessageRepository.countUnreadForUser(conversationId, userId);
 
     return {
       id: conv.id,
@@ -173,11 +125,7 @@ export class ChatService {
     // candidato justo cuando el candidato también le escribe) no pueden
     // pasar las dos el chequeo antes de que cualquiera confirme — la
     // constraint única candidateId+companyId decide en una sola query.
-    const conversation = await this.prisma.conversation.upsert({
-      where: { candidateId_companyId: { candidateId, companyId } },
-      update: {},
-      create: { candidateId, companyId, lastMessageAt: new Date() },
-    });
+    const conversation = await this.conversationRepository.upsertForCandidateAndCompany(candidateId, companyId);
 
     await this.chatGateway.notifyConversationUpdated(candidateId);
     await this.chatGateway.notifyConversationUpdated(companyId);
@@ -192,7 +140,7 @@ export class ChatService {
    * alinee a derecha/izquierda sin lógica extra.
    */
   async getMessages(userId: number, conversationId: number, page = 1, limit = 30) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     if (conversation.candidateId !== userId && conversation.companyId !== userId) {
       throw new ForbiddenException('No autorizado');
@@ -201,21 +149,8 @@ export class ChatService {
     const skip = (page - 1) * limit;
 
     const [messages, total] = await Promise.all([
-      this.prisma.chatMessage.findMany({
-        where: { conversationId },
-        orderBy: { createdAt: 'asc' },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          conversationId: true,
-          body: true,
-          senderId: true,
-          createdAt: true,
-          readAt: true,
-        },
-      }),
-      this.prisma.chatMessage.count({ where: { conversationId } }),
+      this.chatMessageRepository.findByConversationId(conversationId, skip, limit),
+      this.chatMessageRepository.countByConversationId(conversationId),
     ]);
 
     return {
@@ -237,25 +172,18 @@ export class ChatService {
    * un refresh de página siempre vea el mensaje aunque el socket falle.
    */
   async sendMessage(userId: number, conversationId: number, body: string) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     if (conversation.candidateId !== userId && conversation.companyId !== userId) {
       throw new ForbiddenException('No autorizado');
     }
 
-    const block = await this.prisma.chatBlock.findFirst({
-      where: { conversationId, blockedId: userId },
-    });
+    const block = await this.chatBlockRepository.findByConversationAndBlockedUser(conversationId, userId);
     if (block) throw new ForbiddenException('No puedes enviar mensajes en esta conversación');
 
-    const message = await this.prisma.chatMessage.create({
-      data: { conversationId, senderId: userId, body },
-    });
+    const message = await this.chatMessageRepository.create({ conversationId, senderId: userId, body });
 
-    await this.prisma.conversation.update({
-      where: { id: conversationId },
-      data: { lastMessageAt: new Date(), updatedAt: new Date() },
-    });
+    await this.conversationRepository.update(conversationId, { lastMessageAt: new Date(), updatedAt: new Date() });
 
     const recipientId = conversation.candidateId === userId ? conversation.companyId : conversation.candidateId;
 
@@ -275,16 +203,13 @@ export class ChatService {
    * no leídos en tiempo real.
    */
   async markAsRead(userId: number, conversationId: number) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     if (conversation.candidateId !== userId && conversation.companyId !== userId) {
       throw new ForbiddenException('No autorizado');
     }
 
-    const result = await this.prisma.chatMessage.updateMany({
-      where: { conversationId, senderId: { not: userId }, readAt: null },
-      data: { readAt: new Date() },
-    });
+    const result = await this.chatMessageRepository.markAllReadForUser(conversationId, userId);
 
     const otherId = conversation.candidateId === userId ? conversation.companyId : conversation.candidateId;
     await this.chatGateway.notifyReadMessages(conversationId, userId);
@@ -296,38 +221,27 @@ export class ChatService {
 
   /** Reporta un mensaje de chat (Fase 12 — moderación de contenido) — solo un participante de esa conversación, y no el propio autor del mensaje. */
   async reportMessage(userId: number, messageId: number, reason: string) {
-    const message = await this.prisma.chatMessage.findUnique({
-      where: { id: messageId },
-      include: { conversation: { select: { candidateId: true, companyId: true } } },
-    });
+    const message = await this.chatMessageRepository.findByIdWithConversationParticipants(messageId);
     if (!message) throw new NotFoundException('Mensaje no encontrado');
 
     const isParticipant = message.conversation.candidateId === userId || message.conversation.companyId === userId;
     if (!isParticipant) throw new ForbiddenException('No autorizado');
     if (message.senderId === userId) throw new BadRequestException('No podés reportar tu propio mensaje');
 
-    await this.prisma.report.create({
-      data: { reporterId: userId, targetType: 'CHAT_MESSAGE', targetId: messageId, reason },
-    });
+    await this.reportRepository.create({ reporterId: userId, targetType: 'CHAT_MESSAGE', targetId: messageId, reason });
     return { message: 'Reporte enviado. Un administrador lo va a revisar.' };
   }
 
   /** Total de mensajes sin leer del usuario autenticado, sumando todas sus conversaciones — usado para el badge de notificaciones del chat. */
   async getUnreadCount(userId: number) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    const conversations = await this.prisma.conversation.findMany({
-      where: user.role === 'CANDIDATE' ? { candidateId: userId } : { companyId: userId },
-      select: { id: true },
-    });
-
+    const conversations = await this.conversationRepository.findIdsForUser(userId, user.role);
     const conversationIds = conversations.map((c) => c.id);
 
     const count = conversationIds.length > 0
-      ? await this.prisma.chatMessage.count({
-          where: { conversationId: { in: conversationIds }, senderId: { not: userId }, readAt: null },
-        })
+      ? await this.chatMessageRepository.countUnreadAcrossConversations(conversationIds, userId)
       : 0;
 
     return { count };
@@ -340,7 +254,7 @@ export class ChatService {
    * duplicados).
    */
   async blockConversation(userId: number, conversationId: number, reason?: string) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
     if (conversation.candidateId !== userId && conversation.companyId !== userId) {
       throw new ForbiddenException('No autorizado');
@@ -348,9 +262,7 @@ export class ChatService {
 
     const blockedId = conversation.candidateId === userId ? conversation.companyId : conversation.candidateId;
 
-    const existing = await this.prisma.chatBlock.findFirst({
-      where: { conversationId, blockerId: userId, blockedId },
-    });
+    const existing = await this.chatBlockRepository.findByConversationBlockerAndBlocked(conversationId, userId, blockedId);
     if (existing) throw new ConflictException('Conversación ya bloqueada');
 
     // El chequeo de arriba es best-effort: dos requests simultáneas
@@ -359,9 +271,7 @@ export class ChatService {
     // que realmente lo impide; acá traducimos su violación (P2002) al
     // mismo 409 amigable.
     try {
-      await this.prisma.chatBlock.create({
-        data: { conversationId, blockerId: userId, blockedId, reason },
-      });
+      await this.chatBlockRepository.create({ conversationId, blockerId: userId, blockedId, reason });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
         throw new ConflictException('Conversación ya bloqueada');
@@ -374,14 +284,12 @@ export class ChatService {
 
   /** Elimina el registro de bloqueo creado por `blockConversation`, permitiendo de nuevo que la otra parte envíe mensajes. */
   async unblockConversation(userId: number, conversationId: number) {
-    const conversation = await this.prisma.conversation.findUnique({ where: { id: conversationId } });
+    const conversation = await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversación no encontrada');
 
     const blockedId = conversation.candidateId === userId ? conversation.companyId : conversation.candidateId;
 
-    await this.prisma.chatBlock.deleteMany({
-      where: { conversationId, blockerId: userId, blockedId },
-    });
+    await this.chatBlockRepository.deleteMany(conversationId, userId, blockedId);
 
     return { message: 'Conversación desbloqueada' };
   }

@@ -33,7 +33,9 @@
       "@app/contracts": ["libs/contracts/src"],
       "@app/contracts/*": ["libs/contracts/src/*"],
       "@app/events": ["libs/events/src"],
-      "@app/events/*": ["libs/events/src/*"]
+      "@app/events/*": ["libs/events/src/*"],
+      "@app/repository": ["libs/repository/src"],
+      "@app/repository/*": ["libs/repository/src/*"]
     }
   }
 }

@@ -2,6 +2,15 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { PrismaService, UserRole, NotificationType, JobOfferStatus } from '@app/database';
 import { computeSkillMatch } from '@app/contracts';
 import { titleCaseText, trimText, getPaginationLimits, clampLimit } from '@app/common';
+import {
+  JobOfferRepository,
+  SystemCatalogRepository,
+  SystemParameterRepository,
+  NotificationRepository,
+  ReportRepository,
+  ProfileRepository,
+  SkillRepository,
+} from '@app/repository';
 import { CreateJobOfferDto, UpdateJobOfferDto } from './dto/create-job-offer.dto';
 
 /**
@@ -38,50 +47,44 @@ const JOB_CATALOG_KEYS = {
 
 @Injectable()
 export class JobsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    // `prisma` se conserva solo para `getPaginationLimits`, utilidad
+    // compartida en `libs/common` (también la usan applications-service,
+    // fuera del alcance de este refactor) que toma un `PrismaLike` — mismo
+    // criterio ya documentado en `CandidateSearchService` (Fase 3). Se
+    // evaluó refactorizar esa utilidad para que tome `SystemParameterRepository`
+    // en vez de un `PrismaLike`, pero cambiaría su firma pública y forzaría a
+    // tocar `applications-service` (fuera del alcance de este plan) solo
+    // para que siga compilando — no vale la pena por un único call site acá.
+    private readonly prisma: PrismaService,
+    private readonly jobOfferRepository: JobOfferRepository,
+    private readonly systemCatalogRepository: SystemCatalogRepository,
+    private readonly systemParameterRepository: SystemParameterRepository,
+    private readonly notificationRepository: NotificationRepository,
+    private readonly reportRepository: ReportRepository,
+    private readonly profileRepository: ProfileRepository,
+    private readonly skillRepository: SkillRepository,
+  ) {}
 
   /** Trae una oferta y valida que pertenezca a la empresa autenticada — chequeo que se repetía al principio de casi todos los métodos de escritura de este service. */
   private async getOwnedJobOrThrow(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId } });
+    const job = await this.jobOfferRepository.findById(jobId);
     if (!job) throw new NotFoundException('Oferta no encontrada');
     if (job.companyId !== companyUserId) throw new ForbiddenException('No autorizado');
     return job;
   }
 
   async getCompanyJobs(companyUserId: number, status?: string) {
-    const where: any = { companyId: companyUserId };
     // Un status inválido en el query param antes llegaba tal cual al `where`
     // de Prisma y explotaba con un error crudo (el campo es un enum en la
     // base) — se ignora en vez de filtrar, mismo criterio que ya usa
     // `ApplicationsService.getMyApplications` para su propio filtro de status.
-    if (status && ALL_STATUSES.includes(status)) where.status = status;
-
-    return this.prisma.jobOffer.findMany({
-      where,
-      include: {
-        _count: { select: { applications: true } },
-        company: {
-          select: {
-            companyProfile: { select: { companyName: true, logoUrl: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const validStatus = status && ALL_STATUSES.includes(status) ? (status as JobOfferStatus) : undefined;
+    return this.jobOfferRepository.findManyForCompany(companyUserId, validStatus);
   }
 
   async getCompanyJob(companyUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findFirst({
-      where: { id: jobId, companyId: companyUserId },
-      include: {
-        _count: { select: { applications: true } },
-        company: {
-          select: {
-            companyProfile: { select: { companyName: true, logoUrl: true } },
-          },
-        },
-      },
-    });
+    const job = await this.jobOfferRepository.findOneForCompany(companyUserId, jobId);
     if (!job) throw new NotFoundException('Oferta no encontrada');
     return job;
   }
@@ -94,9 +97,7 @@ export class JobsService {
    */
   private async assertValidCatalogValue(catalogKey: string, value: string | undefined, fieldLabel: string): Promise<void> {
     if (value === undefined) return;
-    const entry = await this.prisma.systemCatalog.findUnique({
-      where: { catalogKey_value: { catalogKey, value } },
-    });
+    const entry = await this.systemCatalogRepository.findByKeyAndValue(catalogKey, value);
     if (!entry || !entry.active) {
       throw new BadRequestException(`${fieldLabel} no es un valor válido`);
     }
@@ -105,10 +106,10 @@ export class JobsService {
   /** Catálogos de opciones para el formulario de oferta laboral — leídos por candidato y empresa (Fase 3, `currency` agregada en Fase 10). */
   async getJobCatalogs() {
     const [modality, contractType, workload, currency] = await Promise.all([
-      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.modality, active: true }, orderBy: { sortOrder: 'asc' } }),
-      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.contractType, active: true }, orderBy: { sortOrder: 'asc' } }),
-      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.workload, active: true }, orderBy: { sortOrder: 'asc' } }),
-      this.prisma.systemCatalog.findMany({ where: { catalogKey: JOB_CATALOG_KEYS.currency, active: true }, orderBy: { sortOrder: 'asc' } }),
+      this.systemCatalogRepository.findActiveByKey(JOB_CATALOG_KEYS.modality),
+      this.systemCatalogRepository.findActiveByKey(JOB_CATALOG_KEYS.contractType),
+      this.systemCatalogRepository.findActiveByKey(JOB_CATALOG_KEYS.workload),
+      this.systemCatalogRepository.findActiveByKey(JOB_CATALOG_KEYS.currency),
     ]);
     const toOptions = (rows: { value: string; label: string }[]) => rows.map((r) => ({ value: r.value, label: r.label }));
     return { modality: toOptions(modality), contractType: toOptions(contractType), workload: toOptions(workload), currency: toOptions(currency) };
@@ -120,29 +121,27 @@ export class JobsService {
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.contractType, dto.contractType, 'El tipo de contrato');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.workload, dto.workload, 'La jornada');
     await this.assertValidCatalogValue(JOB_CATALOG_KEYS.currency, dto.currency, 'La moneda');
-    return this.prisma.jobOffer.create({
-      data: {
-        companyId: companyUserId,
-        title: titleCaseText(dto.title),
-        description: trimText(dto.description),
-        requirements: dto.requirements ? trimText(dto.requirements) : dto.requirements,
-        responsibilities: dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities,
-        // Sin titleCaseText: viene del catálogo DIVIPOLA con su casing
-        // oficial (incluye conectores en minúscula, ej. "San José de la Montaña").
-        city: dto.city ? trimText(dto.city) : dto.city,
-        modality: dto.modality,
-        contractType: dto.contractType,
-        customContractType: dto.customContractType,
-        workload: dto.workload,
-        customWorkload: dto.customWorkload,
-        salaryMin: dto.salaryMin,
-        salaryMax: dto.salaryMax,
-        currency: dto.currency || 'COP',
-        skillsRequired: dto.skillsRequired
-          ? Array.isArray(dto.skillsRequired) ? dto.skillsRequired.join(',') : dto.skillsRequired
-          : undefined,
-        status: DRAFT,
-      },
+    return this.jobOfferRepository.create({
+      companyId: companyUserId,
+      title: titleCaseText(dto.title),
+      description: trimText(dto.description),
+      requirements: dto.requirements ? trimText(dto.requirements) : dto.requirements,
+      responsibilities: dto.responsibilities ? trimText(dto.responsibilities) : dto.responsibilities,
+      // Sin titleCaseText: viene del catálogo DIVIPOLA con su casing
+      // oficial (incluye conectores en minúscula, ej. "San José de la Montaña").
+      city: dto.city ? trimText(dto.city) : dto.city,
+      modality: dto.modality,
+      contractType: dto.contractType,
+      customContractType: dto.customContractType,
+      workload: dto.workload,
+      customWorkload: dto.customWorkload,
+      salaryMin: dto.salaryMin,
+      salaryMax: dto.salaryMax,
+      currency: dto.currency || 'COP',
+      skillsRequired: dto.skillsRequired
+        ? Array.isArray(dto.skillsRequired) ? dto.skillsRequired.join(',') : dto.skillsRequired
+        : undefined,
+      status: DRAFT,
     });
   }
 
@@ -182,13 +181,13 @@ export class JobsService {
         : dto.skillsRequired;
     }
 
-    return this.prisma.jobOffer.update({ where: { id: jobId }, data: updateData });
+    return this.jobOfferRepository.update(jobId, updateData);
   }
 
   async deleteJob(companyUserId: number, jobId: number) {
     await this.getOwnedJobOrThrow(companyUserId, jobId);
 
-    await this.prisma.jobOffer.delete({ where: { id: jobId } });
+    await this.jobOfferRepository.delete(jobId);
     return { message: 'Oferta eliminada' };
   }
 
@@ -202,13 +201,10 @@ export class JobsService {
       throw new BadRequestException('Solo se puede publicar una oferta en borrador o cerrada');
     }
 
-    const published = await this.prisma.jobOffer.update({
-      where: { id: jobId },
-      // `closedAt: null` limpia la fecha de cierre de un ciclo anterior —
-      // sin esto, republicar una oferta CLOSED dejaba "closedAt" con la
-      // fecha del cierre viejo aunque la oferta ya estuviera activa de nuevo.
-      data: { status: PUBLISHED, publishedAt: new Date(), closedAt: null },
-    });
+    // `closedAt: null` limpia la fecha de cierre de un ciclo anterior — sin
+    // esto, republicar una oferta CLOSED dejaba "closedAt" con la fecha del
+    // cierre viejo aunque la oferta ya estuviera activa de nuevo.
+    const published = await this.jobOfferRepository.update(jobId, { status: PUBLISHED, publishedAt: new Date(), closedAt: null });
 
     await this.notifyMatchingCandidates(published);
 
@@ -229,9 +225,7 @@ export class JobsService {
    * Sin cache: esto solo corre al publicar una oferta, no es un hot path.
    */
   private async getMatchThreshold(): Promise<number> {
-    const param = await this.prisma.systemParameter.findUnique({
-      where: { key: 'JOB_MATCH_ALERT_THRESHOLD' },
-    });
+    const param = await this.systemParameterRepository.findByKey('JOB_MATCH_ALERT_THRESHOLD');
     if (!param) return JOB_MATCH_ALERT_THRESHOLD_FALLBACK;
     const value = Number(param.value);
     return Number.isNaN(value) ? JOB_MATCH_ALERT_THRESHOLD_FALLBACK : value;
@@ -240,13 +234,7 @@ export class JobsService {
   private async notifyMatchingCandidates(job: { id: number; title: string; skillsRequired: string | null }): Promise<void> {
     if (!job.skillsRequired?.trim()) return;
 
-    const profiles = await this.prisma.profile.findMany({
-      where: { isPublished: true },
-      select: {
-        userId: true,
-        skills: { select: { normalizedName: true, level: true } },
-      },
-    });
+    const profiles = await this.profileRepository.findPublishedWithSkillsForMatching();
 
     const threshold = await this.getMatchThreshold();
     const matchingUserIds = profiles
@@ -256,15 +244,15 @@ export class JobsService {
 
     if (matchingUserIds.length === 0) return;
 
-    await this.prisma.notification.createMany({
-      data: matchingUserIds.map((userId) => ({
+    await this.notificationRepository.createMany(
+      matchingUserIds.map((userId) => ({
         userId,
         type: NotificationType.JOB_MATCH,
         title: 'Vacante que podría interesarte',
         body: `"${job.title}" coincide con tu perfil. Revísala antes de que se llene.`,
         link: `/app/jobs?jobId=${job.id}`,
       })),
-    });
+    );
   }
 
   async closeJob(companyUserId: number, jobId: number) {
@@ -272,10 +260,7 @@ export class JobsService {
     if (job.status !== PUBLISHED) {
       throw new BadRequestException('Solo se puede cerrar una oferta publicada');
     }
-    return this.prisma.jobOffer.update({
-      where: { id: jobId },
-      data: { status: CLOSED, closedAt: new Date() },
-    });
+    return this.jobOfferRepository.update(jobId, { status: CLOSED, closedAt: new Date() });
   }
 
   async archiveJob(companyUserId: number, jobId: number) {
@@ -284,7 +269,7 @@ export class JobsService {
     if (job.status !== DRAFT) {
       throw new BadRequestException('Solo se puede archivar una oferta en borrador');
     }
-    return this.prisma.jobOffer.update({ where: { id: jobId }, data: { status: ARCHIVED } });
+    return this.jobOfferRepository.update(jobId, { status: ARCHIVED });
   }
 
   async restoreJob(companyUserId: number, jobId: number) {
@@ -292,14 +277,12 @@ export class JobsService {
     if (job.status !== ARCHIVED) {
       throw new BadRequestException('Solo se puede restaurar una oferta archivada');
     }
-    return this.prisma.jobOffer.update({ where: { id: jobId }, data: { status: DRAFT } });
+    return this.jobOfferRepository.update(jobId, { status: DRAFT });
   }
 
   async getCandidateJobs(candidateUserId: number, query?: any) {
-    const profile = await this.prisma.profile.findUnique({ where: { userId: candidateUserId } });
-    const candidateSkills = profile
-      ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
-      : [];
+    const profile = await this.profileRepository.findByUserId(candidateUserId);
+    const candidateSkills = profile ? await this.skillRepository.findByProfileId(profile.id) : [];
 
     // parseInt(...) || fallback en vez de `+query.page`: un query param no
     // numérico (ej. "?page=abc") con `+` da NaN y rompía el `skip`/`take`
@@ -325,22 +308,8 @@ export class JobsService {
     if (query?.contractType) where.contractType = query.contractType;
 
     const [jobs, total] = await Promise.all([
-      this.prisma.jobOffer.findMany({
-        where,
-        include: {
-          company: {
-            select: { id: true, companyProfile: { select: { companyName: true, logoUrl: true, city: true } } },
-          },
-          applications: {
-            where: { candidateId: candidateUserId },
-            select: { id: true, status: true },
-          },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      this.prisma.jobOffer.count({ where }),
+      this.jobOfferRepository.findPublishedForCandidate(where, candidateUserId, (page - 1) * limit, limit),
+      this.jobOfferRepository.countForCandidate(where),
     ]);
 
     const data = jobs.map((job) => {
@@ -366,21 +335,7 @@ export class JobsService {
   }
 
   async getJobById(candidateUserId: number, jobId: number) {
-    const job = await this.prisma.jobOffer.findUnique({
-      where: { id: jobId },
-      include: {
-        company: {
-          select: {
-            id: true,
-            companyProfile: { select: { companyName: true, logoUrl: true, city: true, description: true, websiteUrl: true } },
-          },
-        },
-        applications: {
-          where: { candidateId: candidateUserId },
-          select: { id: true, status: true },
-        },
-      },
-    });
+    const job = await this.jobOfferRepository.findByIdForCandidate(jobId, candidateUserId);
     if (!job) throw new NotFoundException('Oferta no encontrada');
 
     // Sin este chequeo, un candidato podía ver el detalle de cualquier
@@ -395,10 +350,8 @@ export class JobsService {
       throw new NotFoundException('Oferta no encontrada');
     }
 
-    const profile = await this.prisma.profile.findUnique({ where: { userId: candidateUserId } });
-    const candidateSkills = profile
-      ? await this.prisma.skill.findMany({ where: { profileId: profile.id }, select: { normalizedName: true, level: true } })
-      : [];
+    const profile = await this.profileRepository.findByUserId(candidateUserId);
+    const candidateSkills = profile ? await this.skillRepository.findByProfileId(profile.id) : [];
 
     const match = computeSkillMatch(job.skillsRequired, candidateSkills);
 
@@ -414,12 +367,10 @@ export class JobsService {
 
   /** Reporta una oferta laboral (Fase 12 — moderación de contenido) — cualquier candidato autenticado, no solo quien ya se postuló. */
   async reportJob(reporterId: number, jobId: number, reason: string) {
-    const job = await this.prisma.jobOffer.findUnique({ where: { id: jobId }, select: { id: true } });
-    if (!job) throw new NotFoundException('Oferta no encontrada');
+    const jobExists = await this.jobOfferRepository.exists(jobId);
+    if (!jobExists) throw new NotFoundException('Oferta no encontrada');
 
-    await this.prisma.report.create({
-      data: { reporterId, targetType: 'JOB_OFFER', targetId: jobId, reason },
-    });
+    await this.reportRepository.create({ reporterId, targetType: 'JOB_OFFER', targetId: jobId, reason });
     return { message: 'Reporte enviado. Un administrador lo va a revisar.' };
   }
 }

@@ -4,14 +4,39 @@ NestJS 11, monorepo con 10 apps + 5 libs compartidas. Ver también [`BACKEND/MIC
 
 ## 1. Estructura
 
+Cada `apps/<servicio>/src/` sigue uno de dos patrones, según si el servicio cubre un solo dominio o varios (mismo criterio que ya usa el frontend con `features/<dominio>/` — ver `docs/REUSABLE_SKILLS.md` #1 y #24):
+
+**Patrón A — un solo dominio** (`api-gateway`, `auth-service`, `candidate-service`, `jobs-service`, `chat-service`, `assistant-service`, `dashboard-service`): estructura plana, sin subcarpetas — envolver el único dominio en una carpeta con el mismo nombre del servicio no organizaría nada.
+
+```
+apps/<servicio>/src/
+├── main.ts                  bootstrap propio, puerto propio, cookie-parser, CORS
+├── <servicio>.module.ts     ValidationPipe global (whitelist+forbidNonWhitelisted+transform) + HttpExceptionFilter
+├── <servicio>.controller.ts
+├── <servicio>.service.ts    lógica + acceso a Prisma
+└── dto/*.dto.ts             class-validator
+```
+
+**Patrón B — varios dominios** (`portfolio-service`, `admin-service`, `applications-service`, `company-service`): cada dominio interno vive en su propia subcarpeta — controller, service y DTO(s) juntos, sin una carpeta `dto/` plana separada. `main.ts` y `<servicio>.module.ts` quedan en la raíz de `src/` (no pertenecen a ningún dominio en particular). Una dependencia cruzada real entre dominios (sin controller propio) va a `shared/`; si el código compartido sí tiene su propio endpoint, se queda como un dominio más, aunque otros lo importen cruzando carpeta.
+
+```
+apps/portfolio-service/src/
+├── main.ts
+├── portfolio.module.ts
+├── skills/           skills.controller.ts, skills.service.ts, skill.dto.ts
+├── experiences/       experiences.controller.ts, experiences.service.ts, experience.dto.ts
+├── education/         education.controller.ts, education.service.ts, education.dto.ts
+├── projects/          projects.controller.ts, projects.service.ts, project.dto.ts
+├── cv/                cv.controller.ts, cv.service.ts
+├── public-portfolio/   public-portfolio.controller.ts, public-portfolio.service.ts
+└── shared/            candidate-access.service.ts — usado por skills/ y public-portfolio/, sin endpoint propio
+```
+
+Ver `docs/DECISIONS.md` para el detalle completo de por qué estos 4 servicios se reorganizaron y `jobs-service` no (tiene 2 controllers pero un solo `JobsService` — no son 2 dominios reales).
+
 ```
 BACKEND/
-├── apps/<servicio>/src/
-│   ├── main.ts                  bootstrap propio, puerto propio, cookie-parser, CORS
-│   ├── <servicio>.module.ts     ValidationPipe global (whitelist+forbidNonWhitelisted+transform) + HttpExceptionFilter
-│   ├── <servicio>.controller.ts
-│   ├── <servicio>.service.ts    lógica + acceso a Prisma
-│   └── dto/*.dto.ts             class-validator
+├── apps/<servicio>/src/     ver los dos patrones arriba
 ├── libs/
 │   ├── auth/       JwtStrategy, JwtAuthGuard, OptionalJwtAuthGuard, RolesGuard, @Roles(), @CurrentUser()
 │   ├── database/    PrismaService, PrismaModule, cliente Prisma generado (no tocar a mano)
@@ -19,7 +44,7 @@ BACKEND/
 │   ├── contracts/    Interfaces compartidas entre servicios (DTOs de comunicación interna)
 │   └── events/       Nombres/payloads de eventos — preparado para un futuro broker, no usado hoy
 ├── prisma/           schema.prisma, migrations/, seeds (ver DATABASE.md)
-├── nest-cli.json      Registro de las 10 apps del monorepo
+├── nest-cli.json      Registro de las apps del monorepo
 ├── Dockerfile          Multi-stage, un `target` por servicio (nombres = los de docker-compose.yml)
 └── .env / .env.example
 ```

@@ -1,25 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService, Prisma } from '@app/database';
+import { Prisma } from '@app/database';
 import { trimText, titleCaseText, normalizePhoneStorage, normalizeUrl } from '@app/common';
+import { ProfileRepository, UserRepository, ProfileViewRepository } from '@app/repository';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly profileRepository: ProfileRepository,
+    private readonly userRepository: UserRepository,
+    private readonly profileViewRepository: ProfileViewRepository,
+  ) {}
 
   async getProfile(userId: number) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-      include: {
-        skills: true,
-        experiences: true,
-        educations: true,
-        projects: true,
-        views: {
-          select: { id: true, createdAt: true, companyUser: { select: { email: true, companyProfile: { select: { companyName: true } } } } },
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
+    const profile = await this.profileRepository.findByUserIdWithFullDetails(userId);
 
     if (!profile) {
       throw new NotFoundException('Perfil no encontrado');
@@ -44,18 +37,13 @@ export class ProfileService {
   }
 
   async updateProfile(userId: number, dto: Partial<ProfileDto>) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
+    const profile = await this.profileRepository.findByUserId(userId);
 
     if (!profile) {
       throw new NotFoundException('Perfil no encontrado');
     }
 
-    return this.prisma.profile.update({
-      where: { userId },
-      data: this.normalizeProfileDto(dto),
-    });
+    return this.profileRepository.update(userId, this.normalizeProfileDto(dto));
   }
 
   /** El frontend ya manda los campos formateados, pero no se confía solo en eso —
@@ -78,19 +66,17 @@ export class ProfileService {
   }
 
   async generateSlug(userId: number, attempt = 0): Promise<unknown> {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
+    const profile = await this.profileRepository.findByUserId(userId);
 
     if (!profile) {
       throw new NotFoundException('Perfil no encontrado');
     }
 
-    const email = (await this.prisma.user.findUnique({ where: { id: userId } }))?.email || '';
+    const email = (await this.userRepository.findById(userId))?.email || '';
     const base = email.split('@')[0].replace(/[^a-zA-Z0-9_-]/g, '') + (attempt > 0 ? `-${Date.now().toString(36)}` : '');
     let slug = base;
     let counter = 1;
-    while (await this.prisma.profile.findUnique({ where: { slug } })) {
+    while (await this.profileRepository.findBySlug(slug)) {
       slug = `${base}-${counter}`;
       counter++;
     }
@@ -101,10 +87,7 @@ export class ProfileService {
     // constraint única en la base es la que realmente decide — acá
     // reintentamos con otro slug en vez de dejar pasar el P2002 crudo.
     try {
-      return await this.prisma.profile.update({
-        where: { userId },
-        data: { slug },
-      });
+      return await this.profileRepository.update(userId, { slug });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002' && attempt < 3) {
         return this.generateSlug(userId, attempt + 1);
@@ -114,29 +97,13 @@ export class ProfileService {
   }
 
   async getProfileViews(userId: number) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
+    const profile = await this.profileRepository.findByUserId(userId);
 
     if (!profile) {
       throw new NotFoundException('Perfil no encontrado');
     }
 
-    const views = await this.prisma.profileView.findMany({
-      where: { profileId: profile.id },
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        createdAt: true,
-        companyUser: {
-          select: {
-            email: true,
-            companyProfile: { select: { companyName: true, logoUrl: true } },
-          },
-        },
-      },
-    });
+    const views = await this.profileViewRepository.findByProfileId(profile.id);
 
     return {
       total: views.length,

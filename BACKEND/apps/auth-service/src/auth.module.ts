@@ -8,6 +8,7 @@ import type { StringValue } from 'ms';
 import { PrismaModule, PrismaService } from '@app/database';
 import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { JwtStrategy, OptionalJwtAuthGuard } from '@app/auth';
+import { RepositoryModule } from '@app/repository';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
@@ -30,6 +31,7 @@ const jwtExpiresIn = (process.env['JWT_EXPIRES_IN'] || '1d') as StringValue;
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     CommonModule,
+    RepositoryModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: jwtSecret,

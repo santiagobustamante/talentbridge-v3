@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
 import { PrismaService, UserRole, Prisma, VerificationTokenType } from '@app/database';
 import { normalizeEmail, titleCaseText, trimText, EmailService } from '@app/common';
+import { UserRepository, ProfileRepository, VerificationTokenRepository } from '@app/repository';
 import { RegisterDto, LoginDto, RegisterCompanyDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, ResendVerificationDto } from './dto/auth.dto';
 
 /** Emisor mostrado en la app autenticadora (Google Authenticator, Authy, etc.) junto al nombre de la cuenta. */
@@ -36,7 +37,21 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
+    // `prisma` se conserva solo para orquestar las dos transacciones de
+    // `resetPassword`/`verifyEmail` — antes eran `$transaction([opA, opB])`
+    // (forma array), pero esa forma exige pasar las PrismaPromise crudas sin
+    // envolver, y un método de repositorio `async` (el patrón de todo este
+    // refactor) SIEMPRE envuelve el resultado en una Promise nueva al
+    // devolverlo — Prisma ya no reconoce esa promesa envuelta como uno de
+    // sus operations y el batching de la transacción se rompe. Se convirtió
+    // a la forma callback (`$transaction(async (tx) => {...})`), que sí es
+    // compatible: los métodos de repositorio ya aceptan `tx` desde la Fase 1
+    // para exactamente este caso (mismo patrón que la transacción
+    // `Serializable` de la Fase 5). Ver `docs/DECISIONS.md`.
     private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
+    private readonly profileRepository: ProfileRepository,
+    private readonly verificationTokenRepository: VerificationTokenRepository,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
@@ -48,9 +63,7 @@ export class AuthService {
 
     const email = normalizeEmail(dto.email);
 
-    const existing = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    const existing = await this.userRepository.findByEmail(email);
 
     if (existing) {
       throw new ConflictException('Correo ya registrado');
@@ -81,18 +94,15 @@ export class AuthService {
    */
   private async createCandidateWithUniqueSlug(email: string, passwordHash: string, fullName: string, attempt = 0): Promise<any> {
     try {
-      return await this.prisma.user.create({
-        data: {
-          email,
-          passwordHash,
-          profile: {
-            create: {
-              slug: await this.generateUniqueSlug(email, attempt),
-              fullName: titleCaseText(fullName),
-            },
+      return await this.userRepository.create({
+        email,
+        passwordHash,
+        profile: {
+          create: {
+            slug: await this.generateUniqueSlug(email, attempt),
+            fullName: titleCaseText(fullName),
           },
         },
-        include: { profile: true },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -112,9 +122,7 @@ export class AuthService {
 
     const email = normalizeEmail(dto.email);
 
-    const existing = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    const existing = await this.userRepository.findByEmail(email);
 
     if (existing) {
       throw new ConflictException('Correo ya registrado');
@@ -129,24 +137,21 @@ export class AuthService {
     // amigable en vez de dejar pasar el error crudo de Prisma.
     let user;
     try {
-      user = await this.prisma.user.create({
-        data: {
-          email,
-          passwordHash,
-          role: UserRole.COMPANY,
-          companyProfile: {
-            create: {
-              companyName: titleCaseText(dto.companyName),
-              sector: dto.sector ? titleCaseText(dto.sector) : dto.sector,
-              // No se le aplica titleCaseText: el valor viene del catálogo
-              // DIVIPOLA (municipio-input) con su casing oficial exacto, que
-              // incluye conectores en minúscula ("San José de la Montaña") —
-              // recapitalizar cada palabra los rompería ("... De La ...").
-              city: dto.city ? trimText(dto.city) : dto.city,
-            },
+      user = await this.userRepository.create({
+        email,
+        passwordHash,
+        role: UserRole.COMPANY,
+        companyProfile: {
+          create: {
+            companyName: titleCaseText(dto.companyName),
+            sector: dto.sector ? titleCaseText(dto.sector) : dto.sector,
+            // No se le aplica titleCaseText: el valor viene del catálogo
+            // DIVIPOLA (municipio-input) con su casing oficial exacto, que
+            // incluye conectores en minúscula ("San José de la Montaña") —
+            // recapitalizar cada palabra los rompería ("... De La ...").
+            city: dto.city ? trimText(dto.city) : dto.city,
           },
         },
-        include: { companyProfile: true },
       });
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -164,10 +169,7 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: normalizeEmail(dto.email) },
-      include: { profile: true, companyProfile: true },
-    });
+    const user = await this.userRepository.findByEmailWithProfiles(normalizeEmail(dto.email));
 
     if (!user) {
       throw new UnauthorizedException('Credenciales incorrectas');
@@ -197,10 +199,7 @@ export class AuthService {
   }
 
   async loginCompany(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: normalizeEmail(dto.email) },
-      include: { profile: true, companyProfile: true },
-    });
+    const user = await this.userRepository.findByEmailWithProfiles(normalizeEmail(dto.email));
 
     if (!user) {
       throw new UnauthorizedException('Credenciales incorrectas');
@@ -237,9 +236,7 @@ export class AuthService {
    * script de un solo uso corrido a mano contra la base.
    */
   async loginAdmin(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: normalizeEmail(dto.email) },
-    });
+    const user = await this.userRepository.findByEmail(normalizeEmail(dto.email));
 
     if (!user) {
       throw new UnauthorizedException('Credenciales incorrectas');
@@ -287,7 +284,7 @@ export class AuthService {
       throw new UnauthorizedException('Token temporal no válido para este paso.');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+    const user = await this.userRepository.findById(payload.sub);
     if (!user || user.role !== UserRole.ADMIN || !user.twoFactorEnabled || !user.twoFactorSecret) {
       throw new UnauthorizedException('Credenciales incorrectas');
     }
@@ -314,7 +311,7 @@ export class AuthService {
    * carga manual.
    */
   async setupTwoFactor(userId: number) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user || user.role !== UserRole.ADMIN) {
       throw new ForbiddenException('Solo disponible para cuentas de administrador');
     }
@@ -323,14 +320,14 @@ export class AuthService {
     }
 
     const secret = generateSecret();
-    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorSecret: secret } });
+    await this.userRepository.update(userId, { twoFactorSecret: secret });
 
     return { secret, otpauthUrl: generateURI({ issuer: TOTP_ISSUER, label: user.email, secret }) };
   }
 
   /** Confirma el primer código TOTP y activa 2FA — ver `setupTwoFactor()`. */
   async confirmTwoFactorSetup(userId: number, code: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user || user.role !== UserRole.ADMIN || !user.twoFactorSecret) {
       throw new BadRequestException('No hay una configuración de 2FA en curso — pedí un secreto nuevo primero');
     }
@@ -340,13 +337,13 @@ export class AuthService {
       throw new BadRequestException('Código incorrecto');
     }
 
-    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: true } });
+    await this.userRepository.update(userId, { twoFactorEnabled: true });
     return { message: '2FA activado correctamente' };
   }
 
   /** Exige el código TOTP vigente antes de desactivar — evita que un token de sesión robado alcance por sí solo para bajar esta protección. */
   async disableTwoFactor(userId: number, code: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.userRepository.findById(userId);
     if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
       throw new BadRequestException('El 2FA no está activado en esta cuenta');
     }
@@ -356,7 +353,7 @@ export class AuthService {
       throw new BadRequestException('Código incorrecto');
     }
 
-    await this.prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: false, twoFactorSecret: null } });
+    await this.userRepository.update(userId, { twoFactorEnabled: false, twoFactorSecret: null });
     return { message: '2FA desactivado' };
   }
 
@@ -371,19 +368,17 @@ export class AuthService {
   async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
     const genericResponse = { message: 'Si el correo está registrado, vas a recibir un enlace para restablecer tu contraseña.' };
     const email = normalizeEmail(dto.email);
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.userRepository.findByEmail(email);
     if (!user) return genericResponse;
 
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = this.hashToken(rawToken);
 
-    await this.prisma.verificationToken.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        type: VerificationTokenType.RESET_PASSWORD,
-        expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
-      },
+    await this.verificationTokenRepository.create({
+      userId: user.id,
+      tokenHash,
+      type: VerificationTokenType.RESET_PASSWORD,
+      expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
     });
 
     const resetUrl = `${process.env['FRONTEND_URL'] || 'http://localhost:4200'}/reset-password?token=${rawToken}`;
@@ -411,7 +406,7 @@ export class AuthService {
     }
 
     const tokenHash = this.hashToken(dto.token);
-    const record = await this.prisma.verificationToken.findUnique({ where: { tokenHash } });
+    const record = await this.verificationTokenRepository.findByTokenHash(tokenHash);
 
     if (
       !record ||
@@ -424,10 +419,12 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.newPassword, 10);
 
-    await this.prisma.$transaction([
-      this.prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
-      this.prisma.verificationToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
-    ]);
+    // Forma callback (no array): ver la nota del constructor sobre por qué
+    // `$transaction([...])` no es compatible con métodos de repositorio.
+    await this.prisma.$transaction(async (tx) => {
+      await this.userRepository.update(record.userId, { passwordHash }, tx);
+      await this.verificationTokenRepository.markUsed(record.id, tx);
+    });
 
     return { message: 'Contraseña actualizada. Ya puedes iniciar sesión con la nueva.' };
   }
@@ -444,13 +441,11 @@ export class AuthService {
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = this.hashToken(rawToken);
 
-    await this.prisma.verificationToken.create({
-      data: {
-        userId,
-        tokenHash,
-        type: VerificationTokenType.VERIFY_EMAIL,
-        expiresAt: new Date(Date.now() + VERIFY_TOKEN_TTL_MS),
-      },
+    await this.verificationTokenRepository.create({
+      userId,
+      tokenHash,
+      type: VerificationTokenType.VERIFY_EMAIL,
+      expiresAt: new Date(Date.now() + VERIFY_TOKEN_TTL_MS),
     });
 
     const verifyUrl = `${process.env['FRONTEND_URL'] || 'http://localhost:4200'}/verify-email?token=${rawToken}`;
@@ -469,7 +464,7 @@ export class AuthService {
 
   async verifyEmail(dto: VerifyEmailDto): Promise<{ message: string }> {
     const tokenHash = this.hashToken(dto.token);
-    const record = await this.prisma.verificationToken.findUnique({ where: { tokenHash } });
+    const record = await this.verificationTokenRepository.findByTokenHash(tokenHash);
 
     if (
       !record ||
@@ -480,10 +475,11 @@ export class AuthService {
       throw new BadRequestException('El enlace no es válido o ya venció. Pide uno nuevo desde la pantalla de inicio de sesión.');
     }
 
-    await this.prisma.$transaction([
-      this.prisma.user.update({ where: { id: record.userId }, data: { emailVerified: true } }),
-      this.prisma.verificationToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
-    ]);
+    // Forma callback (no array): misma razón que en `resetPassword()`.
+    await this.prisma.$transaction(async (tx) => {
+      await this.userRepository.update(record.userId, { emailVerified: true }, tx);
+      await this.verificationTokenRepository.markUsed(record.id, tx);
+    });
 
     return { message: 'Correo confirmado. Ya puedes iniciar sesión.' };
   }
@@ -498,7 +494,7 @@ export class AuthService {
   async resendVerification(dto: ResendVerificationDto): Promise<{ message: string }> {
     const genericResponse = { message: 'Si el correo está registrado y todavía no fue confirmado, te reenviamos el enlace de confirmación.' };
     const email = normalizeEmail(dto.email);
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.userRepository.findByEmail(email);
     if (!user || user.emailVerified) return genericResponse;
 
     await this.sendVerificationEmail(user.id, user.email);
@@ -510,10 +506,7 @@ export class AuthService {
   }
 
   async me(userId: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: { profile: true, companyProfile: true },
-    });
+    const user = await this.userRepository.findByIdWithProfiles(userId);
 
     if (!user) {
       throw new UnauthorizedException('Usuario no encontrado');
@@ -564,7 +557,7 @@ export class AuthService {
     const base = email.split('@')[0].replace(/[^a-zA-Z0-9_-]/g, '') + (attempt > 0 ? `-${Date.now().toString(36)}` : '');
     let slug = base;
     let counter = 1;
-    while (await this.prisma.profile.findUnique({ where: { slug } })) {
+    while (await this.profileRepository.findBySlug(slug)) {
       slug = `${base}-${counter}`;
       counter++;
     }

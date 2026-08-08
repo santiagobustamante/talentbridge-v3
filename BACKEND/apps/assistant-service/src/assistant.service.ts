@@ -1,7 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '@app/database';
+import { UserRole, JobOfferStatus, JobApplicationStatus } from '@app/database';
 import { DeepSeekService, DeepSeekChatMessage } from '@app/common';
 import { computeSkillMatch } from '@app/contracts';
+import {
+  UserRepository,
+  ProfileRepository,
+  JobOfferRepository,
+  JobApplicationRepository,
+  ConversationRepository,
+  ChatMessageRepository,
+} from '@app/repository';
 import { ChatHistoryItemDto } from './dto/assistant-message.dto';
 
 /**
@@ -99,7 +107,12 @@ export class AssistantService {
   private readonly logger = new Logger(AssistantService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
+    private readonly profileRepository: ProfileRepository,
+    private readonly jobOfferRepository: JobOfferRepository,
+    private readonly jobApplicationRepository: JobApplicationRepository,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly chatMessageRepository: ChatMessageRepository,
     private readonly deepSeek: DeepSeekService,
   ) {}
 
@@ -125,10 +138,7 @@ export class AssistantService {
     message: string,
     history?: ChatHistoryItemDto[],
   ): Promise<AssistantResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: { profile: { include: { skills: true } }, companyProfile: true },
-    });
+    const user = await this.userRepository.findByIdWithProfileAndSkills(userId);
 
     const isCandidate = role === 'CANDIDATE';
     const userName = user?.profile?.fullName || user?.companyProfile?.companyName || 'Usuario';
@@ -262,12 +272,7 @@ Responde ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes n
   private async getCandidateJobMatches(
     candidateSkills: { normalizedName: string; level: string }[],
   ): Promise<{ text: string; topJobs: JobMatchCardData[] }> {
-    const jobs = await this.prisma.jobOffer.findMany({
-      where: { status: 'PUBLISHED' },
-      include: { company: { select: { companyProfile: { select: { companyName: true } } } } },
-      orderBy: { createdAt: 'desc' },
-      take: 40,
-    });
+    const jobs = await this.jobOfferRepository.findPublishedForMatching(40);
 
     if (jobs.length === 0) {
       return { text: 'No hay ofertas publicadas en este momento.', topJobs: [] };
@@ -303,21 +308,13 @@ Responde ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes n
   private async getCompanyCandidateMatches(
     companyUserId: number,
   ): Promise<{ text: string; topCandidates: CandidateCardData[] }> {
-    const jobs = await this.prisma.jobOffer.findMany({
-      where: { companyId: companyUserId, status: 'PUBLISHED' },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    });
+    const jobs = await this.jobOfferRepository.findPublishedForCompanyMatching(companyUserId, 5);
 
     if (jobs.length === 0) {
       return { text: 'Esta empresa no tiene ofertas publicadas actualmente.', topCandidates: [] };
     }
 
-    const candidates = await this.prisma.profile.findMany({
-      where: { isPublished: true },
-      include: { skills: true },
-      take: 200,
-    });
+    const candidates = await this.profileRepository.findPublishedWithSkillsCapped(200);
 
     const lines: string[] = [];
     const topCandidatesByKey = new Map<string, CandidateCardData>();
@@ -362,25 +359,21 @@ Responde ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes n
    * como contexto verificable en vez de que el modelo las estime.
    */
   private async getCandidateStats(userId: number) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-      include: { skills: true, experiences: true, educations: true, projects: true },
-    });
+    // `findByUserIdWithFullDetails` trae también `views` (no se usa acá) —
+    // se reusa igual en vez de armar un método casi idéntico solo para
+    // omitir esa relación: el costo extra es despreciable y evita duplicar
+    // el mismo include en dos lugares.
+    const profile = await this.profileRepository.findByUserIdWithFullDetails(userId);
 
-    const applicationsCount = await this.prisma.jobApplication.count({ where: { candidateId: userId } });
+    const applicationsCount = await this.jobApplicationRepository.countForCandidate(userId);
 
-    const conversations = await this.prisma.conversation.findMany({
-      where: { candidateId: userId },
-      select: { id: true },
-    });
+    const conversations = await this.conversationRepository.findIdsForUser(userId, UserRole.CANDIDATE);
 
     const unreadMessages = conversations.length > 0
-      ? await this.prisma.chatMessage.count({
-          where: { conversationId: { in: conversations.map((c) => c.id) }, senderId: { not: userId }, readAt: null },
-        })
+      ? await this.chatMessageRepository.countUnreadAcrossConversations(conversations.map((c) => c.id), userId)
       : 0;
 
-    const availableJobs = await this.prisma.jobOffer.count({ where: { status: 'PUBLISHED' } });
+    const availableJobs = await this.jobOfferRepository.countPublished();
 
     const hasBasicInfo = !!(profile?.fullName && profile?.professionalTitle);
     let profileCompletion = 0;
@@ -406,22 +399,15 @@ Responde ÚNICAMENTE con un objeto JSON con esta forma exacta, sin texto antes n
    * totales/activas, postulaciones totales/pendientes y mensajes sin leer.
    */
   private async getCompanyStats(userId: number) {
-    const totalJobs = await this.prisma.jobOffer.count({ where: { companyId: userId } });
-    const activeJobs = await this.prisma.jobOffer.count({ where: { companyId: userId, status: 'PUBLISHED' } });
-    const totalApplications = await this.prisma.jobApplication.count({ where: { jobOffer: { companyId: userId } } });
-    const pendingApplications = await this.prisma.jobApplication.count({
-      where: { jobOffer: { companyId: userId }, status: 'PENDING' },
-    });
+    const totalJobs = await this.jobOfferRepository.countForCompany(userId);
+    const activeJobs = await this.jobOfferRepository.countForCompany(userId, JobOfferStatus.PUBLISHED);
+    const totalApplications = await this.jobApplicationRepository.countForCompany(userId);
+    const pendingApplications = await this.jobApplicationRepository.countForCompany(userId, JobApplicationStatus.PENDING);
 
-    const conversations = await this.prisma.conversation.findMany({
-      where: { companyId: userId },
-      select: { id: true },
-    });
+    const conversations = await this.conversationRepository.findIdsForUser(userId, UserRole.COMPANY);
 
     const unreadMessages = conversations.length > 0
-      ? await this.prisma.chatMessage.count({
-          where: { conversationId: { in: conversations.map((c) => c.id) }, senderId: { not: userId }, readAt: null },
-        })
+      ? await this.chatMessageRepository.countUnreadAcrossConversations(conversations.map((c) => c.id), userId)
       : 0;
 
     return {

@@ -35,7 +35,7 @@
     "build:assistant": "nest build assistant-service",
     "build:dashboard": "nest build dashboard-service",
     "build:admin": "nest build admin-service",
-    "build:libs": "nest build database-lib && nest build auth-lib && nest build common-lib && nest build contracts-lib && nest build events-lib",
+    "build:libs": "nest build database-lib && nest build auth-lib && nest build common-lib && nest build contracts-lib && nest build events-lib && nest build repository-lib",
     "build:all": "npm run build:libs && npm run build:gateway && npm run build:auth && npm run build:candidate && npm run build:portfolio && npm run build:company && npm run build:jobs && npm run build:applications && npm run build:chat && npm run build:assistant && npm run build:dashboard && npm run build:admin",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -133,7 +133,8 @@
       "^@app/auth(.*)$": "<rootDir>/libs/auth/src/$1",
       "^@app/common(.*)$": "<rootDir>/libs/common/src/$1",
       "^@app/contracts(.*)$": "<rootDir>/libs/contracts/src/$1",
-      "^@app/events(.*)$": "<rootDir>/libs/events/src/$1"
+      "^@app/events(.*)$": "<rootDir>/libs/events/src/$1",
+      "^@app/repository(.*)$": "<rootDir>/libs/repository/src/$1"
     },
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

@@ -5,10 +5,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule, PrismaService } from '@app/database';
 import { AllExceptionsFilter, CommonModule, IpThrottlerGuard, getDynamicRateLimit } from '@app/common';
 import { AuthLibModule } from '@app/auth';
-import { CompanyProfileController } from './company-profile.controller';
-import { CompanyProfileService } from './company-profile.service';
-import { CandidateSearchController } from './candidate-search.controller';
-import { CandidateSearchService } from './candidate-search.service';
+import { RepositoryModule } from '@app/repository';
+import { CompanyProfileController } from './company-profile/company-profile.controller';
+import { CompanyProfileService } from './company-profile/company-profile.service';
+import { CandidateSearchController } from './candidate-search/candidate-search.controller';
+import { CandidateSearchService } from './candidate-search/candidate-search.service';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CandidateSearchService } from './candidate-search.service';
     PrismaModule,
     CommonModule,
     AuthLibModule,
+    RepositoryModule,
     // 300 req/min por IP — frena abuso/flood sin afectar uso normal. Mismo
     // patrón que auth-service (barrido 2026-07-26). Límite dinámico
     // (`RATE_LIMIT_DEFAULT`, Fase 11) — ver `getDynamicRateLimit`.
